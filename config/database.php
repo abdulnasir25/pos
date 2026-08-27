@@ -17,7 +17,7 @@ return [
     |
     */
 
-    'default' => env('DB_CONNECTION', 'sqlite'),
+    'default' => env('DB_CONNECTION', 'landlord'),
 
     /*
     |--------------------------------------------------------------------------
@@ -31,6 +31,25 @@ return [
     */
 
     'connections' => [
+
+        // The single platform database: tenants, plans, subscriptions,
+        // platform-level admins. Never holds business data.
+        'landlord' => [
+            'driver' => 'sqlite',
+            'database' => env('LANDLORD_DB_DATABASE', database_path('landlord.sqlite')),
+            'prefix' => '',
+            'foreign_key_constraints' => true,
+        ],
+
+        // Template only — never queried directly. TenantConnectionFactory
+        // clones this array at runtime and swaps in the resolved tenant's
+        // own database before binding it under the 'tenant' name.
+        'tenant' => [
+            'driver' => 'sqlite',
+            'database' => null,
+            'prefix' => '',
+            'foreign_key_constraints' => true,
+        ],
 
         'sqlite' => [
             'driver' => 'sqlite',
