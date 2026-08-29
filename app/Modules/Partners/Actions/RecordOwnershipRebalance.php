@@ -2,6 +2,7 @@
 
 namespace App\Modules\Partners\Actions;
 
+use App\Modules\AuditLog\Actions\RecordAuditLog;
 use App\Modules\Partners\Exceptions\InvalidOwnershipDateRangeException;
 use App\Modules\Partners\Exceptions\OwnershipPercentagesMustSumTo100Exception;
 use App\Modules\Partners\Exceptions\RebalanceMustCoverEveryActivePartnerException;
@@ -27,12 +28,15 @@ use Throwable;
  */
 class RecordOwnershipRebalance
 {
-    public function __construct(private readonly TenantContext $tenant) {}
+    public function __construct(
+        private readonly TenantContext $tenant,
+        private readonly RecordAuditLog $auditLog,
+    ) {}
 
     /**
      * @param  array<int, string>  $percentagesByPartnerId
      */
-    public function handle(array $percentagesByPartnerId, string $effectiveFrom): void
+    public function handle(array $percentagesByPartnerId, string $effectiveFrom, ?int $performedBy = null): void
     {
         $this->tenant->get();
 
@@ -45,6 +49,12 @@ class RecordOwnershipRebalance
             $activePartnerIds = $connection->table('partners')
                 ->where('status', 'active')
                 ->pluck('id')
+                ->all();
+
+            $previousPercentages = $connection->table('partner_ownership_periods')
+                ->whereIn('partner_id', $activePartnerIds)
+                ->whereNull('effective_to')
+                ->pluck('percentage', 'partner_id')
                 ->all();
 
             $missing = array_diff($activePartnerIds, array_keys($percentagesByPartnerId));
@@ -96,6 +106,23 @@ class RecordOwnershipRebalance
             }
 
             $pdo->exec('COMMIT');
+
+            // Normalized to 2dp explicitly: SQLite's NUMERIC storage can
+            // round-trip a raw-query decimal value like '50.00' back as
+            // '50' — the audit log's snapshot must stay in the same
+            // canonical format regardless of that storage quirk.
+            $this->auditLog->handle(
+                userId: $performedBy,
+                action: 'partner_ownership.rebalanced',
+                oldValues: [
+                    'percentages' => array_map(fn ($p) => bcadd('0', (string) $p, 2), $previousPercentages),
+                    'effective_from' => $effectiveFrom,
+                ],
+                newValues: [
+                    'percentages' => array_map(fn ($p) => bcadd('0', (string) $p, 2), $percentagesByPartnerId),
+                    'effective_from' => $effectiveFrom,
+                ],
+            );
         } catch (Throwable $e) {
             $pdo->exec('ROLLBACK');
 
