@@ -436,6 +436,8 @@ Purpose: standalone payment, not attached to any specific sale — the gap flagg
 
 **Walk-in rule preserved**: a ledger entry always requires a real `customer_id` — there is structurally nowhere for walk-in credit to be recorded, exactly as the confirmed rule requires.
 
+**Implemented 2026-08-29**, together with §I's `supplier_ledger_entries` (symmetric — see that section's addendum note). `ConfirmSale`/`CancelSale`/`ReturnSaleItems` were extended to write itemized entries alongside their existing `customers.balance` maintenance — a full charge entry plus one payment entry per `SalePayment` on confirmation (even when they net to zero, since both events genuinely happened), an `adjustment` entry on cancellation, a `return_credit` entry on a return. `RecordCustomerPayment` (new) handles the standalone "pays down their tab" case. Every write is covered by a reconciliation assertion: `SUM(customer_ledger_entries.amount)` for a customer always equals `customers.balance`.
+
 ---
 
 ## I. Supplier + Purchase
@@ -472,11 +474,9 @@ Mirror the shape of `sale_items`/`sale_payments`/`sale_returns`/`sale_return_ite
 - `purchase_items` has no `unit_cost_snapshot` alongside `unit_cost` — on a Sale those are two different facts (price charged vs. historical cost basis); on a Purchase there's only one figure, since `unit_cost` **becomes** the new weighted-average cost basis.
 - `purchase_return_items` has no `condition` column — that field exists on the Sales side to route a damaged customer return to Inventory's `RecordDamage` instead of a normal restock; a purchase return always sends stock back out to the supplier (`RecordPurchaseReturn`), so there's no equivalent branch.
 
-`supplier_ledger_entries` (also listed below) was **not** built this pass — `customer_ledger_entries` (§H) hasn't been built either yet, and building the supplier side first would be asymmetric. Both remain a future "ledgers" pass; `suppliers.balance` is a maintained cache in the meantime, exactly like `customers.balance` today.
-
 ### `supplier_ledger_entries` — New table
 
-Symmetric to `customer_ledger_entries` — purchase_charge · payment · return_credit · adjustment.
+Symmetric to `customer_ledger_entries` — purchase_charge · payment · return_credit · adjustment. Implemented 2026-08-29 alongside the customer-side ledger pass (see §H's addendum) — `ConfirmPurchase`/`CancelPurchase`/`ReturnPurchaseItems` write itemized entries the same way. No standalone `supplier_payments` table: unlike the customer side, nothing in the confirmed design calls for a supplier payment not tied to a specific purchase, so none was built.
 
 ### Inventory needs no schema change for Purchases to arrive
 

@@ -2,7 +2,9 @@
 
 namespace App\Modules\Sales\Actions;
 
+use App\Modules\Customers\Enums\CustomerLedgerEntryType;
 use App\Modules\Customers\Models\Customer;
+use App\Modules\Customers\Models\CustomerLedgerEntry;
 use App\Modules\Inventory\Actions\RecordSaleReturn;
 use App\Modules\Products\Models\Product;
 use App\Modules\Sales\Enums\SaleStatus;
@@ -45,6 +47,15 @@ class CancelSale
 
             if ($sale->customer_id !== null && bccomp((string) $sale->balance_due, '0.00', 2) === 1) {
                 Customer::where('id', $sale->customer_id)->decrement('balance', $sale->balance_due);
+
+                CustomerLedgerEntry::create([
+                    'customer_id' => $sale->customer_id,
+                    'entry_type' => CustomerLedgerEntryType::Adjustment,
+                    'amount' => bcmul((string) $sale->balance_due, '-1', 2),
+                    'reference_type' => Sale::class,
+                    'reference_id' => $sale->id,
+                    'entry_date' => now()->toDateString(),
+                ]);
             }
 
             $sale->update([

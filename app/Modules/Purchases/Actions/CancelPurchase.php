@@ -7,7 +7,9 @@ use App\Modules\Products\Models\Product;
 use App\Modules\Purchases\Enums\PurchaseStatus;
 use App\Modules\Purchases\Exceptions\InvalidPurchaseStateException;
 use App\Modules\Purchases\Models\Purchase;
+use App\Modules\Suppliers\Enums\SupplierLedgerEntryType;
 use App\Modules\Suppliers\Models\Supplier;
+use App\Modules\Suppliers\Models\SupplierLedgerEntry;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -44,6 +46,15 @@ class CancelPurchase
 
             if (bccomp((string) $purchase->balance_payable, '0.00', 2) === 1) {
                 Supplier::where('id', $purchase->supplier_id)->decrement('balance', $purchase->balance_payable);
+
+                SupplierLedgerEntry::create([
+                    'supplier_id' => $purchase->supplier_id,
+                    'entry_type' => SupplierLedgerEntryType::Adjustment,
+                    'amount' => bcmul((string) $purchase->balance_payable, '-1', 2),
+                    'reference_type' => Purchase::class,
+                    'reference_id' => $purchase->id,
+                    'entry_date' => now()->toDateString(),
+                ]);
             }
 
             $purchase->update([
