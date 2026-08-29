@@ -2,6 +2,7 @@
 
 use App\Modules\Access\Http\Controllers\DashboardController;
 use App\Modules\Access\Http\Controllers\LoginController;
+use App\Modules\Expenses\Http\Controllers\ExpensesController;
 use App\Modules\Partners\Http\Controllers\PartnersController;
 use App\Modules\Sales\Http\Controllers\PosController;
 use App\Modules\Tenancy\Support\TenantContext;
@@ -35,6 +36,13 @@ Route::middleware(['auth', 'permission:partners.manage'])->group(function () {
     Route::post('/partners/capital', [PartnersController::class, 'storeCapital'])->name('partners.capital');
     Route::post('/partners/loans', [PartnersController::class, 'storeLoan'])->name('partners.loans');
     Route::post('/partners/repayments', [PartnersController::class, 'storeRepayment'])->name('partners.repayments');
+});
+
+Route::middleware(['auth', 'permission:expenses.manage'])->group(function () {
+    Route::get('/expenses', [ExpensesController::class, 'show'])->name('expenses');
+    Route::post('/expenses/categories', [ExpensesController::class, 'storeCategory'])->name('expenses.categories.store');
+    Route::post('/expenses', [ExpensesController::class, 'storeExpense'])->name('expenses.store');
+    Route::post('/expenses/corrections', [ExpensesController::class, 'storeCorrection'])->name('expenses.corrections.store');
 });
 
 Route::get('/_tenant/whoami', function (TenantContext $tenants) {
