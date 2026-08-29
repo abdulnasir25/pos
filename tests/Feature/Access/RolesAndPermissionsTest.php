@@ -109,9 +109,12 @@ class RolesAndPermissionsTest extends TestCase
 
     public function test_a_permission_can_be_created(): void
     {
-        $permission = app(CreatePermission::class)->handle('purchases.manage', 'Manage supplier purchases');
+        // A deliberately fictional slug, not a real module's — every
+        // real one now exists in the baseline seed by the time this
+        // runs, and this test's whole point is creating a NEW one.
+        $permission = app(CreatePermission::class)->handle('widgets.manage', 'Manage widgets');
 
-        $this->assertSame('purchases.manage', $permission->slug);
+        $this->assertSame('widgets.manage', $permission->slug);
     }
 
     public function test_creating_a_permission_with_a_duplicate_slug_fails(): void
