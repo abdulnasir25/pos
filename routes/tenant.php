@@ -7,6 +7,7 @@ use App\Modules\AuditLog\Http\Controllers\AuditLogController;
 use App\Modules\CashRegister\Http\Controllers\CashRegisterController;
 use App\Modules\Commission\Http\Controllers\CommissionController;
 use App\Modules\Customers\Http\Controllers\CustomersController;
+use App\Modules\Employees\Http\Controllers\EmployeesController;
 use App\Modules\Expenses\Http\Controllers\ExpensesController;
 use App\Modules\Partners\Http\Controllers\PartnersController;
 use App\Modules\Products\Http\Controllers\ProductsController;
@@ -106,6 +107,18 @@ Route::middleware(['auth', 'permission:customers.manage'])->group(function () {
     Route::get('/customers', [CustomersController::class, 'show'])->name('customers');
     Route::post('/customers', [CustomersController::class, 'store'])->name('customers.store');
     Route::post('/customers/{customer}/payments', [CustomersController::class, 'storePayment'])->name('customers.payments.store');
+});
+
+Route::get('/employees', [EmployeesController::class, 'show'])->middleware(['auth', 'permission:employees.view'])->name('employees');
+
+Route::middleware(['auth', 'permission:employees.manage'])->group(function () {
+    Route::post('/employees', [EmployeesController::class, 'store'])->name('employees.store');
+    Route::post('/employees/{employee}/status', [EmployeesController::class, 'storeStatus'])->name('employees.status.store');
+});
+
+Route::middleware(['auth', 'permission:salaries.manage'])->group(function () {
+    Route::post('/employees/{employee}/salary', [EmployeesController::class, 'storeSalary'])->name('employees.salary.store');
+    Route::post('/employees/{employee}/salary-payments', [EmployeesController::class, 'storeSalaryPayment'])->name('employees.salary-payments.store');
 });
 
 Route::get('/_tenant/whoami', function (TenantContext $tenants) {
