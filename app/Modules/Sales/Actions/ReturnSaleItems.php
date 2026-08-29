@@ -2,7 +2,9 @@
 
 namespace App\Modules\Sales\Actions;
 
+use App\Modules\Customers\Enums\CustomerLedgerEntryType;
 use App\Modules\Customers\Models\Customer;
+use App\Modules\Customers\Models\CustomerLedgerEntry;
 use App\Modules\Inventory\Actions\RecordSaleReturn;
 use App\Modules\Products\Models\Product;
 use App\Modules\Sales\Enums\SaleStatus;
@@ -85,6 +87,15 @@ class ReturnSaleItems
 
             if ($sale->customer_id !== null) {
                 Customer::where('id', $sale->customer_id)->decrement('balance', $refundTotal);
+
+                CustomerLedgerEntry::create([
+                    'customer_id' => $sale->customer_id,
+                    'entry_type' => CustomerLedgerEntryType::ReturnCredit,
+                    'amount' => bcmul($refundTotal, '-1', 2),
+                    'reference_type' => SaleReturn::class,
+                    'reference_id' => $return->id,
+                    'entry_date' => now()->toDateString(),
+                ]);
             }
 
             if ($this->isFullyReturned($sale)) {

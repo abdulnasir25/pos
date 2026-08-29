@@ -8,7 +8,9 @@ use App\Modules\Purchases\DTOs\PurchasePaymentAllocation;
 use App\Modules\Purchases\Enums\PurchaseStatus;
 use App\Modules\Purchases\Exceptions\OverpaymentException;
 use App\Modules\Purchases\Models\Purchase;
+use App\Modules\Suppliers\Enums\SupplierLedgerEntryType;
 use App\Modules\Suppliers\Models\Supplier;
+use App\Modules\Suppliers\Models\SupplierLedgerEntry;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
@@ -104,6 +106,29 @@ class ConfirmPurchase
                     'payment_method_id' => $payment->paymentMethodId,
                     'amount' => $payment->amount,
                     'paid_at' => now(),
+                ]);
+            }
+
+            // Itemized, mirroring ConfirmSale's customer-ledger treatment:
+            // a full charge entry plus one payment entry per
+            // PurchasePayment, regardless of whether they net to zero.
+            SupplierLedgerEntry::create([
+                'supplier_id' => $supplierId,
+                'entry_type' => SupplierLedgerEntryType::PurchaseCharge,
+                'amount' => $total,
+                'reference_type' => Purchase::class,
+                'reference_id' => $purchase->id,
+                'entry_date' => now()->toDateString(),
+            ]);
+
+            foreach ($payments as $payment) {
+                SupplierLedgerEntry::create([
+                    'supplier_id' => $supplierId,
+                    'entry_type' => SupplierLedgerEntryType::Payment,
+                    'amount' => bcmul($payment->amount, '-1', 2),
+                    'reference_type' => Purchase::class,
+                    'reference_id' => $purchase->id,
+                    'entry_date' => now()->toDateString(),
                 ]);
             }
 

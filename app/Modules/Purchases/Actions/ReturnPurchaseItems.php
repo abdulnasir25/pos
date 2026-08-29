@@ -10,7 +10,9 @@ use App\Modules\Purchases\Exceptions\ReturnQuantityExceedsAvailableException;
 use App\Modules\Purchases\Models\Purchase;
 use App\Modules\Purchases\Models\PurchaseItem;
 use App\Modules\Purchases\Models\PurchaseReturn;
+use App\Modules\Suppliers\Enums\SupplierLedgerEntryType;
 use App\Modules\Suppliers\Models\Supplier;
+use App\Modules\Suppliers\Models\SupplierLedgerEntry;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -80,6 +82,15 @@ class ReturnPurchaseItems
             $return->update(['credit_amount' => $creditTotal]);
 
             Supplier::where('id', $purchase->supplier_id)->decrement('balance', $creditTotal);
+
+            SupplierLedgerEntry::create([
+                'supplier_id' => $purchase->supplier_id,
+                'entry_type' => SupplierLedgerEntryType::ReturnCredit,
+                'amount' => bcmul($creditTotal, '-1', 2),
+                'reference_type' => PurchaseReturn::class,
+                'reference_id' => $return->id,
+                'entry_date' => now()->toDateString(),
+            ]);
 
             if ($this->isFullyReturned($purchase)) {
                 $purchase->update(['status' => PurchaseStatus::Returned]);

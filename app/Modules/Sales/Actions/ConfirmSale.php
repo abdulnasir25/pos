@@ -2,7 +2,9 @@
 
 namespace App\Modules\Sales\Actions;
 
+use App\Modules\Customers\Enums\CustomerLedgerEntryType;
 use App\Modules\Customers\Models\Customer;
+use App\Modules\Customers\Models\CustomerLedgerEntry;
 use App\Modules\Inventory\Actions\RecordSaleStockOut;
 use App\Modules\Sales\DTOs\CartLine;
 use App\Modules\Sales\DTOs\PaymentAllocation;
@@ -115,8 +117,36 @@ class ConfirmSale
                 ]);
             }
 
-            if ($customerId !== null && bccomp($balanceDue, '0.00', 2) === 1) {
-                Customer::where('id', $customerId)->increment('balance', $balanceDue);
+            if ($customerId !== null) {
+                // Itemized, not just the net effect: a full charge entry
+                // plus one payment entry per SalePayment, even when they
+                // net to zero (a registered customer paying in full) —
+                // both events genuinely happened and belong in the
+                // reconcilable history. SUM(customer_ledger_entries.amount)
+                // for this customer must always equal customers.balance.
+                CustomerLedgerEntry::create([
+                    'customer_id' => $customerId,
+                    'entry_type' => CustomerLedgerEntryType::SaleCharge,
+                    'amount' => $total,
+                    'reference_type' => Sale::class,
+                    'reference_id' => $sale->id,
+                    'entry_date' => now()->toDateString(),
+                ]);
+
+                foreach ($payments as $payment) {
+                    CustomerLedgerEntry::create([
+                        'customer_id' => $customerId,
+                        'entry_type' => CustomerLedgerEntryType::Payment,
+                        'amount' => bcmul($payment->amount, '-1', 2),
+                        'reference_type' => Sale::class,
+                        'reference_id' => $sale->id,
+                        'entry_date' => now()->toDateString(),
+                    ]);
+                }
+
+                if (bccomp($balanceDue, '0.00', 2) === 1) {
+                    Customer::where('id', $customerId)->increment('balance', $balanceDue);
+                }
             }
 
             return $sale->fresh(['items', 'payments']);
