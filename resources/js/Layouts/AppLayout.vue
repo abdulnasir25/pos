@@ -25,6 +25,7 @@ const navItems = [
     { label: 'Accounting', href: '/accounting', permission: 'accounting.view' },
     { label: 'Reports', href: '/reports', permission: 'reports.view' },
     { label: 'Audit Log', href: '/audit-log', permission: 'audit_logs.view' },
+    { label: 'My Access', href: '/access', permission: null },
 ];
 
 const visibleNavItems = computed(() => {
