@@ -9,6 +9,7 @@ use App\Modules\Commission\Http\Controllers\CommissionController;
 use App\Modules\Customers\Http\Controllers\CustomersController;
 use App\Modules\Employees\Http\Controllers\EmployeesController;
 use App\Modules\Expenses\Http\Controllers\ExpensesController;
+use App\Modules\FinancialPeriods\Http\Controllers\FinancialPeriodsController;
 use App\Modules\Partners\Http\Controllers\PartnersController;
 use App\Modules\Products\Http\Controllers\ProductsController;
 use App\Modules\Purchases\Http\Controllers\PurchasesController;
@@ -119,6 +120,14 @@ Route::middleware(['auth', 'permission:employees.manage'])->group(function () {
 Route::middleware(['auth', 'permission:salaries.manage'])->group(function () {
     Route::post('/employees/{employee}/salary', [EmployeesController::class, 'storeSalary'])->name('employees.salary.store');
     Route::post('/employees/{employee}/salary-payments', [EmployeesController::class, 'storeSalaryPayment'])->name('employees.salary-payments.store');
+});
+
+Route::middleware(['auth', 'permission:financial_periods.manage'])->group(function () {
+    Route::get('/financial-periods', [FinancialPeriodsController::class, 'show'])->name('financial-periods');
+    Route::post('/financial-periods', [FinancialPeriodsController::class, 'store'])->name('financial-periods.store');
+    Route::post('/financial-periods/{period}/calculation', [FinancialPeriodsController::class, 'storeCalculation'])->name('financial-periods.calculation.store');
+    Route::post('/financial-periods/{period}/review', [FinancialPeriodsController::class, 'storeReview'])->name('financial-periods.review.store');
+    Route::post('/financial-periods/{period}/close', [FinancialPeriodsController::class, 'storeClose'])->name('financial-periods.close.store');
 });
 
 Route::get('/_tenant/whoami', function (TenantContext $tenants) {
