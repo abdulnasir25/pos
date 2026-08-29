@@ -54,9 +54,20 @@ class CreateFinancialPeriod
         $pdo->exec('BEGIN IMMEDIATE');
 
         try {
+            // whereDate(), not where(): Eloquent's 'date' cast writes a
+            // full "Y-m-d H:i:s" value (see FinancialPeriod::casts()),
+            // so a plain string '<=' / '>=' against a bare 'Y-m-d'
+            // argument silently misses the boundary case where one
+            // period's start/end date exactly equals another's — e.g.
+            // stored "2026-01-31 00:00:00" is NOT <= plain "2026-01-31"
+            // as a string, even though the dates are equal. whereDate()
+            // wraps the column in SQL DATE(...) so only the calendar
+            // date is compared, matching how the two values are meant
+            // to be read. Same root cause as the ResolveSalaryForDate
+            // bug fixed earlier in the Employees module.
             $overlaps = $connection->table('financial_periods')
-                ->where('period_start', '<=', $periodEnd)
-                ->where('period_end', '>=', $periodStart)
+                ->whereDate('period_start', '<=', $periodEnd)
+                ->whereDate('period_end', '>=', $periodStart)
                 ->exists();
 
             if ($overlaps) {

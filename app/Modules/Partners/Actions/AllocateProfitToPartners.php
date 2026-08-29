@@ -71,9 +71,14 @@ class AllocateProfitToPartners
      */
     private function buildSubRanges(FinancialPeriod $period): array
     {
-        $ownershipPeriods = PartnerOwnershipPeriod::where('effective_from', '<=', $period->period_end)
+        // whereDate(), not where(): comparing a plain-date column against
+        // a Carbon value (which stringifies with a time component) or a
+        // full-datetime-cast column breaks exactly at the boundary where
+        // one date equals the other — same root cause as the
+        // ResolveSalaryForDate / CreateFinancialPeriod overlap-check bugs.
+        $ownershipPeriods = PartnerOwnershipPeriod::whereDate('effective_from', '<=', $period->period_end)
             ->where(function ($query) use ($period) {
-                $query->whereNull('effective_to')->orWhere('effective_to', '>=', $period->period_start);
+                $query->whereNull('effective_to')->orWhereDate('effective_to', '>=', $period->period_start);
             })
             ->get();
 
