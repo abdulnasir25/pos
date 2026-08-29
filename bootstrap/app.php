@@ -2,6 +2,7 @@
 
 use App\Modules\Access\Http\Middleware\HandleInertiaRequests;
 use App\Modules\Access\Http\Middleware\RequirePermission;
+use App\Modules\Platform\Console\Commands\LandlordCreateAdminCommand;
 use App\Modules\Platform\Console\Commands\TenantCreateCommand;
 use App\Modules\Platform\Console\Commands\TenantMigrateCommand;
 use App\Modules\Tenancy\Http\Middleware\IdentifyTenant;
@@ -26,12 +27,21 @@ return Application::configure(basePath: dirname(__DIR__))
         app_path('Console/Commands'),
         TenantCreateCommand::class,
         TenantMigrateCommand::class,
+        LandlordCreateAdminCommand::class,
     ])
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->alias([
             'tenant' => IdentifyTenant::class,
             'permission' => RequirePermission::class,
         ]);
+
+        // The 'landlord' guard has its own login page, outside the
+        // tenant-scoped 'login' route — an unauthenticated request to a
+        // /landlord/* route must not fall back to Authenticate's default
+        // (the tenant-scoped named route 'login').
+        $middleware->redirectGuestsTo(
+            fn (Request $request) => $request->is('landlord/*') ? '/landlord/login' : '/login',
+        );
 
         // Laravel reorders route middleware by its internal priority list,
         // not by the order they're written — the auth-checking contract
