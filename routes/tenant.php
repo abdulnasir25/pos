@@ -1,5 +1,6 @@
 <?php
 
+use App\Modules\Access\Http\Controllers\AccessController;
 use App\Modules\Access\Http\Controllers\DashboardController;
 use App\Modules\Access\Http\Controllers\LoginController;
 use App\Modules\Accounting\Http\Controllers\AccountingController;
@@ -36,6 +37,7 @@ Route::post('/login', [LoginController::class, 'store'])->middleware('guest');
 Route::post('/logout', [LoginController::class, 'destroy'])->middleware('auth');
 
 Route::get('/dashboard', [DashboardController::class, 'show'])->middleware('auth')->name('dashboard');
+Route::get('/access', [AccessController::class, 'show'])->middleware('auth')->name('access');
 
 Route::get('/pos', [PosController::class, 'show'])->middleware(['auth', 'permission:sales.create'])->name('pos');
 Route::post('/pos/sale', [PosController::class, 'store'])->middleware(['auth', 'permission:sales.create'])->name('pos.sale');
