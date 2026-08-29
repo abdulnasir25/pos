@@ -7,6 +7,7 @@ use App\Modules\CashRegister\Http\Controllers\CashRegisterController;
 use App\Modules\Commission\Http\Controllers\CommissionController;
 use App\Modules\Expenses\Http\Controllers\ExpensesController;
 use App\Modules\Partners\Http\Controllers\PartnersController;
+use App\Modules\Purchases\Http\Controllers\PurchasesController;
 use App\Modules\Reports\Http\Controllers\ReportsController;
 use App\Modules\Sales\Http\Controllers\PosController;
 use App\Modules\Tenancy\Support\TenantContext;
@@ -70,6 +71,14 @@ Route::middleware(['auth', 'permission:cash_register.manage'])->group(function (
 });
 
 Route::get('/audit-log', [AuditLogController::class, 'show'])->middleware(['auth', 'permission:audit_logs.view'])->name('audit-log');
+
+Route::middleware(['auth', 'permission:purchases.manage'])->group(function () {
+    Route::get('/purchases', [PurchasesController::class, 'show'])->name('purchases');
+    Route::post('/purchases/suppliers', [PurchasesController::class, 'storeSupplier'])->name('purchases.suppliers.store');
+    Route::post('/purchases', [PurchasesController::class, 'store'])->name('purchases.store');
+    Route::post('/purchases/{purchase}/cancel', [PurchasesController::class, 'cancel'])->name('purchases.cancel');
+    Route::post('/purchases/returns', [PurchasesController::class, 'storeReturn'])->name('purchases.returns.store');
+});
 
 Route::get('/_tenant/whoami', function (TenantContext $tenants) {
     $tenant = $tenants->get();
