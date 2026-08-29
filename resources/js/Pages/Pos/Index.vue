@@ -1,6 +1,7 @@
 <script setup>
 import { computed, ref } from 'vue';
 import { usePage, useForm } from '@inertiajs/vue3';
+import AppLayout from '../../Layouts/AppLayout.vue';
 
 const props = defineProps({
     products: { type: Array, default: () => [] },
@@ -93,12 +94,7 @@ function money(n) {
 </script>
 
 <template>
-    <div class="min-h-screen bg-stone-100">
-        <header class="flex items-center justify-between border-b border-stone-200 bg-white px-6 py-4">
-            <h1 class="text-lg font-semibold text-stone-900">Point of Sale</h1>
-            <span class="text-sm text-stone-500">{{ page.props.auth.user?.name }}</span>
-        </header>
-
+    <AppLayout title="Point of Sale">
         <div
             v-if="page.props.flash?.sale"
             class="mx-6 mt-4 rounded-lg border border-emerald-300 bg-emerald-50 px-4 py-3 text-sm text-emerald-800"
@@ -252,5 +248,5 @@ function money(n) {
                 </button>
             </section>
         </main>
-    </div>
+    </AppLayout>
 </template>

@@ -1,13 +1,13 @@
 <script setup>
 import { ref, computed, watch } from 'vue';
-import { usePage, useForm, router } from '@inertiajs/vue3';
+import { useForm, router } from '@inertiajs/vue3';
+import AppLayout from '../../Layouts/AppLayout.vue';
 
 const props = defineProps({
     accounts: { type: Array, default: () => [] },
     recentSessions: { type: Array, default: () => [] },
 });
 
-const page = usePage();
 const activePanel = ref(null);
 
 function toggle(panel) {
@@ -57,19 +57,7 @@ const closingAmounts = ref({});
 </script>
 
 <template>
-    <div class="min-h-screen bg-stone-100">
-        <header class="flex items-center justify-between border-b border-stone-200 bg-white px-6 py-4">
-            <h1 class="text-lg font-semibold text-stone-900">Cash Register</h1>
-            <span class="text-sm text-stone-500">{{ page.props.auth.user?.name }}</span>
-        </header>
-
-        <div v-if="page.props.flash?.success" class="mx-6 mt-4 rounded-lg border border-emerald-300 bg-emerald-50 px-4 py-3 text-sm text-emerald-800">
-            {{ page.props.flash.success }}
-        </div>
-        <div v-if="Object.keys(page.props.errors ?? {}).length" class="mx-6 mt-4 rounded-lg border border-red-300 bg-red-50 px-4 py-3 text-sm text-red-800">
-            <p v-for="(msg, key) in page.props.errors" :key="key">{{ msg }}</p>
-        </div>
-
+    <AppLayout title="Cash Register">
         <main class="mx-auto max-w-3xl space-y-6 p-6">
             <!-- Accounts -->
             <section class="rounded-lg bg-white p-4 shadow-sm">
@@ -158,5 +146,5 @@ const closingAmounts = ref({});
                 </table>
             </section>
         </main>
-    </div>
+    </AppLayout>
 </template>
