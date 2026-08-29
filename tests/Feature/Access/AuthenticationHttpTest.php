@@ -130,6 +130,14 @@ class AuthenticationHttpTest extends TestCase
         $superAdmin = Role::where('slug', 'super_admin')->first();
         app(AssignRoleToUser::class)->handle($user, $superAdmin);
 
+        // Computed before the request, not after: IdentifyTenant's
+        // terminate() clears TenantContext once the test HTTP client's
+        // request completes, so an Eloquent query here afterward would
+        // throw. Count asserted dynamically, not a hardcoded number —
+        // super_admin is granted every permission that exists at seed
+        // time, and that count grows as new modules register their own.
+        $totalPermissions = \App\Modules\Access\Models\Permission::count();
+
         $response = $this->actingAs($user)->get("{$this->baseUrl}/dashboard");
 
         $response->assertOk();
@@ -137,7 +145,7 @@ class AuthenticationHttpTest extends TestCase
             ->component('Dashboard')
             ->where('auth.user.email', 'ahmed@alfateh.test')
             ->where('auth.user.roles', ['super_admin'])
-            ->has('auth.user.permissions', 15)
+            ->has('auth.user.permissions', $totalPermissions)
         );
     }
 
