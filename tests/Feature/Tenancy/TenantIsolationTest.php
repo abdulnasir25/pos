@@ -30,6 +30,7 @@ class TenantIsolationTest extends TestCase
     protected function tearDown(): void
     {
         File::deleteDirectory($this->tenantDbPath);
+        config(['database.default' => 'landlord']);
 
         parent::tearDown();
     }
