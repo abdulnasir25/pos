@@ -36,7 +36,11 @@ return new class extends Migration
             $table->foreignId('approved_by')->nullable()->constrained('users')->restrictOnDelete();
             $table->timestamps();
 
-            $table->unique(['employee_id', 'commission_rule_id', 'financial_period_id']);
+            // Named explicitly: Laravel's auto-generated name for this
+            // composite (table + all 3 column names) exceeds MySQL's
+            // 64-character identifier limit — fine on SQLite, a hard
+            // error on MySQL.
+            $table->unique(['employee_id', 'commission_rule_id', 'financial_period_id'], 'commission_entries_unique');
             $table->index('financial_period_id');
             $table->index('status');
         });
