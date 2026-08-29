@@ -1,6 +1,7 @@
 <script setup>
 import { ref } from 'vue';
-import { usePage, router } from '@inertiajs/vue3';
+import { router } from '@inertiajs/vue3';
+import AppLayout from '../../Layouts/AppLayout.vue';
 
 const props = defineProps({
     filters: { type: Object, default: () => ({}) },
@@ -13,7 +14,6 @@ const props = defineProps({
     profitAndLossError: { type: String, default: null },
 });
 
-const page = usePage();
 
 const from = ref(props.filters.from);
 const to = ref(props.filters.to);
@@ -36,12 +36,7 @@ function money(n) {
 </script>
 
 <template>
-    <div class="min-h-screen bg-stone-100">
-        <header class="flex items-center justify-between border-b border-stone-200 bg-white px-6 py-4">
-            <h1 class="text-lg font-semibold text-stone-900">Reports</h1>
-            <span class="text-sm text-stone-500">{{ page.props.auth.user?.name }}</span>
-        </header>
-
+    <AppLayout title="Reports">
         <main class="mx-auto max-w-4xl space-y-6 p-6">
             <!-- Sales Summary -->
             <section class="rounded-lg bg-white p-4 shadow-sm">
@@ -160,5 +155,5 @@ function money(n) {
                 </div>
             </section>
         </main>
-    </div>
+    </AppLayout>
 </template>

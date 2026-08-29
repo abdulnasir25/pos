@@ -1,6 +1,7 @@
 <script setup>
 import { ref } from 'vue';
-import { usePage, router } from '@inertiajs/vue3';
+import { router } from '@inertiajs/vue3';
+import AppLayout from '../../Layouts/AppLayout.vue';
 
 const props = defineProps({
     filters: { type: Object, default: () => ({}) },
@@ -8,7 +9,6 @@ const props = defineProps({
     entries: { type: Array, default: () => [] },
 });
 
-const page = usePage();
 const actionFilter = ref(props.filters.action ?? '');
 const expandedId = ref(null);
 
@@ -22,12 +22,7 @@ function toggleExpand(id) {
 </script>
 
 <template>
-    <div class="min-h-screen bg-stone-100">
-        <header class="flex items-center justify-between border-b border-stone-200 bg-white px-6 py-4">
-            <h1 class="text-lg font-semibold text-stone-900">Audit Log</h1>
-            <span class="text-sm text-stone-500">{{ page.props.auth.user?.name }}</span>
-        </header>
-
+    <AppLayout title="Audit Log">
         <main class="mx-auto max-w-4xl space-y-4 p-6">
             <section class="rounded-lg bg-white p-4 shadow-sm">
                 <div class="mb-3 flex items-center justify-between">
@@ -87,5 +82,5 @@ function toggleExpand(id) {
                 </table>
             </section>
         </main>
-    </div>
+    </AppLayout>
 </template>

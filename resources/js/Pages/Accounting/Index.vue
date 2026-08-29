@@ -1,13 +1,13 @@
 <script setup>
 import { computed, ref } from 'vue';
-import { usePage, useForm } from '@inertiajs/vue3';
+import { useForm } from '@inertiajs/vue3';
+import AppLayout from '../../Layouts/AppLayout.vue';
 
 const props = defineProps({
     accounts: { type: Array, default: () => [] },
     entries: { type: Array, default: () => [] },
 });
 
-const page = usePage();
 const activePanel = ref(null);
 
 function toggle(panel) {
@@ -63,19 +63,7 @@ function submitEntry() {
 </script>
 
 <template>
-    <div class="min-h-screen bg-stone-100">
-        <header class="flex items-center justify-between border-b border-stone-200 bg-white px-6 py-4">
-            <h1 class="text-lg font-semibold text-stone-900">Accounting</h1>
-            <span class="text-sm text-stone-500">{{ page.props.auth.user?.name }}</span>
-        </header>
-
-        <div v-if="page.props.flash?.success" class="mx-6 mt-4 rounded-lg border border-emerald-300 bg-emerald-50 px-4 py-3 text-sm text-emerald-800">
-            {{ page.props.flash.success }}
-        </div>
-        <div v-if="Object.keys(page.props.errors ?? {}).length" class="mx-6 mt-4 rounded-lg border border-red-300 bg-red-50 px-4 py-3 text-sm text-red-800">
-            <p v-for="(msg, key) in page.props.errors" :key="key">{{ msg }}</p>
-        </div>
-
+    <AppLayout title="Accounting">
         <main class="mx-auto max-w-4xl space-y-6 p-6">
             <!-- Chart of accounts -->
             <section class="rounded-lg bg-white p-4 shadow-sm">
@@ -173,5 +161,5 @@ function submitEntry() {
                 <p v-if="entries.length === 0" class="text-sm text-stone-400">No journal entries yet.</p>
             </section>
         </main>
-    </div>
+    </AppLayout>
 </template>

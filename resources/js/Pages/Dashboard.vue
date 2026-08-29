@@ -1,23 +1,12 @@
 <script setup>
-import { router, usePage } from '@inertiajs/vue3';
+import { usePage } from '@inertiajs/vue3';
+import AppLayout from '../Layouts/AppLayout.vue';
 
 const page = usePage();
-
-function logout() {
-    router.post('/logout');
-}
 </script>
 
 <template>
-    <div class="min-h-screen bg-stone-100">
-        <header class="flex items-center justify-between border-b border-stone-200 bg-white px-6 py-4">
-            <h1 class="text-lg font-semibold text-stone-900">Ledger &amp; Loom</h1>
-            <div class="flex items-center gap-4">
-                <span class="text-sm text-stone-600">{{ page.props.auth.user.name }}</span>
-                <button @click="logout" class="text-sm text-stone-500 hover:text-stone-900">Sign out</button>
-            </div>
-        </header>
-
+    <AppLayout title="Dashboard">
         <main class="mx-auto max-w-2xl px-6 py-8">
             <div class="rounded-lg bg-white p-6 shadow-sm">
                 <h2 class="mb-4 text-base font-medium text-stone-900">Your access</h2>
@@ -47,5 +36,5 @@ function logout() {
                 </div>
             </div>
         </main>
-    </div>
+    </AppLayout>
 </template>
