@@ -4,6 +4,7 @@ namespace App\Modules\Access\Actions;
 
 use App\Modules\Access\Exceptions\CannotRemoveLastSuperAdminException;
 use App\Modules\Access\Models\Role;
+use App\Modules\AuditLog\Actions\RecordAuditLog;
 use App\Models\User;
 
 /**
@@ -13,13 +14,23 @@ use App\Models\User;
  */
 class RemoveRoleFromUser
 {
-    public function handle(User $user, Role $role): void
+    public function __construct(private readonly RecordAuditLog $auditLog) {}
+
+    public function handle(User $user, Role $role, ?int $performedBy = null): void
     {
         if ($role->is_protected && $this->isLastHolder($user, $role)) {
             throw CannotRemoveLastSuperAdminException::forUser($user->id);
         }
 
         $user->roles()->detach($role->id);
+
+        $this->auditLog->handle(
+            userId: $performedBy,
+            action: 'role.removed',
+            auditableType: User::class,
+            auditableId: $user->id,
+            oldValues: ['role' => $role->slug],
+        );
     }
 
     private function isLastHolder(User $user, Role $role): bool
