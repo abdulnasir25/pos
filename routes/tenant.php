@@ -2,6 +2,7 @@
 
 use App\Modules\Access\Http\Controllers\DashboardController;
 use App\Modules\Access\Http\Controllers\LoginController;
+use App\Modules\Partners\Http\Controllers\PartnersController;
 use App\Modules\Sales\Http\Controllers\PosController;
 use App\Modules\Tenancy\Support\TenantContext;
 use Illuminate\Support\Facades\Route;
@@ -26,6 +27,15 @@ Route::get('/dashboard', [DashboardController::class, 'show'])->middleware('auth
 
 Route::get('/pos', [PosController::class, 'show'])->middleware(['auth', 'permission:sales.create'])->name('pos');
 Route::post('/pos/sale', [PosController::class, 'store'])->middleware(['auth', 'permission:sales.create'])->name('pos.sale');
+
+Route::middleware(['auth', 'permission:partners.manage'])->group(function () {
+    Route::get('/partners', [PartnersController::class, 'show'])->name('partners');
+    Route::post('/partners', [PartnersController::class, 'storePartner'])->name('partners.store');
+    Route::post('/partners/rebalance', [PartnersController::class, 'storeRebalance'])->name('partners.rebalance');
+    Route::post('/partners/capital', [PartnersController::class, 'storeCapital'])->name('partners.capital');
+    Route::post('/partners/loans', [PartnersController::class, 'storeLoan'])->name('partners.loans');
+    Route::post('/partners/repayments', [PartnersController::class, 'storeRepayment'])->name('partners.repayments');
+});
 
 Route::get('/_tenant/whoami', function (TenantContext $tenants) {
     $tenant = $tenants->get();
