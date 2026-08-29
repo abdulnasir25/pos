@@ -2,6 +2,7 @@
 
 use App\Modules\Access\Http\Controllers\DashboardController;
 use App\Modules\Access\Http\Controllers\LoginController;
+use App\Modules\Accounting\Http\Controllers\AccountingController;
 use App\Modules\AuditLog\Http\Controllers\AuditLogController;
 use App\Modules\CashRegister\Http\Controllers\CashRegisterController;
 use App\Modules\Commission\Http\Controllers\CommissionController;
@@ -78,6 +79,12 @@ Route::middleware(['auth', 'permission:purchases.manage'])->group(function () {
     Route::post('/purchases', [PurchasesController::class, 'store'])->name('purchases.store');
     Route::post('/purchases/{purchase}/cancel', [PurchasesController::class, 'cancel'])->name('purchases.cancel');
     Route::post('/purchases/returns', [PurchasesController::class, 'storeReturn'])->name('purchases.returns.store');
+});
+
+Route::middleware(['auth', 'permission:accounting.view'])->group(function () {
+    Route::get('/accounting', [AccountingController::class, 'show'])->name('accounting');
+    Route::post('/accounting/accounts', [AccountingController::class, 'storeAccount'])->name('accounting.accounts.store');
+    Route::post('/accounting/entries', [AccountingController::class, 'storeEntry'])->name('accounting.entries.store');
 });
 
 Route::get('/_tenant/whoami', function (TenantContext $tenants) {
