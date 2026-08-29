@@ -6,12 +6,15 @@ use App\Modules\Accounting\Http\Controllers\AccountingController;
 use App\Modules\AuditLog\Http\Controllers\AuditLogController;
 use App\Modules\CashRegister\Http\Controllers\CashRegisterController;
 use App\Modules\Commission\Http\Controllers\CommissionController;
+use App\Modules\Customers\Http\Controllers\CustomersController;
 use App\Modules\Expenses\Http\Controllers\ExpensesController;
 use App\Modules\Partners\Http\Controllers\PartnersController;
+use App\Modules\Products\Http\Controllers\ProductsController;
 use App\Modules\Purchases\Http\Controllers\PurchasesController;
 use App\Modules\Reports\Http\Controllers\ReportsController;
 use App\Modules\Sales\Http\Controllers\PosController;
 use App\Modules\Tenancy\Support\TenantContext;
+use App\Modules\Warehouses\Http\Controllers\WarehousesController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -85,6 +88,24 @@ Route::middleware(['auth', 'permission:accounting.view'])->group(function () {
     Route::get('/accounting', [AccountingController::class, 'show'])->name('accounting');
     Route::post('/accounting/accounts', [AccountingController::class, 'storeAccount'])->name('accounting.accounts.store');
     Route::post('/accounting/entries', [AccountingController::class, 'storeEntry'])->name('accounting.entries.store');
+});
+
+Route::middleware(['auth', 'permission:products.manage'])->group(function () {
+    Route::get('/products', [ProductsController::class, 'show'])->name('products');
+    Route::post('/products/units', [ProductsController::class, 'storeUnit'])->name('products.units.store');
+    Route::post('/products', [ProductsController::class, 'storeProduct'])->name('products.store');
+    Route::post('/products/{product}/conversions', [ProductsController::class, 'storeConversion'])->name('products.conversions.store');
+});
+
+Route::middleware(['auth', 'permission:warehouses.manage'])->group(function () {
+    Route::get('/warehouses', [WarehousesController::class, 'show'])->name('warehouses');
+    Route::post('/warehouses', [WarehousesController::class, 'store'])->name('warehouses.store');
+});
+
+Route::middleware(['auth', 'permission:customers.manage'])->group(function () {
+    Route::get('/customers', [CustomersController::class, 'show'])->name('customers');
+    Route::post('/customers', [CustomersController::class, 'store'])->name('customers.store');
+    Route::post('/customers/{customer}/payments', [CustomersController::class, 'storePayment'])->name('customers.payments.store');
 });
 
 Route::get('/_tenant/whoami', function (TenantContext $tenants) {
