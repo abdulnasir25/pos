@@ -159,12 +159,14 @@ Indexes: employee_id, (status, effective_from).
 
 Purpose: one row per employee per rule per Financial Period — the finalized, immutable commission result.
 
+> **Correction (2026-08-29, confirmed by the business owner):** `eligible_gross_profit` is the tenant's TOTAL gross profit for the period — every confirmed sale, not just this employee's own. The row below originally said "this employee's confirmed sales," which was wrong: the confirmed rule is 10% of the whole shop's profit paid to the commission-earning employee, not 10% of what they personally sold. `commission_sale_lines` (below) is affected the same way — it traces every sale in the period, not one employee's sales. Implemented correctly in `App\Modules\Commission\Actions\CalculateCommissionForPeriod`.
+
 | Column | Type | Constraint |
 |---|---|---|
 | employee_id | bigint | FK → employees.id, not null, restrict |
 | commission_rule_id | bigint | FK → commission_rules.id, not null, restrict |
 | financial_period_id | bigint | FK → financial_periods.id, not null, restrict |
-| eligible_gross_profit | decimal(14,2) | not null — sum of this employee's confirmed sales' (revenue − COGS) for the period |
+| eligible_gross_profit | decimal(14,2) | not null — the tenant's TOTAL confirmed-sales (revenue − COGS) for the period (see correction note above) |
 | rate_applied | decimal(5,2) | not null — snapshot of the rule's rate at calculation time; the rule itself may change later, this never does |
 | commission_amount | decimal(14,2) | not null |
 | status | string(20) | not null — calculated · approved · finalized · paid |
