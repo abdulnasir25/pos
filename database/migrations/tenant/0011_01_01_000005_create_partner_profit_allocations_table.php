@@ -24,7 +24,11 @@ return new class extends Migration
             $table->decimal('allocated_amount', 14, 2);
             $table->timestamps();
 
-            $table->unique(['financial_period_id', 'partner_id', 'sub_range_start']);
+            // Named explicitly: Laravel's auto-generated name for this
+            // composite (table + all 3 column names) exceeds MySQL's
+            // 64-character identifier limit — fine on SQLite, a hard
+            // error on MySQL.
+            $table->unique(['financial_period_id', 'partner_id', 'sub_range_start'], 'partner_profit_allocations_unique');
         });
     }
 

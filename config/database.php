@@ -44,7 +44,24 @@ return [
         // Template only — never queried directly. TenantConnectionFactory
         // clones this array at runtime and swaps in the resolved tenant's
         // own database before binding it under the 'tenant' name.
-        'tenant' => [
+        // TENANT_DB_DRIVER switches the whole fleet of tenants between
+        // one SQLite file each (local dev) and one MySQL database each
+        // on a shared server (production) — set once per environment,
+        // never per tenant.
+        'tenant' => env('TENANT_DB_DRIVER', 'sqlite') === 'mysql' ? [
+            'driver' => 'mysql',
+            'host' => env('TENANT_DB_HOST', '127.0.0.1'),
+            'port' => env('TENANT_DB_PORT', '3306'),
+            'database' => null,
+            'username' => env('TENANT_DB_USERNAME', 'root'),
+            'password' => env('TENANT_DB_PASSWORD', ''),
+            'charset' => 'utf8mb4',
+            'collation' => 'utf8mb4_unicode_ci',
+            'prefix' => '',
+            'prefix_indexes' => true,
+            'strict' => true,
+            'engine' => null,
+        ] : [
             'driver' => 'sqlite',
             'database' => null,
             'prefix' => '',

@@ -6,9 +6,8 @@ use App\Modules\Employees\Exceptions\InvalidCompensationRangeException;
 use App\Modules\Employees\Exceptions\OverlappingCompensationException;
 use App\Modules\Employees\Models\Employee;
 use App\Modules\Employees\Models\EmployeeCompensation;
+use App\Modules\Tenancy\Support\SerializedWrite;
 use App\Modules\Tenancy\Support\TenantContext;
-use Illuminate\Support\Facades\DB;
-use Throwable;
 
 /**
  * The only supported way to record a salary — first hire or a change.
@@ -25,14 +24,16 @@ use Throwable;
  * rejected outright — this class never auto-closes more than the one
  * record actually being superseded.
  *
- * Uses the same BEGIN IMMEDIATE pattern as FinancialPeriods'
- * CreateFinancialPeriod, for the identical reason: the overlap check
- * and the writes below must not be separated by another writer, which a
- * plain DB::transaction() does not guarantee on SQLite.
+ * Runs through SerializedWrite for the same reason as
+ * CreateFinancialPeriod: the overlap check and the writes below must
+ * not be separated by another writer.
  */
 class RecordSalaryChange
 {
-    public function __construct(private readonly TenantContext $tenant) {}
+    public function __construct(
+        private readonly TenantContext $tenant,
+        private readonly SerializedWrite $serialized,
+    ) {}
 
     public function handle(Employee $employee, string $monthlySalary, string $effectiveFrom, ?string $effectiveTo = null): EmployeeCompensation
     {
@@ -42,12 +43,7 @@ class RecordSalaryChange
             throw InvalidCompensationRangeException::endBeforeStart($effectiveFrom, $effectiveTo);
         }
 
-        $connection = DB::connection(config('tenancy.tenant_connection', 'tenant'));
-        $pdo = $connection->getPdo();
-
-        $pdo->exec('BEGIN IMMEDIATE');
-
-        try {
+        return $this->serialized->run(function ($connection) use ($employee, $monthlySalary, $effectiveFrom, $effectiveTo) {
             $existing = $connection->table('employee_compensation')
                 ->where('employee_id', $employee->id)
                 ->get(['id', 'effective_from', 'effective_to']);
@@ -93,20 +89,12 @@ class RecordSalaryChange
                     ]);
             }
 
-            $compensation = EmployeeCompensation::create([
+            return EmployeeCompensation::create([
                 'employee_id' => $employee->id,
                 'monthly_salary' => $monthlySalary,
                 'effective_from' => $effectiveFrom,
                 'effective_to' => $effectiveTo,
             ]);
-
-            $pdo->exec('COMMIT');
-
-            return $compensation;
-        } catch (Throwable $e) {
-            $pdo->exec('ROLLBACK');
-
-            throw $e;
-        }
+        });
     }
 }
