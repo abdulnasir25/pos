@@ -520,6 +520,8 @@ Evolving `payment_methods` and `sale_payments` additively — neither is replace
 
 This is purely additive — `payment_methods` and `sale_payments` keep working exactly as they do now. Financial Accounts and Cash Register are new tables that new tables reference optionally; existing sales checkout logic doesn't need to know they exist until reconciliation reporting is actually built.
 
+**Implemented 2026-08-29**, scoped exactly as designed: `financial_accounts` + `cash_register_sessions` only, open/close lifecycle, no reconciliation math (expected-vs-counted variance) — that stays deferred to a future Reports pass, once `payment_methods` actually links to a `financial_account_id`. `OpenCashRegisterSession` enforces two things not spelled out as columns but implied by "a session": the wrapped account must actually be `cash`-typed, and an account can have at most one open session at a time (same BEGIN IMMEDIATE concurrency pattern as `CreateFinancialPeriod`'s overlap check).
+
 ---
 
 ## K. Accounting-ready design
