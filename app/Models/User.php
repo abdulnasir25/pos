@@ -3,6 +3,7 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Modules\Access\Support\HasRolesAndPermissions;
 use App\Modules\Tenancy\Database\HasTenantScopedQueries;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
@@ -16,7 +17,7 @@ use Illuminate\Notifications\Notifiable;
 class User extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */
-    use HasFactory, Notifiable, HasTenantScopedQueries;
+    use HasFactory, Notifiable, HasTenantScopedQueries, HasRolesAndPermissions;
 
     /**
      * Get the attributes that should be cast.
