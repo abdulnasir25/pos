@@ -535,7 +535,7 @@ Same `chart_of_accounts` / `journal_entries` / `journal_entry_lines` shape from 
 | COGS | Expense | existing `sale_items.unit_cost_snapshot` |
 | Salary Expense | Expense | §C |
 | Commission Expense | Expense | §D |
-| Operating Expenses (rent, utilities, ...) | Expense | not yet designed — flagged, out of scope this document |
+| Operating Expenses (rent, utilities, ...) | Expense | designed and implemented 2026-08-29 — see addendum at the end of this document |
 | Drawings (per partner) | Contra-equity | §G |
 
 `journal_entries`/`journal_entry_lines` stay exactly as originally designed (polymorphic `reference_type`/`reference_id` pointing at whichever document caused the entry) — every new table in this document already carries the reference fields a future journal-posting listener would need. No structural change to that earlier design; it was already built to absorb exactly this expansion.
@@ -769,6 +769,38 @@ This document included `interest_rate` as a nullable column on `partner_loans` s
 **One recommendation only.**
 
 Design and confirm the **Financial Period** module first, ahead of Employees/Commission/Partners individually — every other new module in this document (§B–§I) has a foreign key into `financial_periods`, so it's the one piece all subsequent implementation work depends on. Building it first, and validating its OPEN → CALCULATING → UNDER_REVIEW → CLOSED lifecycle against a real closing walkthrough before any other module exists, means every module built after it inherits a working period boundary instead of each one having to guess at it independently.
+
+---
+
+## Addendum: Expenses design (implemented 2026-08-29)
+
+Not designed in the original document (§K flagged it out of scope). Designed and implemented together once the Partners/Commission modules made clear how it plugs into the profit-calculation chain.
+
+**Rule**: Operating Expenses have no per-partner attribution. They simply reduce Net Profit before it's split by ownership percentage — which is what "expenses are divided between the partners" means in practice, since both partners' share shrinks symmetrically. No separate per-partner expense-contribution ledger was built; nothing in the confirmed requirements asks partners to pay expenses individually out of pocket.
+
+### `expense_categories` — New table
+
+| Column | Type | Constraint |
+|---|---|---|
+| name | string(100) | not null |
+| status | string(20) | not null, default 'active' |
+
+### `expenses` — New table
+
+Purpose: one row per incurred cost. Immutable once created — a correction is a new row (signed amount), never an edit in place, matching the immutability convention used everywhere else in this codebase.
+
+| Column | Type | Constraint |
+|---|---|---|
+| expense_category_id | bigint | FK → expense_categories.id, not null, restrict |
+| amount | decimal(14,2) | not null |
+| expense_date | date | not null |
+| description | string(255) | nullable |
+| payment_method_id | bigint | FK → payment_methods.id, not null, restrict |
+| reference_type | string(60) | nullable — set only on a correction row, pointing back at the expense it corrects |
+| reference_id | bigint | nullable |
+| created_by | bigint | FK → users.id, not null, restrict |
+
+`App\Modules\Expenses\Support\SumExpensesForDateRange` computes `other_operating_expenses` for a date range — the piece `profit_calculations` will read from once that module exists, the same relationship Commission's `CalculatePeriodGrossProfit` has to `profit_calculations.gross_profit`.
 
 ---
 
