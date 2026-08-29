@@ -468,7 +468,11 @@ Indexes: supplier_id, status, employee_id.
 
 ### `purchase_items`, `purchase_payments`, `purchase_returns`, `purchase_return_items` — New tables
 
-Mirror the shape of `sale_items`/`sale_payments`/`sale_returns`/`sale_return_items` exactly — same pattern, opposite direction. No new design pattern needed; the existing Sales tables are the template.
+Mirror the shape of `sale_items`/`sale_payments`/`sale_returns`/`sale_return_items` — same pattern, opposite direction. Implemented 2026-08-29 with two deliberate simplifications, not deviations of substance:
+- `purchase_items` has no `unit_cost_snapshot` alongside `unit_cost` — on a Sale those are two different facts (price charged vs. historical cost basis); on a Purchase there's only one figure, since `unit_cost` **becomes** the new weighted-average cost basis.
+- `purchase_return_items` has no `condition` column — that field exists on the Sales side to route a damaged customer return to Inventory's `RecordDamage` instead of a normal restock; a purchase return always sends stock back out to the supplier (`RecordPurchaseReturn`), so there's no equivalent branch.
+
+`supplier_ledger_entries` (also listed below) was **not** built this pass — `customer_ledger_entries` (§H) hasn't been built either yet, and building the supplier side first would be asymmetric. Both remain a future "ledgers" pass; `suppliers.balance` is a maintained cache in the meantime, exactly like `customers.balance` today.
 
 ### `supplier_ledger_entries` — New table
 
