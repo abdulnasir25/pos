@@ -5,6 +5,7 @@ use App\Modules\Access\Http\Controllers\LoginController;
 use App\Modules\Commission\Http\Controllers\CommissionController;
 use App\Modules\Expenses\Http\Controllers\ExpensesController;
 use App\Modules\Partners\Http\Controllers\PartnersController;
+use App\Modules\Reports\Http\Controllers\ReportsController;
 use App\Modules\Sales\Http\Controllers\PosController;
 use App\Modules\Tenancy\Support\TenantContext;
 use Illuminate\Support\Facades\Route;
@@ -56,6 +57,8 @@ Route::middleware(['auth', 'permission:commission.manage'])->group(function () {
     Route::post('/commission/entries/{entry}/pay', [CommissionController::class, 'pay'])->name('commission.entries.pay');
     Route::post('/commission/corrections', [CommissionController::class, 'storeCorrection'])->name('commission.corrections.store');
 });
+
+Route::get('/reports', [ReportsController::class, 'show'])->middleware(['auth', 'permission:reports.view'])->name('reports');
 
 Route::get('/_tenant/whoami', function (TenantContext $tenants) {
     $tenant = $tenants->get();
