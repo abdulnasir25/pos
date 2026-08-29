@@ -112,6 +112,29 @@ class FinancialPeriodTest extends TestCase
         app(CreateFinancialPeriod::class)->handle('2026-01-01', '2026-01-31');
     }
 
+    public function test_a_new_period_starting_exactly_on_an_existing_periods_end_date_is_rejected(): void
+    {
+        // Regression test: Eloquent's 'date' cast writes a full
+        // "Y-m-d H:i:s" value, so a plain string comparison between the
+        // stored period_end and a bare 'Y-m-d' boundary date used to
+        // silently miss this exact single-day overlap. Fixed via
+        // whereDate() in CreateFinancialPeriod.
+        app(CreateFinancialPeriod::class)->handle('2026-01-01', '2026-01-31');
+
+        $this->expectException(OverlappingPeriodException::class);
+
+        app(CreateFinancialPeriod::class)->handle('2026-01-31', '2026-02-28');
+    }
+
+    public function test_a_new_period_ending_exactly_on_an_existing_periods_start_date_is_rejected(): void
+    {
+        app(CreateFinancialPeriod::class)->handle('2026-02-01', '2026-02-28');
+
+        $this->expectException(OverlappingPeriodException::class);
+
+        app(CreateFinancialPeriod::class)->handle('2026-01-01', '2026-02-01');
+    }
+
     public function test_adjacent_non_overlapping_periods_are_both_allowed(): void
     {
         app(CreateFinancialPeriod::class)->handle('2026-01-01', '2026-01-31');
