@@ -2,6 +2,8 @@
 
 use App\Modules\Access\Http\Controllers\DashboardController;
 use App\Modules\Access\Http\Controllers\LoginController;
+use App\Modules\AuditLog\Http\Controllers\AuditLogController;
+use App\Modules\CashRegister\Http\Controllers\CashRegisterController;
 use App\Modules\Commission\Http\Controllers\CommissionController;
 use App\Modules\Expenses\Http\Controllers\ExpensesController;
 use App\Modules\Partners\Http\Controllers\PartnersController;
@@ -59,6 +61,15 @@ Route::middleware(['auth', 'permission:commission.manage'])->group(function () {
 });
 
 Route::get('/reports', [ReportsController::class, 'show'])->middleware(['auth', 'permission:reports.view'])->name('reports');
+
+Route::middleware(['auth', 'permission:cash_register.manage'])->group(function () {
+    Route::get('/cash-register', [CashRegisterController::class, 'show'])->name('cash-register');
+    Route::post('/cash-register/accounts', [CashRegisterController::class, 'storeAccount'])->name('cash-register.accounts.store');
+    Route::post('/cash-register/sessions', [CashRegisterController::class, 'openSession'])->name('cash-register.sessions.open');
+    Route::post('/cash-register/sessions/{session}/close', [CashRegisterController::class, 'closeSession'])->name('cash-register.sessions.close');
+});
+
+Route::get('/audit-log', [AuditLogController::class, 'show'])->middleware(['auth', 'permission:audit_logs.view'])->name('audit-log');
 
 Route::get('/_tenant/whoami', function (TenantContext $tenants) {
     $tenant = $tenants->get();
