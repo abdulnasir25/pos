@@ -45,17 +45,18 @@ function logout() {
 
 <template>
     <div class="flex min-h-screen bg-stone-100">
-        <aside class="flex w-56 flex-shrink-0 flex-col border-r border-stone-200 bg-white">
-            <div class="border-b border-stone-200 px-4 py-4">
-                <span class="text-base font-semibold text-stone-900">Ledger &amp; Loom</span>
+        <aside class="flex w-64 flex-shrink-0 flex-col border-r border-stone-200 bg-white">
+            <div class="flex items-center gap-3 border-b border-stone-200 px-5 py-5">
+                <span class="flex size-9 flex-shrink-0 items-center justify-center rounded-lg bg-stone-900 text-sm font-semibold text-white">L&amp;L</span>
+                <span class="text-lg font-semibold leading-tight text-stone-900">Ledger &amp; Loom</span>
             </div>
-            <nav class="flex flex-1 flex-col gap-0.5 overflow-y-auto p-2">
+            <nav class="flex flex-1 flex-col gap-1 overflow-y-auto p-3">
                 <Link
                     v-for="item in visibleNavItems"
                     :key="item.href"
                     :href="item.href"
-                    class="rounded-md px-3 py-2 text-sm"
-                    :class="isActive(item.href) ? 'bg-stone-900 text-white' : 'text-stone-600 hover:bg-stone-100'"
+                    class="rounded-lg px-3.5 py-2.5 text-[0.95rem] font-medium"
+                    :class="isActive(item.href) ? 'bg-stone-900 text-white shadow-sm' : 'text-stone-600 hover:bg-stone-100 hover:text-stone-900'"
                 >
                     {{ item.label }}
                 </Link>
@@ -63,18 +64,24 @@ function logout() {
         </aside>
 
         <div class="min-w-0 flex-1">
-            <header class="flex items-center justify-between border-b border-stone-200 bg-white px-6 py-4">
-                <h1 class="text-lg font-semibold text-stone-900">{{ title }}</h1>
+            <header class="flex items-center justify-between border-b border-stone-200 bg-white px-8 py-5">
+                <h1 class="text-2xl font-semibold text-stone-900">{{ title }}</h1>
                 <div class="flex items-center gap-4">
-                    <span class="text-sm text-stone-500">{{ page.props.auth.user?.name }}</span>
-                    <button type="button" @click="logout" class="text-sm text-stone-500 hover:text-stone-900">Sign out</button>
+                    <span class="text-[0.95rem] text-stone-600">{{ page.props.auth.user?.name }}</span>
+                    <button
+                        type="button"
+                        @click="logout"
+                        class="rounded-lg px-3 py-1.5 text-sm font-medium text-stone-500 hover:bg-stone-100 hover:text-stone-900"
+                    >
+                        Sign out
+                    </button>
                 </div>
             </header>
 
-            <div v-if="page.props.flash?.success" class="mx-6 mt-4 rounded-lg border border-emerald-300 bg-emerald-50 px-4 py-3 text-sm text-emerald-800">
+            <div v-if="page.props.flash?.success" class="mx-8 mt-5 rounded-lg border border-emerald-300 bg-emerald-50 px-5 py-3.5 text-[0.95rem] text-emerald-800">
                 {{ page.props.flash.success }}
             </div>
-            <div v-if="Object.keys(page.props.errors ?? {}).length" class="mx-6 mt-4 rounded-lg border border-red-300 bg-red-50 px-4 py-3 text-sm text-red-800">
+            <div v-if="Object.keys(page.props.errors ?? {}).length" class="mx-8 mt-5 rounded-lg border border-red-300 bg-red-50 px-5 py-3.5 text-[0.95rem] text-red-800">
                 <p v-for="(msg, key) in page.props.errors" :key="key">{{ msg }}</p>
             </div>
 
