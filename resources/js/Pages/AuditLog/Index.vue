@@ -24,7 +24,7 @@ function toggleExpand(id) {
 <template>
     <AppLayout title="Audit Log">
         <main class="mx-auto max-w-4xl space-y-4 p-6">
-            <section class="rounded-lg bg-white p-4 shadow-sm">
+            <section class="rounded-xl border border-stone-200/70 bg-white p-6 shadow-sm">
                 <div class="mb-3 flex items-center justify-between">
                     <h2 class="text-base font-medium text-stone-900">Recent Activity</h2>
                     <div class="flex items-center gap-2">
@@ -32,7 +32,7 @@ function toggleExpand(id) {
                             <option value="">All actions</option>
                             <option v-for="a in actions" :key="a" :value="a">{{ a }}</option>
                         </select>
-                        <button type="button" @click="applyFilter" class="rounded-md bg-stone-900 px-3 py-1.5 text-sm text-white hover:bg-stone-700">Filter</button>
+                        <button type="button" @click="applyFilter" class="rounded-md bg-indigo-600 px-3 py-1.5 text-sm text-white hover:bg-indigo-700">Filter</button>
                     </div>
                 </div>
 
@@ -56,7 +56,7 @@ function toggleExpand(id) {
                                         v-if="e.old_values || e.new_values"
                                         type="button"
                                         @click="toggleExpand(e.id)"
-                                        class="text-xs text-stone-600 underline"
+                                        class="text-xs text-indigo-700 underline hover:text-indigo-800"
                                     >
                                         {{ expandedId === e.id ? 'Hide' : 'Details' }}
                                     </button>

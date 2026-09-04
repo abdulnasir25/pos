@@ -107,17 +107,17 @@ function submitPayment(employeeId) {
 <template>
     <AppLayout title="Employees">
         <main class="mx-auto max-w-5xl space-y-6 p-6">
-            <section class="rounded-lg bg-white p-4 shadow-sm">
+            <section class="rounded-xl border border-stone-200/70 bg-white p-6 shadow-sm">
                 <div class="mb-3 flex items-center justify-between">
                     <h2 class="text-base font-medium text-stone-900">Employees</h2>
-                    <button type="button" @click="toggle('employee')" class="text-sm text-stone-600 underline">+ Add Employee</button>
+                    <button type="button" @click="toggle('employee')" class="text-sm text-indigo-700 underline hover:text-indigo-800">+ Add Employee</button>
                 </div>
 
                 <form v-if="activePanel === 'employee'" @submit.prevent="submitEmployee" class="mb-4 grid grid-cols-4 gap-2 rounded-md border border-stone-200 p-3">
                     <input v-model="employeeForm.name" type="text" placeholder="Name" class="rounded border-stone-300 text-sm">
                     <input v-model="employeeForm.phone" type="text" placeholder="Phone (optional)" class="rounded border-stone-300 text-sm">
                     <input v-model="employeeForm.hired_at" type="date" class="rounded border-stone-300 text-sm">
-                    <button type="submit" :disabled="employeeForm.processing" class="rounded-md bg-stone-900 px-3 py-1.5 text-sm text-white hover:bg-stone-700">Add</button>
+                    <button type="submit" :disabled="employeeForm.processing" class="rounded-md bg-indigo-600 px-3 py-1.5 text-sm text-white hover:bg-indigo-700">Add</button>
                 </form>
 
                 <table class="w-full text-sm">
@@ -144,9 +144,9 @@ function submitPayment(employeeId) {
                                     >{{ e.status }}</span>
                                 </td>
                                 <td class="text-right whitespace-nowrap">
-                                    <button type="button" @click="toggle(`salary-${e.id}`)" class="mr-2 text-xs text-stone-600 underline">Salary</button>
-                                    <button type="button" @click="toggle(`pay-${e.id}`)" class="mr-2 text-xs text-stone-600 underline">Pay</button>
-                                    <button type="button" @click="toggle(`status-${e.id}`)" class="text-xs text-stone-600 underline">Status</button>
+                                    <button type="button" @click="toggle(`salary-${e.id}`)" class="mr-2 text-xs text-indigo-700 underline hover:text-indigo-800">Salary</button>
+                                    <button type="button" @click="toggle(`pay-${e.id}`)" class="mr-2 text-xs text-indigo-700 underline hover:text-indigo-800">Pay</button>
+                                    <button type="button" @click="toggle(`status-${e.id}`)" class="text-xs text-indigo-700 underline hover:text-indigo-800">Status</button>
                                 </td>
                             </tr>
 
@@ -156,7 +156,7 @@ function submitPayment(employeeId) {
                                         <input v-model="salaryForm(e.id).monthly_salary" type="number" step="0.01" placeholder="Monthly salary" class="w-32 rounded border-stone-300 text-sm">
                                         <span class="text-xs text-stone-500">effective from</span>
                                         <input v-model="salaryForm(e.id).effective_from" type="date" class="rounded border-stone-300 text-sm">
-                                        <button type="button" @click="submitSalary(e.id)" :disabled="salaryForm(e.id).processing" class="rounded-md bg-stone-900 px-3 py-1.5 text-xs text-white hover:bg-stone-700">Save</button>
+                                        <button type="button" @click="submitSalary(e.id)" :disabled="salaryForm(e.id).processing" class="rounded-md bg-indigo-600 px-3 py-1.5 text-xs text-white hover:bg-indigo-700">Save</button>
                                     </div>
                                 </td>
                             </tr>
@@ -171,7 +171,7 @@ function submitPayment(employeeId) {
                                         <select v-model="paymentForm(e.id).payment_method_id" class="rounded border-stone-300 text-sm">
                                             <option v-for="m in paymentMethods" :key="m.id" :value="m.id">{{ m.name }}</option>
                                         </select>
-                                        <button type="button" @click="submitPayment(e.id)" :disabled="paymentForm(e.id).processing" class="rounded-md bg-stone-900 px-3 py-1.5 text-xs text-white hover:bg-stone-700">Record</button>
+                                        <button type="button" @click="submitPayment(e.id)" :disabled="paymentForm(e.id).processing" class="rounded-md bg-indigo-600 px-3 py-1.5 text-xs text-white hover:bg-indigo-700">Record</button>
                                     </div>
                                 </td>
                             </tr>
@@ -188,7 +188,7 @@ function submitPayment(employeeId) {
                                             <span class="text-xs text-stone-500">as of</span>
                                             <input v-model="statusForm(e.id, e.status).terminated_at" type="date" class="rounded border-stone-300 text-sm">
                                         </template>
-                                        <button type="button" @click="submitStatus(e.id)" :disabled="statusForm(e.id, e.status).processing" class="rounded-md bg-stone-900 px-3 py-1.5 text-xs text-white hover:bg-stone-700">Save</button>
+                                        <button type="button" @click="submitStatus(e.id)" :disabled="statusForm(e.id, e.status).processing" class="rounded-md bg-indigo-600 px-3 py-1.5 text-xs text-white hover:bg-indigo-700">Save</button>
                                     </div>
                                 </td>
                             </tr>

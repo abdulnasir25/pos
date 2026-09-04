@@ -3,9 +3,24 @@
 use App\Modules\Platform\Http\Controllers\BillingController;
 use App\Modules\Platform\Http\Controllers\LandlordLoginController;
 use App\Modules\Platform\Http\Middleware\HandleLandlordInertiaRequests;
+use App\Modules\Tenancy\Support\TenantResolver;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
+/*
+ * This route has no domain constraint, so it also matches every tenant
+ * subdomain (alfateh.pos.test/, etc.) — there is nothing else registered
+ * for a bare "/" on those hosts, and none of the tenant-scoped
+ * middleware (IdentifyTenant, HandleInertiaRequests) has run here. A
+ * tenant subdomain never gets the landlord welcome page: it's bounced
+ * straight to its own login, which resolves the tenant correctly and,
+ * if already signed in, redirects on to the dashboard on its own.
+ */
+Route::get('/', function (Request $request, TenantResolver $resolver) {
+    if ($resolver->resolve($request) !== null) {
+        return redirect('/login');
+    }
+
     return view('welcome');
 });
 

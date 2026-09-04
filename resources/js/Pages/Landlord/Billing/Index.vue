@@ -83,7 +83,7 @@ function recordPayment(invoiceId) {
             <h1 class="text-lg font-semibold text-stone-900">SaaS Billing</h1>
             <div class="flex items-center gap-4 text-sm">
                 <span class="text-stone-500">{{ page.props.auth.user?.name }}</span>
-                <button type="button" @click="logout" class="text-stone-600 underline">Sign out</button>
+                <button type="button" @click="logout" class="text-indigo-700 underline hover:text-indigo-800">Sign out</button>
             </div>
         </header>
 
@@ -96,7 +96,7 @@ function recordPayment(invoiceId) {
 
         <main class="mx-auto max-w-5xl space-y-6 p-6">
             <!-- Tenants -->
-            <section class="rounded-lg bg-white p-4 shadow-sm">
+            <section class="rounded-xl border border-stone-200/70 bg-white p-6 shadow-sm">
                 <h2 class="mb-3 text-base font-medium text-stone-900">Tenants</h2>
                 <table class="w-full text-sm">
                     <thead>
@@ -121,10 +121,10 @@ function recordPayment(invoiceId) {
             </section>
 
             <!-- Plans -->
-            <section class="rounded-lg bg-white p-4 shadow-sm">
+            <section class="rounded-xl border border-stone-200/70 bg-white p-6 shadow-sm">
                 <div class="mb-3 flex items-center justify-between">
                     <h2 class="text-base font-medium text-stone-900">Plans</h2>
-                    <button type="button" @click="toggle('plan')" class="text-sm text-stone-600 underline">+ Add Plan</button>
+                    <button type="button" @click="toggle('plan')" class="text-sm text-indigo-700 underline hover:text-indigo-800">+ Add Plan</button>
                 </div>
 
                 <form v-if="activePanel === 'plan'" @submit.prevent="submitPlan" class="mb-4 grid grid-cols-4 gap-2 rounded-md border border-stone-200 p-3">
@@ -135,7 +135,7 @@ function recordPayment(invoiceId) {
                         <option value="monthly">Monthly</option>
                         <option value="yearly">Yearly</option>
                     </select>
-                    <button type="submit" :disabled="planForm.processing" class="col-span-4 rounded-md bg-stone-900 px-3 py-1.5 text-sm text-white hover:bg-stone-700">Add</button>
+                    <button type="submit" :disabled="planForm.processing" class="col-span-4 rounded-md bg-indigo-600 px-3 py-1.5 text-sm text-white hover:bg-indigo-700">Add</button>
                 </form>
 
                 <table class="w-full text-sm">
@@ -158,10 +158,10 @@ function recordPayment(invoiceId) {
             </section>
 
             <!-- Subscriptions -->
-            <section class="rounded-lg bg-white p-4 shadow-sm">
+            <section class="rounded-xl border border-stone-200/70 bg-white p-6 shadow-sm">
                 <div class="mb-3 flex items-center justify-between">
                     <h2 class="text-base font-medium text-stone-900">Subscriptions</h2>
-                    <button type="button" @click="toggle('subscription')" class="text-sm text-stone-600 underline">+ Start Subscription</button>
+                    <button type="button" @click="toggle('subscription')" class="text-sm text-indigo-700 underline hover:text-indigo-800">+ Start Subscription</button>
                 </div>
 
                 <form v-if="activePanel === 'subscription'" @submit.prevent="submitSubscription" class="mb-4 grid grid-cols-4 gap-2 rounded-md border border-stone-200 p-3">
@@ -172,7 +172,7 @@ function recordPayment(invoiceId) {
                         <option v-for="p in plans" :key="p.id" :value="p.id">{{ p.name }}</option>
                     </select>
                     <input v-model="subscriptionForm.start_date" type="date" class="rounded border-stone-300 text-sm">
-                    <button type="submit" :disabled="subscriptionForm.processing" class="rounded-md bg-stone-900 px-3 py-1.5 text-sm text-white hover:bg-stone-700">Start</button>
+                    <button type="submit" :disabled="subscriptionForm.processing" class="rounded-md bg-indigo-600 px-3 py-1.5 text-sm text-white hover:bg-indigo-700">Start</button>
                 </form>
 
                 <table class="w-full text-sm">
@@ -188,7 +188,7 @@ function recordPayment(invoiceId) {
                             <td class="text-stone-500">{{ s.status }}</td>
                             <td class="text-stone-500">{{ s.current_period_start }} — {{ s.current_period_end }}</td>
                             <td class="text-right">
-                                <button type="button" @click="generateInvoice(s.id)" class="text-xs text-stone-600 underline">Generate invoice</button>
+                                <button type="button" @click="generateInvoice(s.id)" class="text-xs text-indigo-700 underline hover:text-indigo-800">Generate invoice</button>
                             </td>
                         </tr>
                     </tbody>
@@ -197,7 +197,7 @@ function recordPayment(invoiceId) {
             </section>
 
             <!-- Invoices -->
-            <section class="rounded-lg bg-white p-4 shadow-sm">
+            <section class="rounded-xl border border-stone-200/70 bg-white p-6 shadow-sm">
                 <h2 class="mb-3 text-base font-medium text-stone-900">Invoices</h2>
                 <div v-for="inv in invoices" :key="inv.id" class="mb-2 flex items-center justify-between rounded-md border border-stone-200 p-2 text-sm">
                     <div>
@@ -211,7 +211,7 @@ function recordPayment(invoiceId) {
                         >{{ inv.status }}</span>
                         <template v-if="inv.status !== 'paid'">
                             <input v-model="paymentForm(inv.id).paid_at" type="date" class="rounded border-stone-300 text-xs">
-                            <button type="button" @click="recordPayment(inv.id)" class="text-xs text-stone-600 underline">Record payment</button>
+                            <button type="button" @click="recordPayment(inv.id)" class="text-xs text-indigo-700 underline hover:text-indigo-800">Record payment</button>
                         </template>
                         <span v-else class="text-xs text-stone-400">paid {{ inv.paid_at }}</span>
                     </div>

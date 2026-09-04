@@ -51,16 +51,16 @@ function submitConversion(productId) {
     <AppLayout title="Products">
         <main class="mx-auto max-w-4xl space-y-6 p-6">
             <!-- Units -->
-            <section class="rounded-lg bg-white p-4 shadow-sm">
+            <section class="rounded-xl border border-stone-200/70 bg-white p-6 shadow-sm">
                 <div class="mb-3 flex items-center justify-between">
                     <h2 class="text-base font-medium text-stone-900">Units</h2>
-                    <button type="button" @click="toggle('unit')" class="text-sm text-stone-600 underline">+ Add Unit</button>
+                    <button type="button" @click="toggle('unit')" class="text-sm text-indigo-700 underline hover:text-indigo-800">+ Add Unit</button>
                 </div>
 
                 <form v-if="activePanel === 'unit'" @submit.prevent="submitUnit" class="mb-3 grid grid-cols-3 gap-2 rounded-md border border-stone-200 p-3">
                     <input v-model="unitForm.name" type="text" placeholder="Name (e.g. Meter)" class="rounded border-stone-300 text-sm">
                     <input v-model="unitForm.abbreviation" type="text" placeholder="Abbreviation (e.g. m)" class="rounded border-stone-300 text-sm">
-                    <button type="submit" :disabled="unitForm.processing" class="rounded-md bg-stone-900 px-3 py-1.5 text-sm text-white hover:bg-stone-700">Add</button>
+                    <button type="submit" :disabled="unitForm.processing" class="rounded-md bg-indigo-600 px-3 py-1.5 text-sm text-white hover:bg-indigo-700">Add</button>
                 </form>
 
                 <div class="flex flex-wrap gap-2">
@@ -72,10 +72,10 @@ function submitConversion(productId) {
             </section>
 
             <!-- Products -->
-            <section class="rounded-lg bg-white p-4 shadow-sm">
+            <section class="rounded-xl border border-stone-200/70 bg-white p-6 shadow-sm">
                 <div class="mb-3 flex items-center justify-between">
                     <h2 class="text-base font-medium text-stone-900">Products</h2>
-                    <button type="button" @click="toggle('product')" class="text-sm text-stone-600 underline">+ Add Product</button>
+                    <button type="button" @click="toggle('product')" class="text-sm text-indigo-700 underline hover:text-indigo-800">+ Add Product</button>
                 </div>
 
                 <form v-if="activePanel === 'product'" @submit.prevent="submitProduct" class="mb-4 grid grid-cols-4 gap-2 rounded-md border border-stone-200 p-3">
@@ -85,7 +85,7 @@ function submitConversion(productId) {
                         <option v-for="u in units" :key="u.id" :value="u.id">{{ u.name }}</option>
                     </select>
                     <input v-model="productForm.low_stock_threshold" type="number" step="0.0001" placeholder="Low stock alert (optional)" class="rounded border-stone-300 text-sm">
-                    <button type="submit" :disabled="productForm.processing" class="col-span-4 rounded-md bg-stone-900 px-3 py-1.5 text-sm text-white hover:bg-stone-700">Add</button>
+                    <button type="submit" :disabled="productForm.processing" class="col-span-4 rounded-md bg-indigo-600 px-3 py-1.5 text-sm text-white hover:bg-indigo-700">Add</button>
                 </form>
 
                 <table class="w-full text-sm">
@@ -106,7 +106,7 @@ function submitConversion(productId) {
                                 </td>
                                 <td class="text-stone-500">{{ p.status }}</td>
                                 <td class="text-right">
-                                    <button type="button" @click="toggle(`unit-${p.id}`)" class="text-xs text-stone-600 underline">+ Alt. unit</button>
+                                    <button type="button" @click="toggle(`unit-${p.id}`)" class="text-xs text-indigo-700 underline hover:text-indigo-800">+ Alt. unit</button>
                                 </td>
                             </tr>
                             <tr v-if="activePanel === `unit-${p.id}`" class="border-b border-stone-100 bg-stone-50">
@@ -117,7 +117,7 @@ function submitConversion(productId) {
                                         </select>
                                         <span class="text-xs text-stone-500">= how many {{ p.base_unit }}?</span>
                                         <input v-model="conversionForm(p.id).factor" type="number" step="0.0001" placeholder="Factor" class="w-28 rounded border-stone-300 text-sm">
-                                        <button type="button" @click="submitConversion(p.id)" :disabled="conversionForm(p.id).processing" class="rounded-md bg-stone-900 px-3 py-1.5 text-xs text-white hover:bg-stone-700">Add</button>
+                                        <button type="button" @click="submitConversion(p.id)" :disabled="conversionForm(p.id).processing" class="rounded-md bg-indigo-600 px-3 py-1.5 text-xs text-white hover:bg-indigo-700">Add</button>
                                     </div>
                                 </td>
                             </tr>

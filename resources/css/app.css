@@ -40,12 +40,12 @@
     input:not([type='checkbox']):not([type='radio']):focus,
     select:focus,
     textarea:focus {
-        @apply border-stone-500 outline-none ring-2 ring-stone-200;
+        @apply border-indigo-500 outline-none ring-2 ring-indigo-200;
     }
 
     input[type='checkbox'],
     input[type='radio'] {
-        @apply size-4 rounded border-stone-300 text-stone-900;
+        @apply size-4 rounded border-stone-300 text-indigo-600;
     }
 
     button {

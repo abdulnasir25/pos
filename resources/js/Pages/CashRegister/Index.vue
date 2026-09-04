@@ -60,10 +60,10 @@ const closingAmounts = ref({});
     <AppLayout title="Cash Register">
         <main class="mx-auto max-w-3xl space-y-6 p-6">
             <!-- Accounts -->
-            <section class="rounded-lg bg-white p-4 shadow-sm">
+            <section class="rounded-xl border border-stone-200/70 bg-white p-6 shadow-sm">
                 <div class="mb-3 flex items-center justify-between">
                     <h2 class="text-base font-medium text-stone-900">Financial Accounts</h2>
-                    <button type="button" @click="toggle('account')" class="text-sm text-stone-600 underline">+ Add Account</button>
+                    <button type="button" @click="toggle('account')" class="text-sm text-indigo-700 underline hover:text-indigo-800">+ Add Account</button>
                 </div>
 
                 <form v-if="activePanel === 'account'" @submit.prevent="submitAccount" class="mb-4 grid grid-cols-3 gap-2 rounded-md border border-stone-200 p-3">
@@ -74,7 +74,7 @@ const closingAmounts = ref({});
                         <option value="digital_wallet">Digital Wallet</option>
                     </select>
                     <input v-model="accountForm.opening_balance" type="number" step="0.01" placeholder="Opening balance" class="rounded border-stone-300 text-sm">
-                    <button type="submit" :disabled="accountForm.processing" class="col-span-3 rounded-md bg-stone-900 px-3 py-1.5 text-sm text-white hover:bg-stone-700">Add</button>
+                    <button type="submit" :disabled="accountForm.processing" class="col-span-3 rounded-md bg-indigo-600 px-3 py-1.5 text-sm text-white hover:bg-indigo-700">Add</button>
                 </form>
 
                 <table class="w-full text-sm">
@@ -96,7 +96,7 @@ const closingAmounts = ref({});
                             <td class="text-right">
                                 <div v-if="a.open_session" class="flex items-center justify-end gap-2">
                                     <input v-model="closingAmounts[a.open_session.id]" type="number" step="0.01" placeholder="Counted amount" class="w-32 rounded border-stone-300 text-xs">
-                                    <button type="button" @click="closeSession(a.open_session.id, closingAmounts[a.open_session.id])" class="text-xs text-stone-600 underline">Close</button>
+                                    <button type="button" @click="closeSession(a.open_session.id, closingAmounts[a.open_session.id])" class="text-xs text-indigo-700 underline hover:text-indigo-800">Close</button>
                                 </div>
                             </td>
                         </tr>
@@ -106,7 +106,7 @@ const closingAmounts = ref({});
             </section>
 
             <!-- Open session -->
-            <section v-if="closedCashAccounts.length > 0" class="rounded-lg bg-white p-4 shadow-sm">
+            <section v-if="closedCashAccounts.length > 0" class="rounded-xl border border-stone-200/70 bg-white p-6 shadow-sm">
                 <button type="button" @click="toggle('open')" class="text-base font-medium text-stone-900">
                     Open Session {{ activePanel === 'open' ? '▲' : '▼' }}
                 </button>
@@ -116,12 +116,12 @@ const closingAmounts = ref({});
                         <option v-for="a in closedCashAccounts" :key="a.id" :value="a.id">{{ a.name }}</option>
                     </select>
                     <input v-model="openForm.opening_float" type="number" step="0.01" placeholder="Opening float" class="rounded border-stone-300 text-sm">
-                    <button type="submit" :disabled="openForm.processing" class="rounded-md bg-stone-900 px-3 py-1.5 text-sm text-white hover:bg-stone-700">Open</button>
+                    <button type="submit" :disabled="openForm.processing" class="rounded-md bg-indigo-600 px-3 py-1.5 text-sm text-white hover:bg-indigo-700">Open</button>
                 </form>
             </section>
 
             <!-- Recent sessions -->
-            <section class="rounded-lg bg-white p-4 shadow-sm">
+            <section class="rounded-xl border border-stone-200/70 bg-white p-6 shadow-sm">
                 <h2 class="mb-3 text-base font-medium text-stone-900">Recent Sessions</h2>
                 <table class="w-full text-sm">
                     <thead>

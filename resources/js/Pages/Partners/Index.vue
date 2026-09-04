@@ -89,17 +89,17 @@ function money(n) {
     <AppLayout title="Partners">
         <main class="mx-auto max-w-4xl space-y-6 p-6">
             <!-- Partners table -->
-            <section class="rounded-lg bg-white p-4 shadow-sm">
+            <section class="rounded-xl border border-stone-200/70 bg-white p-6 shadow-sm">
                 <div class="mb-3 flex items-center justify-between">
                     <h2 class="text-base font-medium text-stone-900">All Partners</h2>
-                    <button type="button" @click="toggle('add')" class="text-sm text-stone-600 underline">+ Add Partner</button>
+                    <button type="button" @click="toggle('add')" class="text-sm text-indigo-700 underline hover:text-indigo-800">+ Add Partner</button>
                 </div>
 
                 <form v-if="activePanel === 'add'" @submit.prevent="submitPartner" class="mb-4 grid grid-cols-3 gap-2 rounded-md border border-stone-200 p-3">
                     <input v-model="partnerForm.name" type="text" placeholder="Name" class="rounded border-stone-300 text-sm">
                     <input v-model="partnerForm.phone" type="text" placeholder="Phone (optional)" class="rounded border-stone-300 text-sm">
                     <input v-model="partnerForm.joined_at" type="date" class="rounded border-stone-300 text-sm">
-                    <button type="submit" :disabled="partnerForm.processing" class="col-span-3 rounded-md bg-stone-900 px-3 py-1.5 text-sm text-white hover:bg-stone-700">Add</button>
+                    <button type="submit" :disabled="partnerForm.processing" class="col-span-3 rounded-md bg-indigo-600 px-3 py-1.5 text-sm text-white hover:bg-indigo-700">Add</button>
                 </form>
 
                 <table class="w-full text-sm">
@@ -129,7 +129,7 @@ function money(n) {
             </section>
 
             <!-- Rebalance ownership -->
-            <section class="rounded-lg bg-white p-4 shadow-sm">
+            <section class="rounded-xl border border-stone-200/70 bg-white p-6 shadow-sm">
                 <button type="button" @click="toggle('rebalance')" class="text-base font-medium text-stone-900">
                     Rebalance Ownership {{ activePanel === 'rebalance' ? '▲' : '▼' }}
                 </button>
@@ -150,14 +150,14 @@ function money(n) {
                             Total: {{ rebalanceSum.toFixed(2) }}%
                         </span>
                     </div>
-                    <button type="button" :disabled="rebalanceSum !== 100 || rebalanceForm.processing" @click="submitRebalance" class="rounded-md bg-stone-900 px-3 py-1.5 text-sm text-white hover:bg-stone-700 disabled:opacity-50">
+                    <button type="button" :disabled="rebalanceSum !== 100 || rebalanceForm.processing" @click="submitRebalance" class="rounded-md bg-indigo-600 px-3 py-1.5 text-sm text-white hover:bg-indigo-700 disabled:opacity-50">
                         Save Rebalance
                     </button>
                 </div>
             </section>
 
             <!-- Capital -->
-            <section class="rounded-lg bg-white p-4 shadow-sm">
+            <section class="rounded-xl border border-stone-200/70 bg-white p-6 shadow-sm">
                 <button type="button" @click="toggle('capital')" class="text-base font-medium text-stone-900">
                     Record Capital {{ activePanel === 'capital' ? '▲' : '▼' }}
                 </button>
@@ -172,12 +172,12 @@ function money(n) {
                     </select>
                     <input v-model="capitalForm.amount" type="number" step="0.01" placeholder="Amount" class="rounded border-stone-300 text-sm">
                     <input v-model="capitalForm.entry_date" type="date" class="rounded border-stone-300 text-sm">
-                    <button type="submit" :disabled="capitalForm.processing" class="col-span-4 rounded-md bg-stone-900 px-3 py-1.5 text-sm text-white hover:bg-stone-700">Save</button>
+                    <button type="submit" :disabled="capitalForm.processing" class="col-span-4 rounded-md bg-indigo-600 px-3 py-1.5 text-sm text-white hover:bg-indigo-700">Save</button>
                 </form>
             </section>
 
             <!-- Loans -->
-            <section class="rounded-lg bg-white p-4 shadow-sm">
+            <section class="rounded-xl border border-stone-200/70 bg-white p-6 shadow-sm">
                 <button type="button" @click="toggle('loan')" class="text-base font-medium text-stone-900">
                     Issue Loan {{ activePanel === 'loan' ? '▲' : '▼' }}
                 </button>
@@ -188,12 +188,12 @@ function money(n) {
                     </select>
                     <input v-model="loanForm.principal_amount" type="number" step="0.01" placeholder="Principal amount" class="rounded border-stone-300 text-sm">
                     <input v-model="loanForm.issued_at" type="date" class="rounded border-stone-300 text-sm">
-                    <button type="submit" :disabled="loanForm.processing" class="col-span-3 rounded-md bg-stone-900 px-3 py-1.5 text-sm text-white hover:bg-stone-700">Issue Loan</button>
+                    <button type="submit" :disabled="loanForm.processing" class="col-span-3 rounded-md bg-indigo-600 px-3 py-1.5 text-sm text-white hover:bg-indigo-700">Issue Loan</button>
                 </form>
             </section>
 
             <!-- Repayments -->
-            <section v-if="outstandingLoans.length > 0" class="rounded-lg bg-white p-4 shadow-sm">
+            <section v-if="outstandingLoans.length > 0" class="rounded-xl border border-stone-200/70 bg-white p-6 shadow-sm">
                 <button type="button" @click="toggle('repayment')" class="text-base font-medium text-stone-900">
                     Record Loan Repayment {{ activePanel === 'repayment' ? '▲' : '▼' }}
                 </button>
@@ -206,7 +206,7 @@ function money(n) {
                     </select>
                     <input v-model="repaymentForm.amount" type="number" step="0.01" placeholder="Amount" class="rounded border-stone-300 text-sm">
                     <input v-model="repaymentForm.repaid_at" type="date" class="rounded border-stone-300 text-sm">
-                    <button type="submit" :disabled="repaymentForm.processing" class="col-span-3 rounded-md bg-stone-900 px-3 py-1.5 text-sm text-white hover:bg-stone-700">Record Repayment</button>
+                    <button type="submit" :disabled="repaymentForm.processing" class="col-span-3 rounded-md bg-indigo-600 px-3 py-1.5 text-sm text-white hover:bg-indigo-700">Record Repayment</button>
                 </form>
             </section>
         </main>

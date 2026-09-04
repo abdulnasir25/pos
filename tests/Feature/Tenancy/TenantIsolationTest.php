@@ -54,6 +54,21 @@ class TenantIsolationTest extends TestCase
             ->assertNotFound();
     }
 
+    public function test_the_bare_central_domain_root_shows_the_welcome_page(): void
+    {
+        $this->get('http://pos.test/')
+            ->assertOk()
+            ->assertSee('Platform Admin Login');
+    }
+
+    public function test_a_tenant_subdomain_root_redirects_to_that_tenants_login(): void
+    {
+        $this->createTenant('Al-Fateh Cloth House', 'alfateh');
+
+        $this->get('http://alfateh.pos.test/')
+            ->assertRedirect('/login');
+    }
+
     public function test_a_resolved_tenant_gets_its_own_connection(): void
     {
         $this->createTenant('Al-Fateh Cloth House', 'alfateh');

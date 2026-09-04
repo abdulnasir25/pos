@@ -147,7 +147,7 @@ function money(n) {
             </section>
 
             <!-- Cart + checkout -->
-            <section class="rounded-lg bg-white p-4 shadow-sm">
+            <section class="rounded-xl border border-stone-200/70 bg-white p-6 shadow-sm">
                 <h2 class="mb-3 text-base font-medium text-stone-900">Cart</h2>
 
                 <div v-if="form.lines.length === 0" class="text-sm text-stone-400">
@@ -205,7 +205,7 @@ function money(n) {
                 <div class="mt-3 border-t border-stone-200 pt-3">
                     <div class="mb-2 flex items-center justify-between">
                         <label class="text-xs text-stone-500">Payments</label>
-                        <button type="button" @click="payExactBalance" class="text-xs text-stone-600 underline">Pay exact balance</button>
+                        <button type="button" @click="payExactBalance" class="text-xs text-indigo-700 underline hover:text-indigo-800">Pay exact balance</button>
                     </div>
                     <div v-for="(payment, index) in form.payments" :key="index" class="mb-2 flex gap-2">
                         <select v-model="payment.payment_method_id" class="w-1/2 rounded border-stone-300 text-xs">
@@ -221,7 +221,7 @@ function money(n) {
                             ✕
                         </button>
                     </div>
-                    <button type="button" @click="addPaymentRow" class="text-xs text-stone-600 underline">+ Add payment method</button>
+                    <button type="button" @click="addPaymentRow" class="text-xs text-indigo-700 underline hover:text-indigo-800">+ Add payment method</button>
                 </div>
 
                 <div class="mt-3 flex justify-between text-sm">
@@ -242,7 +242,7 @@ function money(n) {
                     type="button"
                     :disabled="form.lines.length === 0 || form.processing"
                     @click="submitSale"
-                    class="mt-4 w-full rounded-md bg-stone-900 px-4 py-2 text-sm font-medium text-white hover:bg-stone-700 disabled:opacity-50"
+                    class="mt-4 w-full rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 disabled:opacity-50"
                 >
                     Confirm Sale
                 </button>
