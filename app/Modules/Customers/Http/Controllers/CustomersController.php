@@ -32,6 +32,25 @@ class CustomersController extends \App\Http\Controllers\Controller
         return back()->with('success', 'Customer added.');
     }
 
+    public function update(Request $request, Customer $customer): RedirectResponse
+    {
+        $validated = $request->validate([
+            'name' => ['required', 'string', 'max:150'],
+            'phone' => ['nullable', 'string', 'max:30'],
+        ]);
+
+        $customer->update($validated);
+
+        return back()->with('success', 'Customer updated.');
+    }
+
+    public function toggleStatus(Customer $customer): RedirectResponse
+    {
+        $customer->update(['status' => $customer->status === 'active' ? 'inactive' : 'active']);
+
+        return back()->with('success', 'Customer status updated.');
+    }
+
     public function storePayment(Request $request, Customer $customer): RedirectResponse
     {
         $validated = $request->validate([

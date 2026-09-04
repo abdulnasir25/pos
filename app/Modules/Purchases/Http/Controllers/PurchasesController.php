@@ -65,6 +65,7 @@ class PurchasesController extends \App\Http\Controllers\Controller
         return Inertia::render('Purchases/Index', [
             'products' => $products,
             'suppliers' => Supplier::where('status', 'active')->get(['id', 'name', 'phone', 'balance']),
+            'allSuppliers' => Supplier::orderBy('name')->get(['id', 'name', 'phone', 'balance', 'status']),
             'warehouses' => Warehouse::where('status', 'active')->get(['id', 'name']),
             'paymentMethods' => PaymentMethod::all(['id', 'name']),
             'purchases' => $purchases,
@@ -86,6 +87,25 @@ class PurchasesController extends \App\Http\Controllers\Controller
         ]);
 
         return back()->with('success', 'Supplier added.');
+    }
+
+    public function updateSupplier(Request $request, Supplier $supplier): RedirectResponse
+    {
+        $validated = $request->validate([
+            'name' => ['required', 'string', 'max:150'],
+            'phone' => ['nullable', 'string', 'max:30'],
+        ]);
+
+        $supplier->update($validated);
+
+        return back()->with('success', 'Supplier updated.');
+    }
+
+    public function toggleSupplierStatus(Supplier $supplier): RedirectResponse
+    {
+        $supplier->update(['status' => $supplier->status === 'active' ? 'inactive' : 'active']);
+
+        return back()->with('success', 'Supplier status updated.');
     }
 
     public function store(Request $request, ConfirmPurchase $confirmPurchase): RedirectResponse

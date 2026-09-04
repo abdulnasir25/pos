@@ -131,4 +131,36 @@ class CustomersControllerTest extends TestCase
         $this->resumeTenantContext();
         $this->assertSame('300.00', $customer->fresh()->balance);
     }
+
+    public function test_a_customer_can_be_updated_through_the_form(): void
+    {
+        $customer = Customer::create(['name' => 'Ahmed', 'balance' => '0.00', 'status' => 'active']);
+        $this->login();
+
+        $response = $this->post("{$this->baseUrl}/customers/{$customer->id}", [
+            'name' => 'Ahmed Khan',
+            'phone' => '0300-9999999',
+        ]);
+
+        $response->assertRedirect();
+        $this->resumeTenantContext();
+        $fresh = $customer->fresh();
+        $this->assertSame('Ahmed Khan', $fresh->name);
+        $this->assertSame('0300-9999999', $fresh->phone);
+    }
+
+    public function test_a_customer_can_be_deactivated_and_reactivated(): void
+    {
+        $customer = Customer::create(['name' => 'Ahmed', 'balance' => '0.00', 'status' => 'active']);
+        $this->login();
+
+        $this->post("{$this->baseUrl}/customers/{$customer->id}/toggle-status")->assertRedirect();
+        $this->resumeTenantContext();
+        $this->assertSame('inactive', $customer->fresh()->status);
+
+        $this->login();
+        $this->post("{$this->baseUrl}/customers/{$customer->id}/toggle-status")->assertRedirect();
+        $this->resumeTenantContext();
+        $this->assertSame('active', $customer->fresh()->status);
+    }
 }

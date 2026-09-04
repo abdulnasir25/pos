@@ -4,11 +4,14 @@ import { useForm, router } from '@inertiajs/vue3';
 import AppLayout from '../../Layouts/AppLayout.vue';
 import PlusIcon from '../../Components/icons/PlusIcon.vue';
 import TrashIcon from '../../Components/icons/TrashIcon.vue';
+import PencilIcon from '../../Components/icons/PencilIcon.vue';
+import CheckIcon from '../../Components/icons/CheckIcon.vue';
 import { useI18n } from '../../i18n';
 
 const props = defineProps({
     products: { type: Array, default: () => [] },
     suppliers: { type: Array, default: () => [] },
+    allSuppliers: { type: Array, default: () => [] },
     warehouses: { type: Array, default: () => [] },
     paymentMethods: { type: Array, default: () => [] },
     purchases: { type: Array, default: () => [] },
@@ -34,6 +37,26 @@ const supplierForm = useForm({ name: '', phone: '' });
 
 function submitSupplier() {
     supplierForm.post('/purchases/suppliers', { preserveScroll: true, onSuccess: () => supplierForm.reset() });
+}
+
+const supplierEditForms = ref({});
+
+function supplierEditForm(supplier) {
+    if (!supplierEditForms.value[supplier.id]) {
+        supplierEditForms.value[supplier.id] = useForm({ name: supplier.name, phone: supplier.phone });
+    }
+    return supplierEditForms.value[supplier.id];
+}
+
+function submitSupplierEdit(supplier) {
+    supplierEditForm(supplier).post(`/purchases/suppliers/${supplier.id}`, {
+        preserveScroll: true,
+        onSuccess: () => toggle(null),
+    });
+}
+
+function toggleSupplierStatus(supplier) {
+    router.post(`/purchases/suppliers/${supplier.id}/toggle-status`, {}, { preserveScroll: true });
 }
 
 // --- Purchase form -----------------------------------------------------
@@ -176,6 +199,61 @@ function purchaseStatusLabel(status) {
                         </div>
                     </div>
                     <p v-if="purchases.length === 0" class="text-sm text-stone-400">{{ t('common.none_yet') }}</p>
+                </div>
+
+                <!-- Suppliers -->
+                <div class="mt-6 rounded-xl border border-stone-200/70 bg-white p-6 shadow-sm">
+                    <h2 class="mb-3 text-base font-medium text-stone-900">{{ t('purchases.suppliers_title') }}</h2>
+                    <table class="w-full text-sm">
+                        <thead>
+                            <tr class="border-b border-stone-200 text-left text-xs uppercase text-stone-500">
+                                <th class="py-2">{{ t('common.name') }}</th><th>{{ t('common.phone') }}</th><th class="text-right">{{ t('customers.balance') }}</th><th>{{ t('common.status') }}</th><th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <template v-for="s in allSuppliers" :key="s.id">
+                                <tr class="border-b border-stone-100">
+                                    <td class="py-2 text-stone-900">{{ s.name }}</td>
+                                    <td class="text-stone-500">{{ s.phone ?? '—' }}</td>
+                                    <td class="text-right tabular-nums">{{ money(s.balance) }}</td>
+                                    <td class="text-stone-500">{{ s.status === 'active' ? t('common.active') : t('common.inactive') }}</td>
+                                    <td class="text-right whitespace-nowrap">
+                                        <button type="button" @click="toggle(`supplier-edit-${s.id}`)" :aria-label="t('common.edit')" class="mr-1 inline-flex size-7 items-center justify-center rounded-full text-indigo-600 hover:bg-indigo-50">
+                                            <PencilIcon class="size-3.5" />
+                                        </button>
+                                        <button
+                                            v-if="s.status === 'active'"
+                                            type="button"
+                                            @click="toggleSupplierStatus(s)"
+                                            :aria-label="t('common.deactivate')"
+                                            class="inline-flex size-7 items-center justify-center rounded-full text-red-600 hover:bg-red-50"
+                                        >
+                                            <TrashIcon class="size-3.5" />
+                                        </button>
+                                        <button
+                                            v-else
+                                            type="button"
+                                            @click="toggleSupplierStatus(s)"
+                                            :aria-label="t('common.activate')"
+                                            class="inline-flex size-7 items-center justify-center rounded-full text-emerald-600 hover:bg-emerald-50"
+                                        >
+                                            <CheckIcon class="size-3.5" />
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr v-if="activePanel === `supplier-edit-${s.id}`" class="border-b border-stone-100 bg-stone-50">
+                                    <td colspan="5" class="p-2">
+                                        <div class="flex items-center gap-2">
+                                            <input v-model="supplierEditForm(s).name" type="text" :placeholder="t('common.name')" class="rounded border-stone-300 text-sm">
+                                            <input v-model="supplierEditForm(s).phone" type="text" :placeholder="t('customers.phone_placeholder')" class="rounded border-stone-300 text-sm">
+                                            <button type="button" @click="submitSupplierEdit(s)" :disabled="supplierEditForm(s).processing" class="rounded-md bg-indigo-600 px-3 py-1.5 text-xs text-white hover:bg-indigo-700">{{ t('common.save') }}</button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </template>
+                        </tbody>
+                    </table>
+                    <p v-if="allSuppliers.length === 0" class="text-sm text-stone-400">{{ t('common.none_yet') }}</p>
                 </div>
             </section>
 

@@ -63,6 +63,7 @@ Route::middleware(['auth', 'permission:expenses.manage'])->group(function () {
 Route::middleware(['auth', 'permission:commission.manage'])->group(function () {
     Route::get('/commission', [CommissionController::class, 'show'])->name('commission');
     Route::post('/commission/rules', [CommissionController::class, 'storeRule'])->name('commission.rules.store');
+    Route::post('/commission/rules/{rule}/toggle-status', [CommissionController::class, 'toggleRuleStatus'])->name('commission.rules.toggle-status');
     Route::post('/commission/periods', [CommissionController::class, 'storePeriod'])->name('commission.periods.store');
     Route::post('/commission/calculate', [CommissionController::class, 'calculate'])->name('commission.calculate');
     Route::post('/commission/entries/{entry}/approve', [CommissionController::class, 'approve'])->name('commission.entries.approve');
@@ -76,6 +77,8 @@ Route::get('/reports', [ReportsController::class, 'show'])->middleware(['auth', 
 Route::middleware(['auth', 'permission:cash_register.manage'])->group(function () {
     Route::get('/cash-register', [CashRegisterController::class, 'show'])->name('cash-register');
     Route::post('/cash-register/accounts', [CashRegisterController::class, 'storeAccount'])->name('cash-register.accounts.store');
+    Route::post('/cash-register/accounts/{account}', [CashRegisterController::class, 'updateAccount'])->name('cash-register.accounts.update');
+    Route::post('/cash-register/accounts/{account}/toggle-status', [CashRegisterController::class, 'toggleAccountStatus'])->name('cash-register.accounts.toggle-status');
     Route::post('/cash-register/sessions', [CashRegisterController::class, 'openSession'])->name('cash-register.sessions.open');
     Route::post('/cash-register/sessions/{session}/close', [CashRegisterController::class, 'closeSession'])->name('cash-register.sessions.close');
 });
@@ -85,6 +88,8 @@ Route::get('/audit-log', [AuditLogController::class, 'show'])->middleware(['auth
 Route::middleware(['auth', 'permission:purchases.manage'])->group(function () {
     Route::get('/purchases', [PurchasesController::class, 'show'])->name('purchases');
     Route::post('/purchases/suppliers', [PurchasesController::class, 'storeSupplier'])->name('purchases.suppliers.store');
+    Route::post('/purchases/suppliers/{supplier}', [PurchasesController::class, 'updateSupplier'])->name('purchases.suppliers.update');
+    Route::post('/purchases/suppliers/{supplier}/toggle-status', [PurchasesController::class, 'toggleSupplierStatus'])->name('purchases.suppliers.toggle-status');
     Route::post('/purchases', [PurchasesController::class, 'store'])->name('purchases.store');
     Route::post('/purchases/{purchase}/cancel', [PurchasesController::class, 'cancel'])->name('purchases.cancel');
     Route::post('/purchases/returns', [PurchasesController::class, 'storeReturn'])->name('purchases.returns.store');
@@ -99,19 +104,26 @@ Route::middleware(['auth', 'permission:accounting.view'])->group(function () {
 Route::middleware(['auth', 'permission:products.manage'])->group(function () {
     Route::get('/products', [ProductsController::class, 'show'])->name('products');
     Route::post('/products/units', [ProductsController::class, 'storeUnit'])->name('products.units.store');
+    Route::post('/products/units/{unit}', [ProductsController::class, 'updateUnit'])->name('products.units.update');
     Route::post('/products', [ProductsController::class, 'storeProduct'])->name('products.store');
     Route::post('/products/{product}/conversions', [ProductsController::class, 'storeConversion'])->name('products.conversions.store');
+    Route::post('/products/{product}', [ProductsController::class, 'updateProduct'])->name('products.update');
+    Route::post('/products/{product}/toggle-status', [ProductsController::class, 'toggleProductStatus'])->name('products.toggle-status');
 });
 
 Route::middleware(['auth', 'permission:warehouses.manage'])->group(function () {
     Route::get('/warehouses', [WarehousesController::class, 'show'])->name('warehouses');
     Route::post('/warehouses', [WarehousesController::class, 'store'])->name('warehouses.store');
+    Route::post('/warehouses/{warehouse}', [WarehousesController::class, 'update'])->name('warehouses.update');
+    Route::post('/warehouses/{warehouse}/toggle-status', [WarehousesController::class, 'toggleStatus'])->name('warehouses.toggle-status');
 });
 
 Route::middleware(['auth', 'permission:customers.manage'])->group(function () {
     Route::get('/customers', [CustomersController::class, 'show'])->name('customers');
     Route::post('/customers', [CustomersController::class, 'store'])->name('customers.store');
     Route::post('/customers/{customer}/payments', [CustomersController::class, 'storePayment'])->name('customers.payments.store');
+    Route::post('/customers/{customer}', [CustomersController::class, 'update'])->name('customers.update');
+    Route::post('/customers/{customer}/toggle-status', [CustomersController::class, 'toggleStatus'])->name('customers.toggle-status');
 });
 
 Route::get('/employees', [EmployeesController::class, 'show'])->middleware(['auth', 'permission:employees.view'])->name('employees');
@@ -119,6 +131,7 @@ Route::get('/employees', [EmployeesController::class, 'show'])->middleware(['aut
 Route::middleware(['auth', 'permission:employees.manage'])->group(function () {
     Route::post('/employees', [EmployeesController::class, 'store'])->name('employees.store');
     Route::post('/employees/{employee}/status', [EmployeesController::class, 'storeStatus'])->name('employees.status.store');
+    Route::post('/employees/{employee}/profile', [EmployeesController::class, 'updateProfile'])->name('employees.profile.update');
 });
 
 Route::middleware(['auth', 'permission:salaries.manage'])->group(function () {

@@ -138,6 +138,22 @@ class CommissionControllerTest extends TestCase
         $this->assertSame(1, CommissionRule::where('employee_id', $employee->id)->count());
     }
 
+    public function test_a_commission_rules_status_can_be_toggled_through_the_form(): void
+    {
+        $employee = app(CreateEmployee::class)->handle('Tailor Ahmed', '2026-01-01');
+        $rule = app(CreateCommissionRule::class)->handle($employee, '10', $this->today);
+        $this->login();
+
+        $this->post("{$this->baseUrl}/commission/rules/{$rule->id}/toggle-status")->assertRedirect();
+        $this->resumeTenantContext();
+        $this->assertSame('inactive', $rule->fresh()->status->value);
+
+        $this->login();
+        $this->post("{$this->baseUrl}/commission/rules/{$rule->id}/toggle-status")->assertRedirect();
+        $this->resumeTenantContext();
+        $this->assertSame('active', $rule->fresh()->status->value);
+    }
+
     public function test_a_financial_period_can_be_created_through_the_form(): void
     {
         $this->login();

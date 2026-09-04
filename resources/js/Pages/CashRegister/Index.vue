@@ -4,6 +4,9 @@ import { useForm, router } from '@inertiajs/vue3';
 import AppLayout from '../../Layouts/AppLayout.vue';
 import PlusIcon from '../../Components/icons/PlusIcon.vue';
 import ChevronDownIcon from '../../Components/icons/ChevronDownIcon.vue';
+import PencilIcon from '../../Components/icons/PencilIcon.vue';
+import TrashIcon from '../../Components/icons/TrashIcon.vue';
+import CheckIcon from '../../Components/icons/CheckIcon.vue';
 import { useI18n } from '../../i18n';
 
 const props = defineProps({
@@ -41,6 +44,28 @@ const accountForm = useForm({ name: '', account_type: 'cash', opening_balance: '
 
 function submitAccount() {
     accountForm.post('/cash-register/accounts', { preserveScroll: true, onSuccess: () => accountForm.reset('name') });
+}
+
+// --- Edit / deactivate account ------------------------------------------
+
+const editForms = ref({});
+
+function editForm(account) {
+    if (!editForms.value[account.id]) {
+        editForms.value[account.id] = useForm({ name: account.name });
+    }
+    return editForms.value[account.id];
+}
+
+function submitEditAccount(account) {
+    editForm(account).post(`/cash-register/accounts/${account.id}`, {
+        preserveScroll: true,
+        onSuccess: () => toggle(null),
+    });
+}
+
+function toggleAccountStatus(accountId) {
+    router.post(`/cash-register/accounts/${accountId}/toggle-status`, {}, { preserveScroll: true });
 }
 
 // --- Open session --------------------------------------------------------
@@ -115,22 +140,52 @@ const closingAmounts = ref({});
                         </tr>
                     </thead>
                     <tbody>
-                        <tr v-for="a in accounts" :key="a.id" class="border-b border-stone-100">
-                            <td class="py-2 font-medium text-stone-900">{{ a.name }}</td>
-                            <td class="text-stone-500">{{ accountTypeLabel(a.account_type) }}</td>
-                            <td>
-                                <span v-if="a.open_session" class="rounded-full bg-emerald-100 px-2 py-0.5 text-xs text-emerald-800">
-                                    {{ t('cash_register.open_float', { amount: money(a.open_session.opening_float) }) }}
-                                </span>
-                                <span v-else class="rounded-full bg-stone-100 px-2 py-0.5 text-xs text-stone-600">{{ t('cash_register.closed') }}</span>
-                            </td>
-                            <td class="text-right">
-                                <div v-if="a.open_session" class="flex items-center justify-end gap-2">
-                                    <input v-model="closingAmounts[a.open_session.id]" type="number" step="0.01" :placeholder="t('cash_register.counted_placeholder')" class="w-32 rounded border-stone-300 text-xs">
-                                    <button type="button" @click="closeSession(a.open_session.id, closingAmounts[a.open_session.id])" class="text-xs text-indigo-700 underline hover:text-indigo-800">{{ t('cash_register.close_action') }}</button>
-                                </div>
-                            </td>
-                        </tr>
+                        <template v-for="a in accounts" :key="a.id">
+                            <tr class="border-b border-stone-100">
+                                <td class="py-2 font-medium text-stone-900">{{ a.name }}</td>
+                                <td class="text-stone-500">{{ accountTypeLabel(a.account_type) }}</td>
+                                <td>
+                                    <span v-if="a.open_session" class="rounded-full bg-emerald-100 px-2 py-0.5 text-xs text-emerald-800">
+                                        {{ t('cash_register.open_float', { amount: money(a.open_session.opening_float) }) }}
+                                    </span>
+                                    <span v-else class="rounded-full bg-stone-100 px-2 py-0.5 text-xs text-stone-600">{{ t('cash_register.closed') }}</span>
+                                </td>
+                                <td class="text-right">
+                                    <div class="flex items-center justify-end gap-2">
+                                        <template v-if="a.open_session">
+                                            <input v-model="closingAmounts[a.open_session.id]" type="number" step="0.01" :placeholder="t('cash_register.counted_placeholder')" class="w-32 rounded border-stone-300 text-xs">
+                                            <button type="button" @click="closeSession(a.open_session.id, closingAmounts[a.open_session.id])" class="text-xs text-indigo-700 underline hover:text-indigo-800">{{ t('cash_register.close_action') }}</button>
+                                        </template>
+                                        <button
+                                            type="button"
+                                            @click="toggle(`edit-${a.id}`)"
+                                            :aria-label="t('common.edit')"
+                                            class="inline-flex size-6 items-center justify-center rounded-full text-stone-500 hover:bg-stone-100 hover:text-indigo-700"
+                                        >
+                                            <PencilIcon class="size-3.5" />
+                                        </button>
+                                        <button
+                                            type="button"
+                                            @click="toggleAccountStatus(a.id)"
+                                            :aria-label="a.status === 'active' ? t('common.deactivate') : t('common.activate')"
+                                            class="inline-flex size-6 items-center justify-center rounded-full text-stone-500 hover:bg-stone-100"
+                                            :class="a.status === 'active' ? 'hover:text-red-700' : 'hover:text-emerald-700'"
+                                        >
+                                            <TrashIcon v-if="a.status === 'active'" class="size-3.5" />
+                                            <CheckIcon v-else class="size-3.5" />
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr v-if="activePanel === `edit-${a.id}`" class="border-b border-stone-100 bg-stone-50">
+                                <td colspan="4" class="p-2">
+                                    <div class="flex items-center gap-2">
+                                        <input v-model="editForm(a).name" type="text" :placeholder="t('common.name')" class="rounded border-stone-300 text-sm">
+                                        <button type="button" @click="submitEditAccount(a)" :disabled="editForm(a).processing" class="rounded-md bg-indigo-600 px-3 py-1.5 text-xs text-white hover:bg-indigo-700">{{ t('common.save') }}</button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </template>
                         <tr v-if="accounts.length === 0"><td colspan="4" class="py-3 text-center text-stone-400">{{ t('cash_register.none_yet') }}</td></tr>
                     </tbody>
                 </table>

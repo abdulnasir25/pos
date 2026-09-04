@@ -27,4 +27,22 @@ class WarehousesController extends \App\Http\Controllers\Controller
 
         return back()->with('success', 'Warehouse added.');
     }
+
+    public function update(Request $request, Warehouse $warehouse): RedirectResponse
+    {
+        $validated = $request->validate([
+            'name' => ['required', 'string', 'max:150', 'unique:warehouses,name,'.$warehouse->id],
+        ]);
+
+        $warehouse->update($validated);
+
+        return back()->with('success', 'Warehouse updated.');
+    }
+
+    public function toggleStatus(Warehouse $warehouse): RedirectResponse
+    {
+        $warehouse->update(['status' => $warehouse->status === 'active' ? 'inactive' : 'active']);
+
+        return back()->with('success', 'Warehouse status updated.');
+    }
 }

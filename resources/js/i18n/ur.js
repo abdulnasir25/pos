@@ -84,6 +84,9 @@ export default {
     'common.active': 'فعال',
     'common.inactive': 'غیر فعال',
     'common.none_yet': 'ابھی کچھ شامل نہیں۔',
+    'common.edit': 'تبدیل کریں',
+    'common.deactivate': 'بند کریں',
+    'common.activate': 'دوبارہ چالو کریں',
 
     // Warehouses
     'warehouses.title': 'گودام',
@@ -361,6 +364,7 @@ export default {
     'purchases.new_purchase': 'نئی خریداری',
     'purchases.cancel': 'منسوخ کریں',
     'purchases.return': 'واپس کریں',
+    'purchases.suppliers_title': 'سپلائرز',
     'purchases.search_placeholder': 'چیز تلاش کریں...',
     'purchases.supplier': 'سپلائر',
     'purchases.supplier_name_placeholder': 'سپلائر کا نام',

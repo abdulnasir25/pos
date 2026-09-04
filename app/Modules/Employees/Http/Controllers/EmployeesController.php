@@ -6,6 +6,7 @@ use App\Modules\Employees\Actions\ChangeEmployeeStatus;
 use App\Modules\Employees\Actions\CreateEmployee;
 use App\Modules\Employees\Actions\RecordSalaryChange;
 use App\Modules\Employees\Actions\RecordSalaryPayment;
+use App\Modules\Employees\Actions\UpdateEmployeeProfile;
 use App\Modules\Employees\Enums\EmployeeStatus;
 use App\Modules\Employees\Exceptions\InvalidCompensationRangeException;
 use App\Modules\Employees\Exceptions\OverlappingCompensationException;
@@ -67,6 +68,18 @@ class EmployeesController extends \App\Http\Controllers\Controller
         );
 
         return back()->with('success', 'Employee added.');
+    }
+
+    public function updateProfile(Request $request, Employee $employee): RedirectResponse
+    {
+        $validated = $request->validate([
+            'name' => ['required', 'string', 'max:150'],
+            'phone' => ['nullable', 'string', 'max:30'],
+        ]);
+
+        app(UpdateEmployeeProfile::class)->handle($employee, $validated['name'], $validated['phone'] ?? null);
+
+        return back()->with('success', 'Employee updated.');
     }
 
     public function storeSalary(Request $request, Employee $employee): RedirectResponse
