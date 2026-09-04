@@ -212,6 +212,10 @@ export default {
     'commission.save_correction': 'تصحیح محفوظ کریں',
     'commission.no_open_period': 'کوئی کھلی مدت موجود نہیں جہاں یہ تصحیح درج ہو سکے۔',
     'commission.open_period_option': 'کھلی مدت: :range',
+    'commission.status_calculated': 'حساب لگ گیا',
+    'commission.status_approved': 'منظور شدہ',
+    'commission.status_finalized': 'حتمی',
+    'commission.status_paid': 'ادا شدہ',
 
     // Cash Register / Cash Counter
     'cash_register.title': 'کیش کاؤنٹر',
@@ -237,6 +241,8 @@ export default {
     'cash_register.float': 'ابتدائی رقم',
     'cash_register.counted': 'گنی گئی',
     'cash_register.sessions_none_yet': 'ابھی کوئی سیشن نہیں۔',
+    'cash_register.session_open': 'کھلا',
+    'cash_register.session_closed': 'بند',
 
     // Financial Periods / Closing Period
     'financial_periods.title': 'ماہانہ حساب',
@@ -315,6 +321,8 @@ export default {
     'reports.customers_owe': 'گاہکوں کا ادھار — :amount',
     'reports.we_owe': 'سپلائرز کو ادھار — :amount',
     'reports.none_outstanding': 'کوئی ادھار نہیں۔',
+    'reports.status_draft': 'ابتدائی',
+    'reports.status_finalized': 'حتمی',
 
     // Audit Log / Activity History
     'audit_log.title': 'سرگرمیوں کا ریکارڈ',
@@ -364,6 +372,9 @@ export default {
     'purchases.qty_to_return': 'واپس کرنے کی مقدار',
     'purchases.confirm_return': 'واپسی کی تصدیق',
     'purchases.total_payable': 'کل :total · باقی :payable',
+    'purchases.status_confirmed': 'مکمل',
+    'purchases.status_cancelled': 'منسوخ',
+    'purchases.status_returned': 'واپس شدہ',
 
     // Language switcher
     'lang.switch': 'English',

@@ -114,6 +114,15 @@ function cancelPurchase(purchaseId) {
 function money(n) {
     return (Math.round(parseFloat(n ?? 0) * 100) / 100).toFixed(2);
 }
+
+const purchaseStatusLabels = {
+    confirmed: () => t('purchases.status_confirmed'),
+    cancelled: () => t('purchases.status_cancelled'),
+    returned: () => t('purchases.status_returned'),
+};
+function purchaseStatusLabel(status) {
+    return purchaseStatusLabels[status]?.() ?? status;
+}
 </script>
 
 <template>
@@ -142,7 +151,7 @@ function money(n) {
                     <div v-for="p in purchases" :key="p.id" class="mb-2 rounded-md border border-stone-200 p-2 text-sm">
                         <div class="flex items-center justify-between">
                             <span class="font-medium">{{ p.reference_no }} — {{ p.supplier }}</span>
-                            <span class="rounded-full bg-stone-100 px-2 py-0.5 text-xs">{{ p.status }}</span>
+                            <span class="rounded-full bg-stone-100 px-2 py-0.5 text-xs">{{ purchaseStatusLabel(p.status) }}</span>
                         </div>
                         <div class="mt-1 flex items-center justify-between text-xs text-stone-500">
                             <span>{{ t('purchases.total_payable', { total: money(p.total), payable: money(p.balance_payable) }) }}</span>

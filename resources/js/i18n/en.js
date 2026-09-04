@@ -212,6 +212,10 @@ export default {
     'commission.save_correction': 'Save Correction',
     'commission.no_open_period': 'No open period exists to record this correction in.',
     'commission.open_period_option': 'Open period: :range',
+    'commission.status_calculated': 'Worked out',
+    'commission.status_approved': 'Approved',
+    'commission.status_finalized': 'Finalized',
+    'commission.status_paid': 'Paid',
 
     // Cash Register / Cash Counter
     'cash_register.title': 'Cash Counter',
@@ -237,6 +241,8 @@ export default {
     'cash_register.float': 'Start Cash',
     'cash_register.counted': 'Counted',
     'cash_register.sessions_none_yet': 'No sessions yet.',
+    'cash_register.session_open': 'Open',
+    'cash_register.session_closed': 'Closed',
 
     // Financial Periods / Closing Period
     'financial_periods.title': 'Closing Period',
@@ -315,6 +321,8 @@ export default {
     'reports.customers_owe': 'Customers owe us — :amount',
     'reports.we_owe': 'We owe suppliers — :amount',
     'reports.none_outstanding': 'Nothing outstanding.',
+    'reports.status_draft': 'Draft',
+    'reports.status_finalized': 'Finalized',
 
     // Audit Log / Activity History
     'audit_log.title': 'Activity History',
@@ -364,6 +372,9 @@ export default {
     'purchases.qty_to_return': 'Qty to return',
     'purchases.confirm_return': 'Confirm Return',
     'purchases.total_payable': 'Total :total · To pay :payable',
+    'purchases.status_confirmed': 'Confirmed',
+    'purchases.status_cancelled': 'Cancelled',
+    'purchases.status_returned': 'Returned',
 
     // Language switcher
     'lang.switch': 'اردو',

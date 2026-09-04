@@ -35,6 +35,10 @@ function reload(overrides = {}) {
 function money(n) {
     return (Math.round(parseFloat(n ?? 0) * 100) / 100).toFixed(2);
 }
+
+function plStatusLabel(status) {
+    return status === 'draft' ? t('reports.status_draft') : t('reports.status_finalized');
+}
 </script>
 
 <template>
@@ -130,7 +134,7 @@ function money(n) {
                     <div><p class="text-xs text-stone-500">{{ t('reports.commission_expense') }}</p><p class="tabular-nums font-medium">{{ money(profitAndLoss.commissionExpense) }}</p></div>
                     <div><p class="text-xs text-stone-500">{{ t('reports.other_expenses') }}</p><p class="tabular-nums font-medium">{{ money(profitAndLoss.otherOperatingExpenses) }}</p></div>
                     <div><p class="text-xs text-stone-500">{{ t('reports.net_profit') }}</p><p class="tabular-nums font-medium text-emerald-700">{{ money(profitAndLoss.netProfit) }}</p></div>
-                    <div><p class="text-xs text-stone-500">{{ t('reports.status') }}</p><p class="font-medium">{{ profitAndLoss.status }}</p></div>
+                    <div><p class="text-xs text-stone-500">{{ t('reports.status') }}</p><p class="font-medium">{{ plStatusLabel(profitAndLoss.status) }}</p></div>
                     <div><p class="text-xs text-stone-500">{{ t('reports.distributable') }}</p><p class="tabular-nums font-medium">{{ money(profitAndLoss.distributableProfit) }}</p></div>
                     <div><p class="text-xs text-stone-500">{{ t('reports.retained') }}</p><p class="tabular-nums font-medium">{{ money(profitAndLoss.retainedProfit) }}</p></div>
                 </div>
