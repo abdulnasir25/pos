@@ -50,6 +50,15 @@ class BillingControllerTest extends TestCase
         $response->assertInertia(fn ($page) => $page->component('Landlord/Billing/Index'));
     }
 
+    public function test_an_already_authenticated_admin_visiting_login_is_sent_to_billing_not_dashboard(): void
+    {
+        $this->actingAs($this->admin(), 'landlord');
+
+        $response = $this->get('/landlord/login');
+
+        $response->assertRedirect('/landlord/billing');
+    }
+
     public function test_wrong_credentials_are_rejected(): void
     {
         $this->admin();
