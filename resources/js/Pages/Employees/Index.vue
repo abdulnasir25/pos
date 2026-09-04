@@ -148,7 +148,7 @@ function submitPayment(employeeId) {
                     </button>
                 </div>
 
-                <form v-if="activePanel === 'employee'" @submit.prevent="submitEmployee" class="mb-4 grid grid-cols-4 gap-2 rounded-md border border-stone-200 p-3">
+                <form v-if="activePanel === 'employee'" @submit.prevent="submitEmployee" class="mb-4 grid grid-cols-1 sm:grid-cols-4 gap-2 rounded-md border border-stone-200 p-3">
                     <input v-model="employeeForm.name" type="text" :placeholder="t('common.name')" class="rounded border-stone-300 text-sm">
                     <input v-model="employeeForm.phone" type="text" :placeholder="t('customers.phone_placeholder')" class="rounded border-stone-300 text-sm">
                     <input v-model="employeeForm.hired_at" type="date" class="rounded border-stone-300 text-sm">
@@ -162,6 +162,7 @@ function submitPayment(employeeId) {
                     </button>
                 </form>
 
+                <div class="overflow-x-auto">
                 <table class="w-full text-sm">
                     <thead>
                         <tr class="border-b border-stone-200 text-left text-xs uppercase text-stone-500">
@@ -255,6 +256,7 @@ function submitPayment(employeeId) {
                         </template>
                     </tbody>
                 </table>
+                </div>
                 <p v-if="employees.length === 0" class="text-sm text-stone-400">{{ t('employees.none_yet') }}</p>
             </section>
         </main>

@@ -96,7 +96,7 @@ function submitEntry() {
                     </button>
                 </div>
 
-                <form v-if="activePanel === 'account'" @submit.prevent="submitAccount" class="mb-4 grid grid-cols-4 gap-2 rounded-md border border-stone-200 p-3">
+                <form v-if="activePanel === 'account'" @submit.prevent="submitAccount" class="mb-4 grid grid-cols-1 sm:grid-cols-4 gap-2 rounded-md border border-stone-200 p-3">
                     <input v-model="accountForm.code" type="text" :placeholder="t('accounting.code_placeholder')" class="rounded border-stone-300 text-sm">
                     <input v-model="accountForm.name" type="text" :placeholder="t('common.name')" class="rounded border-stone-300 text-sm">
                     <select v-model="accountForm.type" class="rounded border-stone-300 text-sm">
@@ -121,6 +121,7 @@ function submitEntry() {
                     </button>
                 </form>
 
+                <div class="overflow-x-auto">
                 <table class="w-full text-sm">
                     <thead>
                         <tr class="border-b border-stone-200 text-left text-xs uppercase text-stone-500">
@@ -136,6 +137,7 @@ function submitEntry() {
                         </tr>
                     </tbody>
                 </table>
+                </div>
             </section>
 
             <!-- Journal entry -->
@@ -151,7 +153,7 @@ function submitEntry() {
                         <input v-model="entryForm.description" type="text" :placeholder="t('accounting.description_placeholder')" class="flex-1 rounded border-stone-300 text-sm">
                     </div>
 
-                    <div v-for="(line, index) in entryForm.lines" :key="index" class="mb-2 grid grid-cols-4 gap-2">
+                    <div v-for="(line, index) in entryForm.lines" :key="index" class="mb-2 grid grid-cols-1 sm:grid-cols-4 gap-2">
                         <select v-model="line.account_id" class="col-span-2 rounded border-stone-300 text-sm">
                             <option v-for="a in accounts" :key="a.id" :value="a.id">{{ a.code }} — {{ a.name }}</option>
                         </select>

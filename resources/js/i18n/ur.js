@@ -87,6 +87,8 @@ export default {
     'common.edit': 'تبدیل کریں',
     'common.deactivate': 'بند کریں',
     'common.activate': 'دوبارہ چالو کریں',
+    'common.menu': 'مینیو',
+    'common.close': 'بند کریں',
 
     // Warehouses
     'warehouses.title': 'گودام',

@@ -110,7 +110,7 @@ function toggleProductStatus(product) {
                     </button>
                 </div>
 
-                <form v-if="activePanel === 'unit'" @submit.prevent="submitUnit" class="mb-3 grid grid-cols-3 gap-2 rounded-md border border-stone-200 p-3">
+                <form v-if="activePanel === 'unit'" @submit.prevent="submitUnit" class="mb-3 grid grid-cols-1 sm:grid-cols-3 gap-2 rounded-md border border-stone-200 p-3">
                     <input v-model="unitForm.name" type="text" :placeholder="t('products.unit_name_placeholder')" class="rounded border-stone-300 text-sm">
                     <input v-model="unitForm.abbreviation" type="text" :placeholder="t('products.unit_short_placeholder')" class="rounded border-stone-300 text-sm">
                     <button
@@ -156,7 +156,7 @@ function toggleProductStatus(product) {
                     </button>
                 </div>
 
-                <form v-if="activePanel === 'product'" @submit.prevent="submitProduct" class="mb-4 grid grid-cols-4 gap-2 rounded-md border border-stone-200 p-3">
+                <form v-if="activePanel === 'product'" @submit.prevent="submitProduct" class="mb-4 grid grid-cols-1 sm:grid-cols-4 gap-2 rounded-md border border-stone-200 p-3">
                     <input v-model="productForm.name" type="text" :placeholder="t('products.name_placeholder')" class="rounded border-stone-300 text-sm">
                     <input v-model="productForm.sku" type="text" :placeholder="t('products.sku_placeholder')" class="rounded border-stone-300 text-sm">
                     <select v-model="productForm.base_unit_id" class="rounded border-stone-300 text-sm">
@@ -173,6 +173,7 @@ function toggleProductStatus(product) {
                     </button>
                 </form>
 
+                <div class="overflow-x-auto">
                 <table class="w-full text-sm">
                     <thead>
                         <tr class="border-b border-stone-200 text-left text-xs uppercase text-stone-500">
@@ -244,7 +245,7 @@ function toggleProductStatus(product) {
                             </tr>
                             <tr v-if="activePanel === `edit-${p.id}`" class="border-b border-stone-100 bg-stone-50">
                                 <td colspan="6" class="p-2">
-                                    <div class="grid grid-cols-4 gap-2">
+                                    <div class="grid grid-cols-1 sm:grid-cols-4 gap-2">
                                         <input v-model="productEditForm(p).name" type="text" :placeholder="t('products.name_placeholder')" class="rounded border-stone-300 text-sm">
                                         <input v-model="productEditForm(p).sku" type="text" :placeholder="t('products.sku_placeholder')" class="rounded border-stone-300 text-sm">
                                         <input v-model="productEditForm(p).low_stock_threshold" type="number" step="0.0001" :placeholder="t('products.low_stock_placeholder')" class="rounded border-stone-300 text-sm">
@@ -255,6 +256,7 @@ function toggleProductStatus(product) {
                         </template>
                     </tbody>
                 </table>
+                </div>
                 <p v-if="products.length === 0" class="text-sm text-stone-400">{{ t('products.list_empty') }}</p>
             </section>
         </main>

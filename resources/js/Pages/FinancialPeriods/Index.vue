@@ -65,12 +65,13 @@ const statusClass = {
                     </button>
                 </div>
 
-                <form v-if="showForm" @submit.prevent="submit" class="mb-4 grid grid-cols-3 gap-2 rounded-md border border-stone-200 p-3">
+                <form v-if="showForm" @submit.prevent="submit" class="mb-4 grid grid-cols-1 sm:grid-cols-3 gap-2 rounded-md border border-stone-200 p-3">
                     <input v-model="form.period_start" type="date" class="rounded border-stone-300 text-sm">
                     <input v-model="form.period_end" type="date" class="rounded border-stone-300 text-sm">
                     <button type="submit" :disabled="form.processing" class="rounded-md bg-indigo-600 px-3 py-1.5 text-sm text-white hover:bg-indigo-700">{{ t('financial_periods.create') }}</button>
                 </form>
 
+                <div class="overflow-x-auto">
                 <table class="w-full text-sm">
                     <thead>
                         <tr class="border-b border-stone-200 text-left text-xs uppercase text-stone-500">
@@ -97,6 +98,7 @@ const statusClass = {
                         </tr>
                     </tbody>
                 </table>
+                </div>
                 <p v-if="periods.length === 0" class="text-sm text-stone-400">{{ t('financial_periods.none_yet') }}</p>
             </section>
         </main>

@@ -60,7 +60,7 @@ function plStatusLabel(status) {
                     <button type="button" @click="reload()" class="rounded-md bg-indigo-600 px-3 py-1.5 text-sm text-white hover:bg-indigo-700">{{ t('reports.run') }}</button>
                 </div>
 
-                <div v-if="salesSummary" class="grid grid-cols-4 gap-4 text-sm">
+                <div v-if="salesSummary" class="grid grid-cols-2 sm:grid-cols-4 gap-4 text-sm">
                     <div><p class="text-xs text-stone-500">{{ t('dashboard.revenue') }}</p><p class="tabular-nums font-medium">{{ money(salesSummary.revenue) }}</p></div>
                     <div><p class="text-xs text-stone-500">{{ t('dashboard.cogs') }}</p><p class="tabular-nums font-medium">{{ money(salesSummary.cogs) }}</p></div>
                     <div><p class="text-xs text-stone-500">{{ t('dashboard.gross_profit') }}</p><p class="tabular-nums font-medium text-emerald-700">{{ money(salesSummary.grossProfit) }}</p></div>
@@ -88,6 +88,7 @@ function plStatusLabel(status) {
                     </div>
                 </div>
 
+                <div class="overflow-x-auto">
                 <table class="w-full text-sm">
                     <thead>
                         <tr class="border-b border-stone-200 text-left text-xs uppercase text-stone-500">
@@ -111,6 +112,7 @@ function plStatusLabel(status) {
                         </tr>
                     </tfoot>
                 </table>
+                </div>
             </section>
 
             <!-- Profit and Loss -->
@@ -128,7 +130,7 @@ function plStatusLabel(status) {
 
                 <p v-if="profitAndLossError" class="text-sm text-amber-700">{{ profitAndLossError }}</p>
                 <p v-else-if="!profitAndLoss" class="text-sm text-stone-400">{{ t('reports.select_period_hint') }}</p>
-                <div v-else class="grid grid-cols-3 gap-3 text-sm">
+                <div v-else class="grid grid-cols-2 sm:grid-cols-3 gap-3 text-sm">
                     <div><p class="text-xs text-stone-500">{{ t('reports.gross_profit') }}</p><p class="tabular-nums font-medium">{{ money(profitAndLoss.grossProfit) }}</p></div>
                     <div><p class="text-xs text-stone-500">{{ t('reports.salary_expense') }}</p><p class="tabular-nums font-medium">{{ money(profitAndLoss.salaryExpense) }}</p></div>
                     <div><p class="text-xs text-stone-500">{{ t('reports.commission_expense') }}</p><p class="tabular-nums font-medium">{{ money(profitAndLoss.commissionExpense) }}</p></div>
@@ -143,7 +145,7 @@ function plStatusLabel(status) {
             <!-- Outstanding Balances -->
             <section class="rounded-xl border border-stone-200/70 bg-white p-6 shadow-sm">
                 <h2 class="mb-3 text-base font-medium text-stone-900">{{ t('reports.outstanding_balances') }}</h2>
-                <div class="grid grid-cols-2 gap-6">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
                     <div>
                         <p class="mb-2 text-xs uppercase text-stone-500">{{ t('reports.customers_owe', { amount: money(outstandingBalances?.totalReceivable) }) }}</p>
                         <div v-for="(c, i) in outstandingBalances?.customers ?? []" :key="i" class="flex justify-between border-b border-stone-100 py-1 text-sm">

@@ -65,6 +65,7 @@ function toggleStatus(warehouse) {
 
             <section class="rounded-xl border border-stone-200/70 bg-white p-6 shadow-sm">
                 <h2 class="mb-3 text-base font-medium text-stone-900">{{ t('warehouses.all') }}</h2>
+                <div class="overflow-x-auto">
                 <table class="w-full text-sm">
                     <thead>
                         <tr class="border-b border-stone-200 text-left text-xs uppercase text-stone-500">
@@ -116,6 +117,7 @@ function toggleStatus(warehouse) {
                         </template>
                     </tbody>
                 </table>
+                </div>
                 <p v-if="warehouses.length === 0" class="text-sm text-stone-400">{{ t('warehouses.none_yet') }}</p>
             </section>
         </main>

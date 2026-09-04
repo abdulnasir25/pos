@@ -87,6 +87,8 @@ export default {
     'common.edit': 'Edit',
     'common.deactivate': 'Turn off',
     'common.activate': 'Turn on',
+    'common.menu': 'Menu',
+    'common.close': 'Close',
 
     // Warehouses
     'warehouses.title': 'Warehouses',

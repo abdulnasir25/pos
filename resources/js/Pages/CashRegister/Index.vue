@@ -115,7 +115,7 @@ const closingAmounts = ref({});
                     </button>
                 </div>
 
-                <form v-if="activePanel === 'account'" @submit.prevent="submitAccount" class="mb-4 grid grid-cols-3 gap-2 rounded-md border border-stone-200 p-3">
+                <form v-if="activePanel === 'account'" @submit.prevent="submitAccount" class="mb-4 grid grid-cols-1 sm:grid-cols-3 gap-2 rounded-md border border-stone-200 p-3">
                     <input v-model="accountForm.name" type="text" :placeholder="t('cash_register.name_placeholder')" class="rounded border-stone-300 text-sm">
                     <select v-model="accountForm.account_type" class="rounded border-stone-300 text-sm">
                         <option value="cash">{{ t('cash_register.type_cash') }}</option>
@@ -133,6 +133,7 @@ const closingAmounts = ref({});
                     </button>
                 </form>
 
+                <div class="overflow-x-auto">
                 <table class="w-full text-sm">
                     <thead>
                         <tr class="border-b border-stone-200 text-left text-xs uppercase text-stone-500">
@@ -189,6 +190,7 @@ const closingAmounts = ref({});
                         <tr v-if="accounts.length === 0"><td colspan="4" class="py-3 text-center text-stone-400">{{ t('cash_register.none_yet') }}</td></tr>
                     </tbody>
                 </table>
+                </div>
             </section>
 
             <!-- Open session -->
@@ -198,7 +200,7 @@ const closingAmounts = ref({});
                     <ChevronDownIcon class="size-4 transition-transform" :class="{ 'rotate-180': activePanel === 'open' }" />
                 </button>
 
-                <form v-if="activePanel === 'open'" @submit.prevent="submitOpen" class="mt-3 grid grid-cols-3 gap-2">
+                <form v-if="activePanel === 'open'" @submit.prevent="submitOpen" class="mt-3 grid grid-cols-1 sm:grid-cols-3 gap-2">
                     <select v-model="openForm.financial_account_id" class="rounded border-stone-300 text-sm">
                         <option v-for="a in closedCashAccounts" :key="a.id" :value="a.id">{{ a.name }}</option>
                     </select>
@@ -210,6 +212,7 @@ const closingAmounts = ref({});
             <!-- Recent sessions -->
             <section class="rounded-xl border border-stone-200/70 bg-white p-6 shadow-sm">
                 <h2 class="mb-3 text-base font-medium text-stone-900">{{ t('cash_register.recent_sessions') }}</h2>
+                <div class="overflow-x-auto">
                 <table class="w-full text-sm">
                     <thead>
                         <tr class="border-b border-stone-200 text-left text-xs uppercase text-stone-500">
@@ -231,6 +234,7 @@ const closingAmounts = ref({});
                         <tr v-if="recentSessions.length === 0"><td colspan="5" class="py-3 text-center text-stone-400">{{ t('cash_register.sessions_none_yet') }}</td></tr>
                     </tbody>
                 </table>
+                </div>
             </section>
         </main>
     </AppLayout>

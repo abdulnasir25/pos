@@ -90,7 +90,7 @@ function toggleStatus(customer) {
                     </button>
                 </div>
 
-                <form v-if="activePanel === 'customer'" @submit.prevent="submitCustomer" class="mb-4 grid grid-cols-3 gap-2 rounded-md border border-stone-200 p-3">
+                <form v-if="activePanel === 'customer'" @submit.prevent="submitCustomer" class="mb-4 grid grid-cols-1 sm:grid-cols-3 gap-2 rounded-md border border-stone-200 p-3">
                     <input v-model="customerForm.name" type="text" :placeholder="t('common.name')" class="rounded border-stone-300 text-sm">
                     <input v-model="customerForm.phone" type="text" :placeholder="t('customers.phone_placeholder')" class="rounded border-stone-300 text-sm">
                     <button
@@ -103,6 +103,7 @@ function toggleStatus(customer) {
                     </button>
                 </form>
 
+                <div class="overflow-x-auto">
                 <table class="w-full text-sm">
                     <thead>
                         <tr class="border-b border-stone-200 text-left text-xs uppercase text-stone-500">
@@ -164,6 +165,7 @@ function toggleStatus(customer) {
                         </template>
                     </tbody>
                 </table>
+                </div>
                 <p v-if="customers.length === 0" class="text-sm text-stone-400">{{ t('customers.none_yet') }}</p>
             </section>
         </main>

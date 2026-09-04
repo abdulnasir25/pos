@@ -67,4 +67,24 @@
     html.font-urdu body {
         line-height: 1.85;
     }
+
+    /*
+     * Every data table across the app is built from bare <th>/<td>
+     * with no horizontal spacing between columns (see e.g.
+     * Employees/Index.vue) — on narrower screens especially, adjacent
+     * right-aligned and left-aligned text visually runs together
+     * ("SALARYSTATUS"). Styling the elements directly here gives every
+     * table consistent column gaps and row padding at once; a cell's
+     * own utility classes (colspan edit-row padding, etc.) still win
+     * since component-authored classes override @layer base.
+     */
+    table th,
+    table td {
+        @apply py-2 pr-4;
+    }
+
+    table th:last-child,
+    table td:last-child {
+        @apply pr-0;
+    }
 }

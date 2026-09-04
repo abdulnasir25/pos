@@ -134,7 +134,7 @@ function submitCorrection() {
                     <ChevronDownIcon class="size-4 transition-transform" :class="{ 'rotate-180': activePanel === 'rule' }" />
                 </button>
 
-                <form v-if="activePanel === 'rule'" @submit.prevent="submitRule" class="mt-3 grid grid-cols-4 gap-2">
+                <form v-if="activePanel === 'rule'" @submit.prevent="submitRule" class="mt-3 grid grid-cols-1 sm:grid-cols-4 gap-2">
                     <select v-model="ruleForm.employee_id" class="rounded border-stone-300 text-sm">
                         <option v-for="e in employees" :key="e.id" :value="e.id">{{ e.name }}</option>
                     </select>
@@ -150,6 +150,7 @@ function submitCorrection() {
                     </button>
                 </form>
 
+                <div class="overflow-x-auto">
                 <table class="mt-3 w-full text-sm">
                     <thead>
                         <tr class="border-b border-stone-200 text-left text-xs uppercase text-stone-500">
@@ -178,6 +179,7 @@ function submitCorrection() {
                         <tr v-if="rules.length === 0"><td colspan="5" class="py-3 text-center text-stone-400">{{ t('commission.no_rules') }}</td></tr>
                     </tbody>
                 </table>
+                </div>
             </section>
 
             <!-- Financial periods + calculate -->
@@ -187,7 +189,7 @@ function submitCorrection() {
                     <ChevronDownIcon class="size-4 transition-transform" :class="{ 'rotate-180': activePanel === 'period' }" />
                 </button>
 
-                <form v-if="activePanel === 'period'" @submit.prevent="submitPeriod" class="mt-3 grid grid-cols-3 gap-2">
+                <form v-if="activePanel === 'period'" @submit.prevent="submitPeriod" class="mt-3 grid grid-cols-1 sm:grid-cols-3 gap-2">
                     <input v-model="periodForm.period_start" type="date" class="rounded border-stone-300 text-sm">
                     <input v-model="periodForm.period_end" type="date" class="rounded border-stone-300 text-sm">
                     <button
@@ -216,6 +218,7 @@ function submitCorrection() {
             <!-- Entries -->
             <section class="rounded-xl border border-stone-200/70 bg-white p-6 shadow-sm">
                 <h2 class="mb-3 text-base font-medium text-stone-900">{{ t('commission.entries') }}</h2>
+                <div class="overflow-x-auto">
                 <table class="w-full text-sm">
                     <thead>
                         <tr class="border-b border-stone-200 text-left text-xs uppercase text-stone-500">
@@ -241,6 +244,7 @@ function submitCorrection() {
                         <tr v-if="entries.length === 0"><td colspan="7" class="py-3 text-center text-stone-400">{{ t('commission.none_yet') }}</td></tr>
                     </tbody>
                 </table>
+                </div>
             </section>
 
             <!-- Correction -->
@@ -253,7 +257,7 @@ function submitCorrection() {
                     {{ t('commission.correction_note') }}
                 </p>
 
-                <form v-if="activePanel === 'correction'" @submit.prevent="submitCorrection" class="mt-3 grid grid-cols-2 gap-2">
+                <form v-if="activePanel === 'correction'" @submit.prevent="submitCorrection" class="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-2">
                     <select v-model="correctionForm.original_commission_entry_id" class="rounded border-stone-300 text-sm">
                         <option v-for="e in finalizedEntries" :key="e.id" :value="e.id">{{ e.employee }} — {{ e.period }}</option>
                     </select>

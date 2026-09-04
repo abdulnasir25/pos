@@ -28,7 +28,7 @@ function money(n) {
                         <Link href="/reports" class="text-sm text-indigo-700 underline hover:text-indigo-800">{{ t('dashboard.full_reports') }}</Link>
                     </div>
 
-                    <div class="grid grid-cols-4 gap-4 text-sm">
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 text-sm">
                         <div><p class="text-xs text-stone-500">{{ t('dashboard.revenue') }}</p><p class="tabular-nums font-medium">{{ money(salesSummary.revenue) }}</p></div>
                         <div><p class="text-xs text-stone-500">{{ t('dashboard.cogs') }}</p><p class="tabular-nums font-medium">{{ money(salesSummary.cogs) }}</p></div>
                         <div><p class="text-xs text-stone-500">{{ t('dashboard.gross_profit') }}</p><p class="tabular-nums font-medium text-emerald-700">{{ money(salesSummary.grossProfit) }}</p></div>
