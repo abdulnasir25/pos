@@ -22,6 +22,19 @@ function money(n) {
     return (Math.round(parseFloat(n ?? 0) * 100) / 100).toFixed(2);
 }
 
+const accountTypeLabels = {
+    cash: () => t('cash_register.type_cash'),
+    bank: () => t('cash_register.type_bank'),
+    digital_wallet: () => t('cash_register.type_wallet'),
+};
+function accountTypeLabel(type) {
+    return accountTypeLabels[type]?.() ?? type;
+}
+
+function sessionStatusLabel(status) {
+    return status === 'open' ? t('cash_register.session_open') : t('cash_register.session_closed');
+}
+
 // --- Add account -----------------------------------------------------------
 
 const accountForm = useForm({ name: '', account_type: 'cash', opening_balance: '0.00' });
@@ -104,7 +117,7 @@ const closingAmounts = ref({});
                     <tbody>
                         <tr v-for="a in accounts" :key="a.id" class="border-b border-stone-100">
                             <td class="py-2 font-medium text-stone-900">{{ a.name }}</td>
-                            <td class="text-stone-500">{{ a.account_type }}</td>
+                            <td class="text-stone-500">{{ accountTypeLabel(a.account_type) }}</td>
                             <td>
                                 <span v-if="a.open_session" class="rounded-full bg-emerald-100 px-2 py-0.5 text-xs text-emerald-800">
                                     {{ t('cash_register.open_float', { amount: money(a.open_session.opening_float) }) }}
@@ -156,7 +169,7 @@ const closingAmounts = ref({});
                             <td class="tabular-nums">{{ s.counted_closing !== null ? money(s.counted_closing) : '—' }}</td>
                             <td>
                                 <span class="rounded-full px-2 py-0.5 text-xs" :class="s.status === 'open' ? 'bg-emerald-100 text-emerald-800' : 'bg-stone-100 text-stone-600'">
-                                    {{ s.status }}
+                                    {{ sessionStatusLabel(s.status) }}
                                 </span>
                             </td>
                         </tr>

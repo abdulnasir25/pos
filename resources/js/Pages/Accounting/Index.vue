@@ -23,6 +23,18 @@ function money(n) {
     return (Math.round(parseFloat(n ?? 0) * 100) / 100).toFixed(2);
 }
 
+const accountTypeLabels = {
+    asset: () => t('accounting.type_asset'),
+    liability: () => t('accounting.type_liability'),
+    equity: () => t('accounting.type_equity'),
+    contra_equity: () => t('accounting.type_contra_equity'),
+    revenue: () => t('accounting.type_revenue'),
+    expense: () => t('accounting.type_expense'),
+};
+function accountTypeLabel(type) {
+    return accountTypeLabels[type]?.() ?? type;
+}
+
 // --- Add account -----------------------------------------------------------
 
 const accountForm = useForm({ code: '', name: '', type: 'asset', parent_id: '' });
@@ -119,7 +131,7 @@ function submitEntry() {
                         <tr v-for="a in accounts" :key="a.id" class="border-b border-stone-100">
                             <td class="py-2 font-mono text-xs text-stone-500">{{ a.code }}</td>
                             <td class="text-stone-900">{{ a.name }}</td>
-                            <td class="text-stone-500">{{ a.type }}</td>
+                            <td class="text-stone-500">{{ accountTypeLabel(a.type) }}</td>
                             <td class="text-right tabular-nums" :class="parseFloat(a.balance) < 0 ? 'text-red-600' : ''">{{ money(a.balance) }}</td>
                         </tr>
                     </tbody>

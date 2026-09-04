@@ -26,6 +26,26 @@ function money(n) {
     return (Math.round(parseFloat(n ?? 0) * 100) / 100).toFixed(2);
 }
 
+const periodStatusLabels = {
+    open: () => t('financial_periods.status_open'),
+    calculating: () => t('financial_periods.status_calculating'),
+    under_review: () => t('financial_periods.status_under_review'),
+    closed: () => t('financial_periods.status_closed'),
+};
+function periodStatusLabel(status) {
+    return periodStatusLabels[status]?.() ?? status;
+}
+
+const entryStatusLabels = {
+    calculated: () => t('commission.status_calculated'),
+    approved: () => t('commission.status_approved'),
+    finalized: () => t('commission.status_finalized'),
+    paid: () => t('commission.status_paid'),
+};
+function entryStatusLabel(status) {
+    return entryStatusLabels[status]?.() ?? status;
+}
+
 // --- Commission rules -------------------------------------------------
 
 const ruleForm = useForm({
@@ -167,7 +187,7 @@ function submitCorrection() {
                     <form @submit.prevent="submitCalculate" class="flex gap-2">
                         <select v-model="calculateForm.financial_period_id" class="flex-1 rounded border-stone-300 text-sm">
                             <option v-for="p in periods" :key="p.id" :value="p.id">
-                                {{ p.period_start }} – {{ p.period_end }} ({{ p.status }})
+                                {{ p.period_start }} – {{ p.period_end }} ({{ periodStatusLabel(p.status) }})
                             </option>
                         </select>
                         <button type="submit" :disabled="calculateForm.processing" class="rounded-md bg-indigo-600 px-3 py-1.5 text-sm text-white hover:bg-indigo-700">{{ t('commission.calculate') }}</button>
@@ -192,7 +212,7 @@ function submitCorrection() {
                             <td class="tabular-nums">{{ e.rate_applied }}%</td>
                             <td class="tabular-nums font-medium">{{ money(e.commission_amount) }}</td>
                             <td>
-                                <span class="rounded-full bg-stone-100 px-2 py-0.5 text-xs text-stone-700">{{ e.status }}</span>
+                                <span class="rounded-full bg-stone-100 px-2 py-0.5 text-xs text-stone-700">{{ entryStatusLabel(e.status) }}</span>
                             </td>
                             <td class="text-right">
                                 <button v-if="e.status === 'calculated'" type="button" @click="approve(e.id)" class="text-xs text-indigo-700 underline hover:text-indigo-800">{{ t('commission.approve') }}</button>
