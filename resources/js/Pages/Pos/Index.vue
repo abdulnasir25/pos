@@ -2,6 +2,7 @@
 import { computed, ref } from 'vue';
 import { usePage, useForm } from '@inertiajs/vue3';
 import AppLayout from '../../Layouts/AppLayout.vue';
+import { useI18n } from '../../i18n';
 
 const props = defineProps({
     products: { type: Array, default: () => [] },
@@ -11,6 +12,7 @@ const props = defineProps({
 });
 
 const page = usePage();
+const { t } = useI18n();
 
 const search = ref('');
 const filteredProducts = computed(() => {
@@ -94,13 +96,17 @@ function money(n) {
 </script>
 
 <template>
-    <AppLayout title="Point of Sale">
+    <AppLayout :title="t('pos.title')">
         <div
             v-if="page.props.flash?.sale"
+            dir="auto"
             class="mx-6 mt-4 rounded-lg border border-emerald-300 bg-emerald-50 px-4 py-3 text-sm text-emerald-800"
         >
-            Sale <strong>{{ page.props.flash.sale.reference_no }}</strong> confirmed — total
-            {{ money(page.props.flash.sale.total) }}, balance due {{ money(page.props.flash.sale.balance_due) }}.
+            {{ t('pos.sale_confirmed', {
+                ref: page.props.flash.sale.reference_no,
+                total: money(page.props.flash.sale.total),
+                due: money(page.props.flash.sale.balance_due),
+            }) }}
         </div>
 
         <div
@@ -117,7 +123,7 @@ function money(n) {
                     <input
                         v-model="search"
                         type="text"
-                        placeholder="Search products by name or SKU..."
+                        :placeholder="t('pos.search_placeholder')"
                         class="w-full rounded-md border-stone-300 shadow-sm focus:border-stone-500 focus:ring-stone-500"
                     >
                     <select
@@ -138,44 +144,44 @@ function money(n) {
                     >
                         <p class="font-medium text-stone-900">{{ product.name }}</p>
                         <p class="text-xs text-stone-500">{{ product.sku ?? '—' }}</p>
-                        <p class="mt-1 text-xs text-stone-600">Stock: {{ stockFor(product) }}</p>
+                        <p dir="auto" class="mt-1 text-xs text-stone-600">{{ t('pos.stock_label', { qty: stockFor(product) }) }}</p>
                     </button>
-                    <p v-if="filteredProducts.length === 0" class="col-span-full text-sm text-stone-400">
-                        No products match "{{ search }}".
+                    <p v-if="filteredProducts.length === 0" dir="auto" class="col-span-full text-sm text-stone-400">
+                        {{ t('pos.no_products_match', { query: search }) }}
                     </p>
                 </div>
             </section>
 
             <!-- Cart + checkout -->
             <section class="rounded-xl border border-stone-200/70 bg-white p-6 shadow-sm">
-                <h2 class="mb-3 text-base font-medium text-stone-900">Cart</h2>
+                <h2 class="mb-3 text-base font-medium text-stone-900">{{ t('pos.cart') }}</h2>
 
                 <div v-if="form.lines.length === 0" class="text-sm text-stone-400">
-                    No items yet — click a product to add it.
+                    {{ t('pos.no_items_yet') }}
                 </div>
 
                 <div v-for="(line, index) in form.lines" :key="index" class="mb-3 rounded-md border border-stone-200 p-2">
                     <div class="mb-2 flex items-center justify-between">
                         <span class="text-sm font-medium text-stone-900">{{ line.product_name }}</span>
-                        <button type="button" @click="removeLine(index)" class="text-xs text-red-600 hover:text-red-800">Remove</button>
+                        <button type="button" @click="removeLine(index)" class="text-xs text-red-600 hover:text-red-800">{{ t('pos.remove') }}</button>
                     </div>
                     <div class="grid grid-cols-4 gap-2 text-xs">
                         <div>
-                            <label class="text-stone-500">Unit</label>
+                            <label class="text-stone-500">{{ t('pos.unit') }}</label>
                             <select v-model="line.unit_id" class="mt-0.5 w-full rounded border-stone-300 text-xs">
                                 <option v-for="u in line.units" :key="u.id" :value="u.id">{{ u.name }}</option>
                             </select>
                         </div>
                         <div>
-                            <label class="text-stone-500">Qty</label>
+                            <label class="text-stone-500">{{ t('pos.qty') }}</label>
                             <input v-model="line.quantity" type="number" step="0.0001" min="0.0001" class="mt-0.5 w-full rounded border-stone-300 text-xs">
                         </div>
                         <div>
-                            <label class="text-stone-500">Price</label>
+                            <label class="text-stone-500">{{ t('pos.price') }}</label>
                             <input v-model="line.unit_price" type="number" step="0.01" min="0" class="mt-0.5 w-full rounded border-stone-300 text-xs">
                         </div>
                         <div>
-                            <label class="text-stone-500">Discount</label>
+                            <label class="text-stone-500">{{ t('pos.discount') }}</label>
                             <input v-model="line.discount" type="number" step="0.01" min="0" class="mt-0.5 w-full rounded border-stone-300 text-xs">
                         </div>
                     </div>
@@ -188,30 +194,30 @@ function money(n) {
                 </div>
 
                 <div class="mt-4 border-t border-stone-200 pt-3">
-                    <label class="text-xs text-stone-500">Customer (optional — leave blank for walk-in)</label>
+                    <label class="text-xs text-stone-500">{{ t('pos.customer_optional') }}</label>
                     <select v-model="form.customer_id" class="mt-1 w-full rounded-md border-stone-300 text-sm">
-                        <option :value="null">Walk-in</option>
+                        <option :value="null">{{ t('pos.walk_in') }}</option>
                         <option v-for="c in customers" :key="c.id" :value="c.id">
-                            {{ c.name }}{{ Number(c.balance) > 0 ? ` (owes ${money(c.balance)})` : '' }}
+                            {{ c.name }}{{ Number(c.balance) > 0 ? ` (${money(c.balance)})` : '' }}
                         </option>
                     </select>
                 </div>
 
                 <div class="mt-3 flex justify-between text-sm text-stone-700">
-                    <span>Subtotal</span>
+                    <span>{{ t('pos.subtotal') }}</span>
                     <span class="font-medium tabular-nums">{{ money(subtotal) }}</span>
                 </div>
 
                 <div class="mt-3 border-t border-stone-200 pt-3">
                     <div class="mb-2 flex items-center justify-between">
-                        <label class="text-xs text-stone-500">Payments</label>
-                        <button type="button" @click="payExactBalance" class="text-xs text-indigo-700 underline hover:text-indigo-800">Pay exact balance</button>
+                        <label class="text-xs text-stone-500">{{ t('pos.payments') }}</label>
+                        <button type="button" @click="payExactBalance" class="text-xs text-indigo-700 underline hover:text-indigo-800">{{ t('pos.pay_exact_balance') }}</button>
                     </div>
                     <div v-for="(payment, index) in form.payments" :key="index" class="mb-2 flex gap-2">
                         <select v-model="payment.payment_method_id" class="w-1/2 rounded border-stone-300 text-xs">
                             <option v-for="m in paymentMethods" :key="m.id" :value="m.id">{{ m.name }}</option>
                         </select>
-                        <input v-model="payment.amount" type="number" step="0.01" min="0" placeholder="Amount" class="w-1/2 rounded border-stone-300 text-xs">
+                        <input v-model="payment.amount" type="number" step="0.01" min="0" :placeholder="t('pos.amount')" class="w-1/2 rounded border-stone-300 text-xs">
                         <button
                             v-if="form.payments.length > 1"
                             type="button"
@@ -221,15 +227,15 @@ function money(n) {
                             ✕
                         </button>
                     </div>
-                    <button type="button" @click="addPaymentRow" class="text-xs text-indigo-700 underline hover:text-indigo-800">+ Add payment method</button>
+                    <button type="button" @click="addPaymentRow" class="text-xs text-indigo-700 underline hover:text-indigo-800">{{ t('pos.add_payment_method') }}</button>
                 </div>
 
                 <div class="mt-3 flex justify-between text-sm">
-                    <span class="text-stone-700">Paid</span>
+                    <span class="text-stone-700">{{ t('pos.paid') }}</span>
                     <span class="font-medium tabular-nums">{{ money(paidTotal) }}</span>
                 </div>
                 <div class="flex justify-between text-sm">
-                    <span class="text-stone-700">Balance due</span>
+                    <span class="text-stone-700">{{ t('pos.balance_due') }}</span>
                     <span
                         class="font-medium tabular-nums"
                         :class="balanceDue > 0 ? 'text-amber-700' : 'text-emerald-700'"
@@ -244,7 +250,7 @@ function money(n) {
                     @click="submitSale"
                     class="mt-4 w-full rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 disabled:opacity-50"
                 >
-                    Confirm Sale
+                    {{ t('pos.confirm_sale') }}
                 </button>
             </section>
         </main>

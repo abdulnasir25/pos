@@ -2,6 +2,9 @@
 import { ref, watch } from 'vue';
 import { useForm, router } from '@inertiajs/vue3';
 import AppLayout from '../../Layouts/AppLayout.vue';
+import PlusIcon from '../../Components/icons/PlusIcon.vue';
+import ChevronDownIcon from '../../Components/icons/ChevronDownIcon.vue';
+import { useI18n } from '../../i18n';
 
 const props = defineProps({
     employees: { type: Array, default: () => [] },
@@ -12,6 +15,7 @@ const props = defineProps({
     finalizedEntries: { type: Array, default: () => [] },
 });
 
+const { t } = useI18n();
 const activePanel = ref(null);
 
 function toggle(panel) {
@@ -95,27 +99,35 @@ function submitCorrection() {
 </script>
 
 <template>
-    <AppLayout title="Commission">
+    <AppLayout :title="t('commission.title')">
         <main class="mx-auto max-w-4xl space-y-6 p-6">
             <!-- Rules -->
             <section class="rounded-xl border border-stone-200/70 bg-white p-6 shadow-sm">
-                <button type="button" @click="toggle('rule')" class="text-base font-medium text-stone-900">
-                    Commission Rules {{ activePanel === 'rule' ? '▲' : '▼' }}
+                <button type="button" @click="toggle('rule')" class="flex items-center gap-2 text-base font-medium text-stone-900">
+                    {{ t('commission.rules_title') }}
+                    <ChevronDownIcon class="size-4 transition-transform" :class="{ 'rotate-180': activePanel === 'rule' }" />
                 </button>
 
                 <form v-if="activePanel === 'rule'" @submit.prevent="submitRule" class="mt-3 grid grid-cols-4 gap-2">
                     <select v-model="ruleForm.employee_id" class="rounded border-stone-300 text-sm">
                         <option v-for="e in employees" :key="e.id" :value="e.id">{{ e.name }}</option>
                     </select>
-                    <input v-model="ruleForm.rate" type="number" step="0.01" placeholder="Rate %" class="rounded border-stone-300 text-sm">
+                    <input v-model="ruleForm.rate" type="number" step="0.01" :placeholder="t('commission.rate_placeholder')" class="rounded border-stone-300 text-sm">
                     <input v-model="ruleForm.effective_from" type="date" class="rounded border-stone-300 text-sm">
-                    <button type="submit" :disabled="ruleForm.processing" class="rounded-md bg-indigo-600 px-3 py-1.5 text-sm text-white hover:bg-indigo-700">Add Rule</button>
+                    <button
+                        type="submit"
+                        :disabled="ruleForm.processing"
+                        :aria-label="t('common.add')"
+                        class="flex items-center justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-white hover:bg-indigo-700"
+                    >
+                        <PlusIcon class="size-4" />
+                    </button>
                 </form>
 
                 <table class="mt-3 w-full text-sm">
                     <thead>
                         <tr class="border-b border-stone-200 text-left text-xs uppercase text-stone-500">
-                            <th class="py-2">Employee</th><th>Rate</th><th>Effective From</th><th>Status</th>
+                            <th class="py-2">{{ t('commission.employee') }}</th><th>{{ t('commission.rate') }}</th><th>{{ t('commission.effective_from') }}</th><th>{{ t('commission.status') }}</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -123,45 +135,53 @@ function submitCorrection() {
                             <td class="py-2">{{ r.employee }}</td>
                             <td class="tabular-nums">{{ r.rate }}%</td>
                             <td>{{ r.effective_from }}</td>
-                            <td>{{ r.status }}</td>
+                            <td>{{ r.status === 'active' ? t('common.active') : t('common.inactive') }}</td>
                         </tr>
-                        <tr v-if="rules.length === 0"><td colspan="4" class="py-3 text-center text-stone-400">No rules yet.</td></tr>
+                        <tr v-if="rules.length === 0"><td colspan="4" class="py-3 text-center text-stone-400">{{ t('commission.no_rules') }}</td></tr>
                     </tbody>
                 </table>
             </section>
 
             <!-- Financial periods + calculate -->
             <section class="rounded-xl border border-stone-200/70 bg-white p-6 shadow-sm">
-                <button type="button" @click="toggle('period')" class="text-base font-medium text-stone-900">
-                    Financial Periods {{ activePanel === 'period' ? '▲' : '▼' }}
+                <button type="button" @click="toggle('period')" class="flex items-center gap-2 text-base font-medium text-stone-900">
+                    {{ t('commission.periods_title') }}
+                    <ChevronDownIcon class="size-4 transition-transform" :class="{ 'rotate-180': activePanel === 'period' }" />
                 </button>
 
                 <form v-if="activePanel === 'period'" @submit.prevent="submitPeriod" class="mt-3 grid grid-cols-3 gap-2">
                     <input v-model="periodForm.period_start" type="date" class="rounded border-stone-300 text-sm">
                     <input v-model="periodForm.period_end" type="date" class="rounded border-stone-300 text-sm">
-                    <button type="submit" :disabled="periodForm.processing" class="rounded-md bg-indigo-600 px-3 py-1.5 text-sm text-white hover:bg-indigo-700">Create Period</button>
+                    <button
+                        type="submit"
+                        :disabled="periodForm.processing"
+                        :aria-label="t('common.add')"
+                        class="flex items-center justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-white hover:bg-indigo-700"
+                    >
+                        <PlusIcon class="size-4" />
+                    </button>
                 </form>
 
                 <div v-if="periods.length > 0" class="mt-4 border-t border-stone-200 pt-3">
-                    <p class="mb-2 text-sm text-stone-700">Calculate commission for a period</p>
+                    <p class="mb-2 text-sm text-stone-700">{{ t('commission.calculate_hint') }}</p>
                     <form @submit.prevent="submitCalculate" class="flex gap-2">
                         <select v-model="calculateForm.financial_period_id" class="flex-1 rounded border-stone-300 text-sm">
                             <option v-for="p in periods" :key="p.id" :value="p.id">
                                 {{ p.period_start }} – {{ p.period_end }} ({{ p.status }})
                             </option>
                         </select>
-                        <button type="submit" :disabled="calculateForm.processing" class="rounded-md bg-indigo-600 px-3 py-1.5 text-sm text-white hover:bg-indigo-700">Calculate</button>
+                        <button type="submit" :disabled="calculateForm.processing" class="rounded-md bg-indigo-600 px-3 py-1.5 text-sm text-white hover:bg-indigo-700">{{ t('commission.calculate') }}</button>
                     </form>
                 </div>
             </section>
 
             <!-- Entries -->
             <section class="rounded-xl border border-stone-200/70 bg-white p-6 shadow-sm">
-                <h2 class="mb-3 text-base font-medium text-stone-900">Commission Entries</h2>
+                <h2 class="mb-3 text-base font-medium text-stone-900">{{ t('commission.entries') }}</h2>
                 <table class="w-full text-sm">
                     <thead>
                         <tr class="border-b border-stone-200 text-left text-xs uppercase text-stone-500">
-                            <th class="py-2">Employee</th><th>Period</th><th>Gross Profit</th><th>Rate</th><th>Commission</th><th>Status</th><th></th>
+                            <th class="py-2">{{ t('commission.employee') }}</th><th>{{ t('commission.period') }}</th><th>{{ t('commission.gross_profit') }}</th><th>{{ t('commission.rate') }}</th><th>{{ t('commission.commission') }}</th><th>{{ t('commission.status') }}</th><th></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -175,23 +195,24 @@ function submitCorrection() {
                                 <span class="rounded-full bg-stone-100 px-2 py-0.5 text-xs text-stone-700">{{ e.status }}</span>
                             </td>
                             <td class="text-right">
-                                <button v-if="e.status === 'calculated'" type="button" @click="approve(e.id)" class="text-xs text-indigo-700 underline hover:text-indigo-800">Approve</button>
-                                <button v-else-if="e.status === 'approved'" type="button" @click="finalize(e.id)" class="text-xs text-indigo-700 underline hover:text-indigo-800">Finalize</button>
-                                <button v-else-if="e.status === 'finalized'" type="button" @click="pay(e.id)" class="text-xs text-indigo-700 underline hover:text-indigo-800">Pay</button>
+                                <button v-if="e.status === 'calculated'" type="button" @click="approve(e.id)" class="text-xs text-indigo-700 underline hover:text-indigo-800">{{ t('commission.approve') }}</button>
+                                <button v-else-if="e.status === 'approved'" type="button" @click="finalize(e.id)" class="text-xs text-indigo-700 underline hover:text-indigo-800">{{ t('commission.finalize') }}</button>
+                                <button v-else-if="e.status === 'finalized'" type="button" @click="pay(e.id)" class="text-xs text-indigo-700 underline hover:text-indigo-800">{{ t('commission.pay') }}</button>
                             </td>
                         </tr>
-                        <tr v-if="entries.length === 0"><td colspan="7" class="py-3 text-center text-stone-400">No commission entries yet.</td></tr>
+                        <tr v-if="entries.length === 0"><td colspan="7" class="py-3 text-center text-stone-400">{{ t('commission.none_yet') }}</td></tr>
                     </tbody>
                 </table>
             </section>
 
             <!-- Correction -->
             <section v-if="finalizedEntries.length > 0" class="rounded-xl border border-stone-200/70 bg-white p-6 shadow-sm">
-                <button type="button" @click="toggle('correction')" class="text-base font-medium text-stone-900">
-                    Record Correction {{ activePanel === 'correction' ? '▲' : '▼' }}
+                <button type="button" @click="toggle('correction')" class="flex items-center gap-2 text-base font-medium text-stone-900">
+                    {{ t('commission.correction') }}
+                    <ChevronDownIcon class="size-4 transition-transform" :class="{ 'rotate-180': activePanel === 'correction' }" />
                 </button>
                 <p v-if="activePanel === 'correction'" class="mt-1 text-xs text-stone-500">
-                    Always lands in the currently open period — never edits the finalized entry it corrects.
+                    {{ t('commission.correction_note') }}
                 </p>
 
                 <form v-if="activePanel === 'correction'" @submit.prevent="submitCorrection" class="mt-3 grid grid-cols-2 gap-2">
@@ -199,18 +220,18 @@ function submitCorrection() {
                         <option v-for="e in finalizedEntries" :key="e.id" :value="e.id">{{ e.employee }} — {{ e.period }}</option>
                     </select>
                     <select v-model="correctionForm.financial_period_id" class="rounded border-stone-300 text-sm">
-                        <option v-for="p in openPeriods" :key="p.id" :value="p.id">Open period: {{ p.period_start }} – {{ p.period_end }}</option>
+                        <option v-for="p in openPeriods" :key="p.id" :value="p.id">{{ t('commission.open_period_option', { range: `${p.period_start} – ${p.period_end}` }) }}</option>
                     </select>
-                    <input v-model="correctionForm.amount" type="number" step="0.01" placeholder="Amount (e.g. -50)" class="rounded border-stone-300 text-sm">
+                    <input v-model="correctionForm.amount" type="number" step="0.01" :placeholder="t('commission.amount_placeholder')" class="rounded border-stone-300 text-sm">
                     <select v-model="correctionForm.reason" class="rounded border-stone-300 text-sm">
-                        <option value="sale_return">Sale return</option>
-                        <option value="sale_cancellation">Sale cancellation</option>
-                        <option value="manual_adjustment">Manual adjustment</option>
+                        <option value="sale_return">{{ t('commission.reason_return') }}</option>
+                        <option value="sale_cancellation">{{ t('commission.reason_cancel') }}</option>
+                        <option value="manual_adjustment">{{ t('commission.reason_manual') }}</option>
                     </select>
                     <button type="submit" :disabled="correctionForm.processing || openPeriods.length === 0" class="col-span-2 rounded-md bg-indigo-600 px-3 py-1.5 text-sm text-white hover:bg-indigo-700 disabled:opacity-50">
-                        Save Correction
+                        {{ t('commission.save_correction') }}
                     </button>
-                    <p v-if="openPeriods.length === 0" class="col-span-2 text-xs text-red-600">No open financial period exists to land this correction in.</p>
+                    <p v-if="openPeriods.length === 0" class="col-span-2 text-xs text-red-600">{{ t('commission.no_open_period') }}</p>
                 </form>
             </section>
         </main>

@@ -2,12 +2,15 @@
 import { ref, watch } from 'vue';
 import { useForm } from '@inertiajs/vue3';
 import AppLayout from '../../Layouts/AppLayout.vue';
+import PlusIcon from '../../Components/icons/PlusIcon.vue';
+import { useI18n } from '../../i18n';
 
 const props = defineProps({
     customers: { type: Array, default: () => [] },
     paymentMethods: { type: Array, default: () => [] },
 });
 
+const { t } = useI18n();
 const activePanel = ref(null);
 
 function toggle(panel) {
@@ -49,24 +52,38 @@ function recordPayment(customerId) {
 </script>
 
 <template>
-    <AppLayout title="Customers">
+    <AppLayout :title="t('customers.title')">
         <main class="mx-auto max-w-3xl space-y-6 p-6">
             <section class="rounded-xl border border-stone-200/70 bg-white p-6 shadow-sm">
                 <div class="mb-3 flex items-center justify-between">
-                    <h2 class="text-base font-medium text-stone-900">Customers</h2>
-                    <button type="button" @click="toggle('customer')" class="text-sm text-indigo-700 underline hover:text-indigo-800">+ Add Customer</button>
+                    <h2 class="text-base font-medium text-stone-900">{{ t('customers.list_title') }}</h2>
+                    <button
+                        type="button"
+                        @click="toggle('customer')"
+                        :aria-label="t('common.add')"
+                        class="flex size-8 items-center justify-center rounded-full bg-indigo-600 text-white hover:bg-indigo-700"
+                    >
+                        <PlusIcon class="size-4" />
+                    </button>
                 </div>
 
                 <form v-if="activePanel === 'customer'" @submit.prevent="submitCustomer" class="mb-4 grid grid-cols-3 gap-2 rounded-md border border-stone-200 p-3">
-                    <input v-model="customerForm.name" type="text" placeholder="Name" class="rounded border-stone-300 text-sm">
-                    <input v-model="customerForm.phone" type="text" placeholder="Phone (optional)" class="rounded border-stone-300 text-sm">
-                    <button type="submit" :disabled="customerForm.processing" class="rounded-md bg-indigo-600 px-3 py-1.5 text-sm text-white hover:bg-indigo-700">Add</button>
+                    <input v-model="customerForm.name" type="text" :placeholder="t('common.name')" class="rounded border-stone-300 text-sm">
+                    <input v-model="customerForm.phone" type="text" :placeholder="t('customers.phone_placeholder')" class="rounded border-stone-300 text-sm">
+                    <button
+                        type="submit"
+                        :disabled="customerForm.processing"
+                        :aria-label="t('common.add')"
+                        class="flex items-center justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-white hover:bg-indigo-700"
+                    >
+                        <PlusIcon class="size-4" />
+                    </button>
                 </form>
 
                 <table class="w-full text-sm">
                     <thead>
                         <tr class="border-b border-stone-200 text-left text-xs uppercase text-stone-500">
-                            <th class="py-2">Name</th><th>Phone</th><th class="text-right">Balance</th><th>Status</th><th></th>
+                            <th class="py-2">{{ t('common.name') }}</th><th>{{ t('common.phone') }}</th><th class="text-right">{{ t('customers.balance') }}</th><th>{{ t('common.status') }}</th><th></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -75,26 +92,26 @@ function recordPayment(customerId) {
                                 <td class="py-2 text-stone-900">{{ c.name }}</td>
                                 <td class="text-stone-500">{{ c.phone ?? '—' }}</td>
                                 <td class="text-right tabular-nums" :class="parseFloat(c.balance) > 0 ? 'text-amber-700' : ''">{{ money(c.balance) }}</td>
-                                <td class="text-stone-500">{{ c.status }}</td>
+                                <td class="text-stone-500">{{ c.status === 'active' ? t('common.active') : t('common.inactive') }}</td>
                                 <td class="text-right">
-                                    <button type="button" @click="toggle(`pay-${c.id}`)" class="text-xs text-indigo-700 underline hover:text-indigo-800">Record payment</button>
+                                    <button type="button" @click="toggle(`pay-${c.id}`)" class="text-xs text-indigo-700 underline hover:text-indigo-800">{{ t('customers.record_payment') }}</button>
                                 </td>
                             </tr>
                             <tr v-if="activePanel === `pay-${c.id}`" class="border-b border-stone-100 bg-stone-50">
                                 <td colspan="5" class="p-2">
                                     <div class="flex items-center gap-2">
-                                        <input v-model="paymentForm(c.id).amount" type="number" step="0.01" placeholder="Amount" class="w-32 rounded border-stone-300 text-sm">
+                                        <input v-model="paymentForm(c.id).amount" type="number" step="0.01" :placeholder="t('customers.amount_placeholder')" class="w-32 rounded border-stone-300 text-sm">
                                         <select v-model="paymentForm(c.id).payment_method_id" class="rounded border-stone-300 text-sm">
                                             <option v-for="m in paymentMethods" :key="m.id" :value="m.id">{{ m.name }}</option>
                                         </select>
-                                        <button type="button" @click="recordPayment(c.id)" :disabled="paymentForm(c.id).processing" class="rounded-md bg-indigo-600 px-3 py-1.5 text-xs text-white hover:bg-indigo-700">Record</button>
+                                        <button type="button" @click="recordPayment(c.id)" :disabled="paymentForm(c.id).processing" class="rounded-md bg-indigo-600 px-3 py-1.5 text-xs text-white hover:bg-indigo-700">{{ t('customers.record') }}</button>
                                     </div>
                                 </td>
                             </tr>
                         </template>
                     </tbody>
                 </table>
-                <p v-if="customers.length === 0" class="text-sm text-stone-400">No customers yet.</p>
+                <p v-if="customers.length === 0" class="text-sm text-stone-400">{{ t('customers.none_yet') }}</p>
             </section>
         </main>
     </AppLayout>

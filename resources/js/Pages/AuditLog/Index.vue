@@ -2,6 +2,7 @@
 import { ref } from 'vue';
 import { router } from '@inertiajs/vue3';
 import AppLayout from '../../Layouts/AppLayout.vue';
+import { useI18n } from '../../i18n';
 
 const props = defineProps({
     filters: { type: Object, default: () => ({}) },
@@ -9,6 +10,7 @@ const props = defineProps({
     entries: { type: Array, default: () => [] },
 });
 
+const { t } = useI18n();
 const actionFilter = ref(props.filters.action ?? '');
 const expandedId = ref(null);
 
@@ -22,26 +24,26 @@ function toggleExpand(id) {
 </script>
 
 <template>
-    <AppLayout title="Audit Log">
+    <AppLayout :title="t('audit_log.title')">
         <main class="mx-auto max-w-4xl space-y-4 p-6">
             <section class="rounded-xl border border-stone-200/70 bg-white p-6 shadow-sm">
                 <div class="mb-3 flex items-center justify-between">
-                    <h2 class="text-base font-medium text-stone-900">Recent Activity</h2>
+                    <h2 class="text-base font-medium text-stone-900">{{ t('audit_log.recent') }}</h2>
                     <div class="flex items-center gap-2">
                         <select v-model="actionFilter" class="rounded border-stone-300 text-sm">
-                            <option value="">All actions</option>
+                            <option value="">{{ t('audit_log.all_actions') }}</option>
                             <option v-for="a in actions" :key="a" :value="a">{{ a }}</option>
                         </select>
-                        <button type="button" @click="applyFilter" class="rounded-md bg-indigo-600 px-3 py-1.5 text-sm text-white hover:bg-indigo-700">Filter</button>
+                        <button type="button" @click="applyFilter" class="rounded-md bg-indigo-600 px-3 py-1.5 text-sm text-white hover:bg-indigo-700">{{ t('audit_log.filter') }}</button>
                     </div>
                 </div>
 
-                <p class="mb-3 text-xs text-stone-400">Showing the most recent 200 entries, newest first. This trail is append-only — nothing here can be edited or deleted.</p>
+                <p class="mb-3 text-xs text-stone-400">{{ t('audit_log.note') }}</p>
 
                 <table class="w-full text-sm">
                     <thead>
                         <tr class="border-b border-stone-200 text-left text-xs uppercase text-stone-500">
-                            <th class="py-2">When</th><th>User</th><th>Action</th><th>Entity</th><th></th>
+                            <th class="py-2">{{ t('audit_log.when') }}</th><th>{{ t('audit_log.user') }}</th><th>{{ t('audit_log.action') }}</th><th>{{ t('audit_log.entity') }}</th><th></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -58,7 +60,7 @@ function toggleExpand(id) {
                                         @click="toggleExpand(e.id)"
                                         class="text-xs text-indigo-700 underline hover:text-indigo-800"
                                     >
-                                        {{ expandedId === e.id ? 'Hide' : 'Details' }}
+                                        {{ expandedId === e.id ? t('audit_log.hide') : t('audit_log.details') }}
                                     </button>
                                 </td>
                             </tr>
@@ -66,18 +68,18 @@ function toggleExpand(id) {
                                 <td colspan="5" class="px-2 py-3">
                                     <div class="grid grid-cols-2 gap-4 text-xs">
                                         <div v-if="e.old_values">
-                                            <p class="mb-1 uppercase text-stone-400">Before</p>
+                                            <p class="mb-1 uppercase text-stone-400">{{ t('audit_log.before') }}</p>
                                             <pre class="whitespace-pre-wrap rounded bg-white p-2">{{ JSON.stringify(e.old_values, null, 2) }}</pre>
                                         </div>
                                         <div v-if="e.new_values">
-                                            <p class="mb-1 uppercase text-stone-400">After</p>
+                                            <p class="mb-1 uppercase text-stone-400">{{ t('audit_log.after') }}</p>
                                             <pre class="whitespace-pre-wrap rounded bg-white p-2">{{ JSON.stringify(e.new_values, null, 2) }}</pre>
                                         </div>
                                     </div>
                                 </td>
                             </tr>
                         </template>
-                        <tr v-if="entries.length === 0"><td colspan="5" class="py-3 text-center text-stone-400">No activity recorded yet.</td></tr>
+                        <tr v-if="entries.length === 0"><td colspan="5" class="py-3 text-center text-stone-400">{{ t('audit_log.none_yet') }}</td></tr>
                     </tbody>
                 </table>
             </section>

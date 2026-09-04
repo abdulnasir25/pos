@@ -2,12 +2,16 @@
 import { ref, computed } from 'vue';
 import { useForm } from '@inertiajs/vue3';
 import AppLayout from '../../Layouts/AppLayout.vue';
+import PlusIcon from '../../Components/icons/PlusIcon.vue';
+import ChevronDownIcon from '../../Components/icons/ChevronDownIcon.vue';
+import { useI18n } from '../../i18n';
 
 const props = defineProps({
     partners: { type: Array, default: () => [] },
     paymentMethods: { type: Array, default: () => [] },
 });
 
+const { t } = useI18n();
 const activePanel = ref(null);
 
 function toggle(panel) {
@@ -86,30 +90,44 @@ function money(n) {
 </script>
 
 <template>
-    <AppLayout title="Partners">
+    <AppLayout :title="t('partners.title')">
         <main class="mx-auto max-w-4xl space-y-6 p-6">
             <!-- Partners table -->
             <section class="rounded-xl border border-stone-200/70 bg-white p-6 shadow-sm">
                 <div class="mb-3 flex items-center justify-between">
-                    <h2 class="text-base font-medium text-stone-900">All Partners</h2>
-                    <button type="button" @click="toggle('add')" class="text-sm text-indigo-700 underline hover:text-indigo-800">+ Add Partner</button>
+                    <h2 class="text-base font-medium text-stone-900">{{ t('partners.list_title') }}</h2>
+                    <button
+                        type="button"
+                        @click="toggle('add')"
+                        :aria-label="t('common.add')"
+                        class="flex size-8 items-center justify-center rounded-full bg-indigo-600 text-white hover:bg-indigo-700"
+                    >
+                        <PlusIcon class="size-4" />
+                    </button>
                 </div>
 
-                <form v-if="activePanel === 'add'" @submit.prevent="submitPartner" class="mb-4 grid grid-cols-3 gap-2 rounded-md border border-stone-200 p-3">
-                    <input v-model="partnerForm.name" type="text" placeholder="Name" class="rounded border-stone-300 text-sm">
-                    <input v-model="partnerForm.phone" type="text" placeholder="Phone (optional)" class="rounded border-stone-300 text-sm">
+                <form v-if="activePanel === 'add'" @submit.prevent="submitPartner" class="mb-4 grid grid-cols-4 gap-2 rounded-md border border-stone-200 p-3">
+                    <input v-model="partnerForm.name" type="text" :placeholder="t('common.name')" class="rounded border-stone-300 text-sm">
+                    <input v-model="partnerForm.phone" type="text" :placeholder="t('customers.phone_placeholder')" class="rounded border-stone-300 text-sm">
                     <input v-model="partnerForm.joined_at" type="date" class="rounded border-stone-300 text-sm">
-                    <button type="submit" :disabled="partnerForm.processing" class="col-span-3 rounded-md bg-indigo-600 px-3 py-1.5 text-sm text-white hover:bg-indigo-700">Add</button>
+                    <button
+                        type="submit"
+                        :disabled="partnerForm.processing"
+                        :aria-label="t('common.add')"
+                        class="flex items-center justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-white hover:bg-indigo-700"
+                    >
+                        <PlusIcon class="size-4" />
+                    </button>
                 </form>
 
                 <table class="w-full text-sm">
                     <thead>
                         <tr class="border-b border-stone-200 text-left text-xs uppercase text-stone-500">
-                            <th class="py-2">Name</th>
-                            <th>Ownership</th>
-                            <th>Capital</th>
-                            <th>Loan Owed</th>
-                            <th>Status</th>
+                            <th class="py-2">{{ t('common.name') }}</th>
+                            <th>{{ t('partners.ownership') }}</th>
+                            <th>{{ t('partners.capital') }}</th>
+                            <th>{{ t('partners.loan_owed') }}</th>
+                            <th>{{ t('common.status') }}</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -120,7 +138,7 @@ function money(n) {
                             <td class="tabular-nums">{{ money(p.loan_balance) }}</td>
                             <td>
                                 <span class="rounded-full px-2 py-0.5 text-xs" :class="p.status === 'active' ? 'bg-emerald-100 text-emerald-800' : 'bg-stone-200 text-stone-600'">
-                                    {{ p.status }}
+                                    {{ p.status === 'active' ? t('common.active') : t('common.inactive') }}
                                 </span>
                             </td>
                         </tr>
@@ -130,12 +148,13 @@ function money(n) {
 
             <!-- Rebalance ownership -->
             <section class="rounded-xl border border-stone-200/70 bg-white p-6 shadow-sm">
-                <button type="button" @click="toggle('rebalance')" class="text-base font-medium text-stone-900">
-                    Rebalance Ownership {{ activePanel === 'rebalance' ? '▲' : '▼' }}
+                <button type="button" @click="toggle('rebalance')" class="flex items-center gap-2 text-base font-medium text-stone-900">
+                    {{ t('partners.rebalance') }}
+                    <ChevronDownIcon class="size-4 transition-transform" :class="{ 'rotate-180': activePanel === 'rebalance' }" />
                 </button>
 
                 <div v-if="activePanel === 'rebalance'" class="mt-3">
-                    <p class="mb-2 text-xs text-stone-500">Every active partner's new percentage must be given at once — they must sum to exactly 100.</p>
+                    <p class="mb-2 text-xs text-stone-500">{{ t('partners.every_partner_note') }}</p>
                     <div class="mb-2 grid grid-cols-2 gap-2">
                         <div v-for="p in activePartners" :key="p.id" class="flex items-center gap-2">
                             <label class="w-32 text-sm text-stone-700">{{ p.name }}</label>
@@ -144,22 +163,23 @@ function money(n) {
                         </div>
                     </div>
                     <div class="mb-3 flex items-center gap-3">
-                        <label class="text-sm text-stone-700">Effective from</label>
+                        <label class="text-sm text-stone-700">{{ t('partners.effective_from') }}</label>
                         <input v-model="rebalanceForm.effective_from" type="date" class="rounded border-stone-300 text-sm">
                         <span class="text-sm" :class="rebalanceSum === 100 ? 'text-emerald-700' : 'text-red-600'">
-                            Total: {{ rebalanceSum.toFixed(2) }}%
+                            {{ t('partners.total') }}: {{ rebalanceSum.toFixed(2) }}%
                         </span>
                     </div>
                     <button type="button" :disabled="rebalanceSum !== 100 || rebalanceForm.processing" @click="submitRebalance" class="rounded-md bg-indigo-600 px-3 py-1.5 text-sm text-white hover:bg-indigo-700 disabled:opacity-50">
-                        Save Rebalance
+                        {{ t('partners.save_rebalance') }}
                     </button>
                 </div>
             </section>
 
             <!-- Capital -->
             <section class="rounded-xl border border-stone-200/70 bg-white p-6 shadow-sm">
-                <button type="button" @click="toggle('capital')" class="text-base font-medium text-stone-900">
-                    Record Capital {{ activePanel === 'capital' ? '▲' : '▼' }}
+                <button type="button" @click="toggle('capital')" class="flex items-center gap-2 text-base font-medium text-stone-900">
+                    {{ t('partners.record_capital') }}
+                    <ChevronDownIcon class="size-4 transition-transform" :class="{ 'rotate-180': activePanel === 'capital' }" />
                 </button>
 
                 <form v-if="activePanel === 'capital'" @submit.prevent="submitCapital" class="mt-3 grid grid-cols-4 gap-2">
@@ -167,46 +187,48 @@ function money(n) {
                         <option v-for="p in partners" :key="p.id" :value="p.id">{{ p.name }}</option>
                     </select>
                     <select v-model="capitalForm.type" class="rounded border-stone-300 text-sm">
-                        <option value="contribution">Contribution</option>
-                        <option value="withdrawal">Withdrawal</option>
+                        <option value="contribution">{{ t('partners.contribution') }}</option>
+                        <option value="withdrawal">{{ t('partners.withdrawal') }}</option>
                     </select>
-                    <input v-model="capitalForm.amount" type="number" step="0.01" placeholder="Amount" class="rounded border-stone-300 text-sm">
+                    <input v-model="capitalForm.amount" type="number" step="0.01" :placeholder="t('partners.amount_placeholder')" class="rounded border-stone-300 text-sm">
                     <input v-model="capitalForm.entry_date" type="date" class="rounded border-stone-300 text-sm">
-                    <button type="submit" :disabled="capitalForm.processing" class="col-span-4 rounded-md bg-indigo-600 px-3 py-1.5 text-sm text-white hover:bg-indigo-700">Save</button>
+                    <button type="submit" :disabled="capitalForm.processing" class="col-span-4 rounded-md bg-indigo-600 px-3 py-1.5 text-sm text-white hover:bg-indigo-700">{{ t('common.save') }}</button>
                 </form>
             </section>
 
             <!-- Loans -->
             <section class="rounded-xl border border-stone-200/70 bg-white p-6 shadow-sm">
-                <button type="button" @click="toggle('loan')" class="text-base font-medium text-stone-900">
-                    Issue Loan {{ activePanel === 'loan' ? '▲' : '▼' }}
+                <button type="button" @click="toggle('loan')" class="flex items-center gap-2 text-base font-medium text-stone-900">
+                    {{ t('partners.issue_loan') }}
+                    <ChevronDownIcon class="size-4 transition-transform" :class="{ 'rotate-180': activePanel === 'loan' }" />
                 </button>
 
                 <form v-if="activePanel === 'loan'" @submit.prevent="submitLoan" class="mt-3 grid grid-cols-3 gap-2">
                     <select v-model="loanForm.partner_id" class="rounded border-stone-300 text-sm">
                         <option v-for="p in partners" :key="p.id" :value="p.id">{{ p.name }}</option>
                     </select>
-                    <input v-model="loanForm.principal_amount" type="number" step="0.01" placeholder="Principal amount" class="rounded border-stone-300 text-sm">
+                    <input v-model="loanForm.principal_amount" type="number" step="0.01" :placeholder="t('partners.principal_placeholder')" class="rounded border-stone-300 text-sm">
                     <input v-model="loanForm.issued_at" type="date" class="rounded border-stone-300 text-sm">
-                    <button type="submit" :disabled="loanForm.processing" class="col-span-3 rounded-md bg-indigo-600 px-3 py-1.5 text-sm text-white hover:bg-indigo-700">Issue Loan</button>
+                    <button type="submit" :disabled="loanForm.processing" class="col-span-3 rounded-md bg-indigo-600 px-3 py-1.5 text-sm text-white hover:bg-indigo-700">{{ t('partners.issue_loan_action') }}</button>
                 </form>
             </section>
 
             <!-- Repayments -->
             <section v-if="outstandingLoans.length > 0" class="rounded-xl border border-stone-200/70 bg-white p-6 shadow-sm">
-                <button type="button" @click="toggle('repayment')" class="text-base font-medium text-stone-900">
-                    Record Loan Repayment {{ activePanel === 'repayment' ? '▲' : '▼' }}
+                <button type="button" @click="toggle('repayment')" class="flex items-center gap-2 text-base font-medium text-stone-900">
+                    {{ t('partners.record_repayment') }}
+                    <ChevronDownIcon class="size-4 transition-transform" :class="{ 'rotate-180': activePanel === 'repayment' }" />
                 </button>
 
                 <form v-if="activePanel === 'repayment'" @submit.prevent="submitRepayment" class="mt-3 grid grid-cols-3 gap-2">
                     <select v-model="repaymentForm.loan_id" class="rounded border-stone-300 text-sm">
                         <option v-for="l in outstandingLoans" :key="l.id" :value="l.id">
-                            {{ l.partner_name }} — owes {{ money(l.outstanding) }}
+                            {{ l.partner_name }} — {{ t('partners.owes') }} {{ money(l.outstanding) }}
                         </option>
                     </select>
-                    <input v-model="repaymentForm.amount" type="number" step="0.01" placeholder="Amount" class="rounded border-stone-300 text-sm">
+                    <input v-model="repaymentForm.amount" type="number" step="0.01" :placeholder="t('partners.amount_placeholder')" class="rounded border-stone-300 text-sm">
                     <input v-model="repaymentForm.repaid_at" type="date" class="rounded border-stone-300 text-sm">
-                    <button type="submit" :disabled="repaymentForm.processing" class="col-span-3 rounded-md bg-indigo-600 px-3 py-1.5 text-sm text-white hover:bg-indigo-700">Record Repayment</button>
+                    <button type="submit" :disabled="repaymentForm.processing" class="col-span-3 rounded-md bg-indigo-600 px-3 py-1.5 text-sm text-white hover:bg-indigo-700">{{ t('partners.record_repayment_action') }}</button>
                 </form>
             </section>
         </main>
