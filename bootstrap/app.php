@@ -43,6 +43,17 @@ return Application::configure(basePath: dirname(__DIR__))
             fn (Request $request) => $request->is('landlord/*') ? '/landlord/login' : '/login',
         );
 
+        // The mirror case: the 'guest' middleware's default, when an
+        // already-authenticated user hits a guest-only route (e.g.
+        // /landlord/login), is route('dashboard') — a tenant-scoped
+        // route name that doesn't exist reachably on the central
+        // domain, so it 404s instead of redirecting anywhere useful.
+        // An already-signed-in landlord admin goes to the billing
+        // screen, not the tenant dashboard.
+        $middleware->redirectUsersTo(
+            fn (Request $request) => $request->is('landlord/*') ? '/landlord/billing' : '/dashboard',
+        );
+
         // Laravel reorders route middleware by its internal priority list,
         // not by the order they're written — the auth-checking contract
         // (which Authenticate implements) is prioritized and would
