@@ -1,12 +1,15 @@
 <script setup>
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 import { useForm, router } from '@inertiajs/vue3';
 import AppLayout from '../../Layouts/AppLayout.vue';
+import PlusIcon from '../../Components/icons/PlusIcon.vue';
+import { useI18n } from '../../i18n';
 
 defineProps({
     periods: { type: Array, default: () => [] },
 });
 
+const { t } = useI18n();
 const showForm = ref(false);
 
 const form = useForm({ period_start: '', period_end: '' });
@@ -25,18 +28,18 @@ function advance(period) {
     if (url) router.post(url, {}, { preserveScroll: true });
 }
 
-const nextActionLabel = {
-    open: 'Start calculation',
-    calculating: 'Move to review',
-    under_review: 'Close period',
-};
+const nextActionLabel = computed(() => ({
+    open: t('financial_periods.next_calculate'),
+    calculating: t('financial_periods.next_review'),
+    under_review: t('financial_periods.next_close'),
+}));
 
-const statusLabel = {
-    open: 'Open',
-    calculating: 'Calculating',
-    under_review: 'Under review',
-    closed: 'Closed',
-};
+const statusLabel = computed(() => ({
+    open: t('financial_periods.status_open'),
+    calculating: t('financial_periods.status_calculating'),
+    under_review: t('financial_periods.status_under_review'),
+    closed: t('financial_periods.status_closed'),
+}));
 
 const statusClass = {
     open: 'bg-stone-100 text-stone-700',
@@ -47,24 +50,31 @@ const statusClass = {
 </script>
 
 <template>
-    <AppLayout title="Financial Periods">
+    <AppLayout :title="t('financial_periods.title')">
         <main class="mx-auto max-w-4xl space-y-6 p-6">
             <section class="rounded-xl border border-stone-200/70 bg-white p-6 shadow-sm">
                 <div class="mb-3 flex items-center justify-between">
-                    <h2 class="text-base font-medium text-stone-900">Periods</h2>
-                    <button type="button" @click="showForm = !showForm" class="text-sm text-indigo-700 underline hover:text-indigo-800">+ New Period</button>
+                    <h2 class="text-base font-medium text-stone-900">{{ t('financial_periods.list_title') }}</h2>
+                    <button
+                        type="button"
+                        @click="showForm = !showForm"
+                        :aria-label="t('common.add')"
+                        class="flex size-8 items-center justify-center rounded-full bg-indigo-600 text-white hover:bg-indigo-700"
+                    >
+                        <PlusIcon class="size-4" />
+                    </button>
                 </div>
 
                 <form v-if="showForm" @submit.prevent="submit" class="mb-4 grid grid-cols-3 gap-2 rounded-md border border-stone-200 p-3">
                     <input v-model="form.period_start" type="date" class="rounded border-stone-300 text-sm">
                     <input v-model="form.period_end" type="date" class="rounded border-stone-300 text-sm">
-                    <button type="submit" :disabled="form.processing" class="rounded-md bg-indigo-600 px-3 py-1.5 text-sm text-white hover:bg-indigo-700">Create</button>
+                    <button type="submit" :disabled="form.processing" class="rounded-md bg-indigo-600 px-3 py-1.5 text-sm text-white hover:bg-indigo-700">{{ t('financial_periods.create') }}</button>
                 </form>
 
                 <table class="w-full text-sm">
                     <thead>
                         <tr class="border-b border-stone-200 text-left text-xs uppercase text-stone-500">
-                            <th class="py-2">Period</th><th>Status</th><th>Calculated</th><th>Reviewed by</th><th>Closed</th><th></th>
+                            <th class="py-2">{{ t('financial_periods.list_title') }}</th><th>{{ t('financial_periods.status') }}</th><th>{{ t('financial_periods.calculated') }}</th><th>{{ t('financial_periods.reviewed_by') }}</th><th>{{ t('financial_periods.closed') }}</th><th></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -87,7 +97,7 @@ const statusClass = {
                         </tr>
                     </tbody>
                 </table>
-                <p v-if="periods.length === 0" class="text-sm text-stone-400">No financial periods yet.</p>
+                <p v-if="periods.length === 0" class="text-sm text-stone-400">{{ t('financial_periods.none_yet') }}</p>
             </section>
         </main>
     </AppLayout>

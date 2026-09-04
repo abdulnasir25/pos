@@ -1,5 +1,8 @@
 <script setup>
 import { useForm } from '@inertiajs/vue3';
+import { useI18n } from '../../i18n';
+
+const { t, toggleLocale } = useI18n();
 
 const form = useForm({
     email: '',
@@ -17,13 +20,22 @@ function submit() {
 <template>
     <div class="flex min-h-screen items-center justify-center bg-gradient-to-br from-stone-100 via-stone-100 to-indigo-50 px-4">
         <div class="w-full max-w-sm rounded-2xl bg-white p-8 shadow-xl shadow-stone-200/60">
-            <span class="mb-4 flex size-11 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500 to-indigo-700 text-sm font-semibold text-white shadow-sm">L&amp;L</span>
-            <h1 class="mb-1 text-xl font-semibold text-stone-900">Welcome back</h1>
-            <p class="mb-6 text-sm text-stone-500">Sign in to Ledger &amp; Loom</p>
+            <div class="mb-4 flex items-center justify-between">
+                <span class="flex size-11 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500 to-indigo-700 text-sm font-semibold text-white shadow-sm">L&amp;L</span>
+                <button
+                    type="button"
+                    @click="toggleLocale"
+                    class="rounded-lg border border-indigo-200 px-3 py-1.5 text-sm font-medium text-indigo-700 hover:bg-indigo-50"
+                >
+                    {{ t('lang.switch') }}
+                </button>
+            </div>
+            <h1 class="mb-1 text-xl font-semibold text-stone-900">{{ t('login.welcome_back') }}</h1>
+            <p class="mb-6 text-sm text-stone-500">{{ t('login.subtitle') }}</p>
 
             <form @submit.prevent="submit" class="space-y-4">
                 <div>
-                    <label for="email" class="block text-sm font-medium text-stone-700">Email</label>
+                    <label for="email" class="block text-sm font-medium text-stone-700">{{ t('login.email') }}</label>
                     <input
                         id="email"
                         v-model="form.email"
@@ -36,7 +48,7 @@ function submit() {
                 </div>
 
                 <div>
-                    <label for="password" class="block text-sm font-medium text-stone-700">Password</label>
+                    <label for="password" class="block text-sm font-medium text-stone-700">{{ t('login.password') }}</label>
                     <input
                         id="password"
                         v-model="form.password"
@@ -49,7 +61,7 @@ function submit() {
 
                 <label class="flex items-center gap-2 text-sm text-stone-600">
                     <input v-model="form.remember" type="checkbox" class="rounded border-stone-300">
-                    Remember me
+                    {{ t('login.remember_me') }}
                 </label>
 
                 <button
@@ -57,14 +69,14 @@ function submit() {
                     :disabled="form.processing"
                     class="w-full rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 disabled:opacity-50"
                 >
-                    Sign in
+                    {{ t('login.sign_in') }}
                 </button>
             </form>
 
             <div class="mt-6 rounded-lg border border-dashed border-indigo-200 bg-indigo-50/60 px-4 py-3 text-xs text-stone-600">
-                <p class="mb-1 font-medium text-indigo-800">Demo credentials (remove before launch)</p>
-                <p>Email: <span class="font-mono">owner@alfateh.test</span></p>
-                <p>Password: <span class="font-mono">password123</span></p>
+                <p class="mb-1 font-medium text-indigo-800">{{ t('login.demo_title') }}</p>
+                <p>{{ t('login.demo_email') }}: <span class="font-mono">owner@alfateh.test</span></p>
+                <p>{{ t('login.demo_password') }}: <span class="font-mono">password123</span></p>
             </div>
         </div>
     </div>

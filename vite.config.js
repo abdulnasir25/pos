@@ -13,6 +13,9 @@ export default defineConfig({
                 bunny('Instrument Sans', {
                     weights: [400, 500, 600],
                 }),
+                bunny('Noto Nastaliq Urdu', {
+                    weights: [400, 600],
+                }),
             ],
         }),
         tailwindcss(),

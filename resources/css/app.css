@@ -19,7 +19,7 @@
      * rather than pinning an absolute px value.
      */
     html {
-        font-size: 112.5%;
+        font-size: 103%;
     }
 
     /*
@@ -50,5 +50,21 @@
 
     button {
         @apply transition-colors duration-150;
+    }
+
+    /*
+     * Applied to <html> when the language switch is set to Urdu (see
+     * resources/js/i18n/index.js). Nastaliq is a diagonal, cursive
+     * script — it needs noticeably taller line-height than Latin text
+     * to avoid letters from adjacent lines colliding, and Instrument
+     * Sans has no Arabic-script glyphs at all.
+     */
+    html.font-urdu {
+        font-family: 'Noto Nastaliq Urdu', 'Instrument Sans', ui-sans-serif, system-ui, sans-serif;
+        font-size: 94%;
+    }
+
+    html.font-urdu body {
+        line-height: 1.85;
     }
 }
