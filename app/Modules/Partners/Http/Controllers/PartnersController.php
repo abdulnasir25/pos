@@ -7,7 +7,9 @@ use App\Modules\Partners\Actions\IssuePartnerLoan;
 use App\Modules\Partners\Actions\RecordCapitalContribution;
 use App\Modules\Partners\Actions\RecordCapitalWithdrawal;
 use App\Modules\Partners\Actions\RecordLoanRepayment;
+use App\Modules\Partners\Actions\ExitPartner;
 use App\Modules\Partners\Actions\RecordOwnershipRebalance;
+use App\Modules\Partners\Actions\UpdatePartnerProfile;
 use App\Modules\Partners\Enums\LoanStatus;
 use App\Modules\Partners\Exceptions\InvalidOwnershipDateRangeException;
 use App\Modules\Partners\Exceptions\OwnershipPercentagesMustSumTo100Exception;
@@ -76,6 +78,29 @@ class PartnersController extends \App\Http\Controllers\Controller
         app(CreatePartner::class)->handle($validated['name'], $validated['joined_at'], $validated['phone'] ?? null);
 
         return back()->with('success', 'Partner added.');
+    }
+
+    public function updateProfile(Request $request, Partner $partner): RedirectResponse
+    {
+        $validated = $request->validate([
+            'name' => ['required', 'string', 'max:150'],
+            'phone' => ['nullable', 'string', 'max:30'],
+        ]);
+
+        app(UpdatePartnerProfile::class)->handle($partner, $validated['name'], $validated['phone'] ?? null);
+
+        return back()->with('success', 'Partner updated.');
+    }
+
+    public function exit(Request $request, Partner $partner): RedirectResponse
+    {
+        $validated = $request->validate([
+            'exited_at' => ['required', 'date'],
+        ]);
+
+        app(ExitPartner::class)->handle($partner, $validated['exited_at']);
+
+        return back()->with('success', 'Partner marked as exited.');
     }
 
     public function storeRebalance(Request $request): RedirectResponse

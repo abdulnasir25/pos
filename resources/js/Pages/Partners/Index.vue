@@ -3,6 +3,8 @@ import { ref, computed } from 'vue';
 import { useForm } from '@inertiajs/vue3';
 import AppLayout from '../../Layouts/AppLayout.vue';
 import PlusIcon from '../../Components/icons/PlusIcon.vue';
+import PencilIcon from '../../Components/icons/PencilIcon.vue';
+import TrashIcon from '../../Components/icons/TrashIcon.vue';
 import ChevronDownIcon from '../../Components/icons/ChevronDownIcon.vue';
 import { useI18n } from '../../i18n';
 
@@ -24,6 +26,43 @@ const partnerForm = useForm({ name: '', phone: '', joined_at: new Date().toISOSt
 
 function submitPartner() {
     partnerForm.post('/partners', { preserveScroll: true, onSuccess: () => partnerForm.reset('name', 'phone') });
+}
+
+// --- Edit partner ---------------------------------------------------------
+
+const editForms = ref({});
+
+function editForm(partnerId) {
+    if (!editForms.value[partnerId]) {
+        const partner = props.partners.find((p) => p.id === partnerId);
+        editForms.value[partnerId] = useForm({ name: partner.name, phone: partner.phone });
+    }
+    return editForms.value[partnerId];
+}
+
+function submitEdit(partnerId) {
+    editForm(partnerId).post(`/partners/${partnerId}/profile`, {
+        preserveScroll: true,
+        onSuccess: () => toggle(null),
+    });
+}
+
+// --- Exit partner ---------------------------------------------------------
+
+const exitForms = ref({});
+
+function exitForm(partnerId) {
+    if (!exitForms.value[partnerId]) {
+        exitForms.value[partnerId] = useForm({ exited_at: new Date().toISOString().slice(0, 10) });
+    }
+    return exitForms.value[partnerId];
+}
+
+function submitExit(partnerId) {
+    exitForm(partnerId).post(`/partners/${partnerId}/exit`, {
+        preserveScroll: true,
+        onSuccess: () => toggle(null),
+    });
 }
 
 // --- Rebalance ownership --------------------------------------------------
@@ -128,20 +167,61 @@ function money(n) {
                             <th>{{ t('partners.capital') }}</th>
                             <th>{{ t('partners.loan_owed') }}</th>
                             <th>{{ t('common.status') }}</th>
+                            <th></th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr v-for="p in partners" :key="p.id" class="border-b border-stone-100">
-                            <td class="py-2 font-medium text-stone-900">{{ p.name }}</td>
-                            <td class="tabular-nums">{{ p.ownership_percentage ?? '—' }}%</td>
-                            <td class="tabular-nums">{{ money(p.capital_balance) }}</td>
-                            <td class="tabular-nums">{{ money(p.loan_balance) }}</td>
-                            <td>
-                                <span class="rounded-full px-2 py-0.5 text-xs" :class="p.status === 'active' ? 'bg-emerald-100 text-emerald-800' : 'bg-stone-200 text-stone-600'">
-                                    {{ p.status === 'active' ? t('common.active') : t('common.inactive') }}
-                                </span>
-                            </td>
-                        </tr>
+                        <template v-for="p in partners" :key="p.id">
+                            <tr class="border-b border-stone-100">
+                                <td class="py-2 font-medium text-stone-900">{{ p.name }}</td>
+                                <td class="tabular-nums">{{ p.ownership_percentage ?? '—' }}%</td>
+                                <td class="tabular-nums">{{ money(p.capital_balance) }}</td>
+                                <td class="tabular-nums">{{ money(p.loan_balance) }}</td>
+                                <td>
+                                    <span class="rounded-full px-2 py-0.5 text-xs" :class="p.status === 'active' ? 'bg-emerald-100 text-emerald-800' : 'bg-stone-200 text-stone-600'">
+                                        {{ p.status === 'active' ? t('common.active') : t('partners.exited') }}
+                                    </span>
+                                </td>
+                                <td class="text-right whitespace-nowrap">
+                                    <button
+                                        type="button"
+                                        @click="toggle(`edit-${p.id}`)"
+                                        :aria-label="t('partners.edit_title')"
+                                        class="mr-1 inline-flex size-7 items-center justify-center rounded-full text-indigo-600 hover:bg-indigo-50"
+                                    >
+                                        <PencilIcon class="size-3.5" />
+                                    </button>
+                                    <button
+                                        v-if="p.status === 'active'"
+                                        type="button"
+                                        @click="toggle(`exit-${p.id}`)"
+                                        :aria-label="t('partners.exit_action')"
+                                        class="inline-flex size-7 items-center justify-center rounded-full text-red-600 hover:bg-red-50"
+                                    >
+                                        <TrashIcon class="size-3.5" />
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr v-if="activePanel === `edit-${p.id}`" class="border-b border-stone-100 bg-stone-50">
+                                <td colspan="6" class="p-2">
+                                    <div class="flex items-center gap-2">
+                                        <input v-model="editForm(p.id).name" type="text" :placeholder="t('common.name')" class="rounded border-stone-300 text-sm">
+                                        <input v-model="editForm(p.id).phone" type="text" :placeholder="t('customers.phone_placeholder')" class="rounded border-stone-300 text-sm">
+                                        <button type="button" @click="submitEdit(p.id)" :disabled="editForm(p.id).processing" class="rounded-md bg-indigo-600 px-3 py-1.5 text-xs text-white hover:bg-indigo-700">{{ t('common.save') }}</button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr v-if="activePanel === `exit-${p.id}`" class="border-b border-stone-100 bg-red-50/40">
+                                <td colspan="6" class="p-2">
+                                    <p class="mb-2 text-xs text-stone-500">{{ t('partners.exit_note') }}</p>
+                                    <div class="flex items-center gap-2">
+                                        <span class="text-xs text-stone-500">{{ t('partners.exited_on') }}</span>
+                                        <input v-model="exitForm(p.id).exited_at" type="date" class="rounded border-stone-300 text-sm">
+                                        <button type="button" @click="submitExit(p.id)" :disabled="exitForm(p.id).processing" class="rounded-md bg-red-600 px-3 py-1.5 text-xs text-white hover:bg-red-700">{{ t('partners.exit_action') }}</button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </template>
                     </tbody>
                 </table>
             </section>

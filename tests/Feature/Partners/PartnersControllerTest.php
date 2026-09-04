@@ -116,6 +116,39 @@ class PartnersControllerTest extends TestCase
         $this->assertSame(1, Partner::where('name', 'Bilal')->count());
     }
 
+    public function test_a_partners_profile_can_be_updated_through_the_form(): void
+    {
+        $partner = app(CreatePartner::class)->handle('Ahmed', '2026-01-01');
+        $this->login();
+
+        $response = $this->post("{$this->baseUrl}/partners/{$partner->id}/profile", [
+            'name' => 'Ahmed Khan',
+            'phone' => '0300-9999999',
+        ]);
+
+        $response->assertRedirect();
+        $this->resumeTenantContext();
+        $fresh = $partner->fresh();
+        $this->assertSame('Ahmed Khan', $fresh->name);
+        $this->assertSame('0300-9999999', $fresh->phone);
+    }
+
+    public function test_a_partner_can_be_marked_as_exited_through_the_form(): void
+    {
+        $partner = app(CreatePartner::class)->handle('Ahmed', '2026-01-01');
+        $this->login();
+
+        $response = $this->post("{$this->baseUrl}/partners/{$partner->id}/exit", [
+            'exited_at' => '2026-06-01',
+        ]);
+
+        $response->assertRedirect();
+        $this->resumeTenantContext();
+        $fresh = $partner->fresh();
+        $this->assertSame('exited', $fresh->status->value);
+        $this->assertSame('2026-06-01', $fresh->exited_at->toDateString());
+    }
+
     public function test_ownership_can_be_rebalanced_through_the_form(): void
     {
         $a = app(CreatePartner::class)->handle('Ahmed', '2026-01-01');
