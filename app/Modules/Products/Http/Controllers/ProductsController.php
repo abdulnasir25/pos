@@ -50,6 +50,18 @@ class ProductsController extends \App\Http\Controllers\Controller
         return back()->with('success', 'Unit added.');
     }
 
+    public function updateUnit(Request $request, Unit $unit): RedirectResponse
+    {
+        $validated = $request->validate([
+            'name' => ['required', 'string', 'max:30', 'unique:units,name,'.$unit->id],
+            'abbreviation' => ['nullable', 'string', 'max:10'],
+        ]);
+
+        $unit->update($validated);
+
+        return back()->with('success', 'Unit updated.');
+    }
+
     public function storeProduct(Request $request): RedirectResponse
     {
         $validated = $request->validate([
@@ -62,6 +74,30 @@ class ProductsController extends \App\Http\Controllers\Controller
         Product::create([...$validated, 'status' => 'active']);
 
         return back()->with('success', 'Product added.');
+    }
+
+    public function updateProduct(Request $request, Product $product): RedirectResponse
+    {
+        // base_unit_id is deliberately not editable here — every past
+        // stock movement for this product is recorded in terms of that
+        // base unit, and changing it after the fact would silently
+        // corrupt their meaning.
+        $validated = $request->validate([
+            'name' => ['required', 'string', 'max:150'],
+            'sku' => ['nullable', 'string', 'max:64', 'unique:products,sku,'.$product->id],
+            'low_stock_threshold' => ['nullable', 'numeric', 'min:0'],
+        ]);
+
+        $product->update($validated);
+
+        return back()->with('success', 'Product updated.');
+    }
+
+    public function toggleProductStatus(Product $product): RedirectResponse
+    {
+        $product->update(['status' => $product->status === 'active' ? 'inactive' : 'active']);
+
+        return back()->with('success', 'Product status updated.');
     }
 
     public function storeConversion(Request $request, Product $product): RedirectResponse

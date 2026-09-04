@@ -1,8 +1,11 @@
 <script setup>
 import { ref, watch } from 'vue';
-import { useForm } from '@inertiajs/vue3';
+import { useForm, router } from '@inertiajs/vue3';
 import AppLayout from '../../Layouts/AppLayout.vue';
 import PlusIcon from '../../Components/icons/PlusIcon.vue';
+import PencilIcon from '../../Components/icons/PencilIcon.vue';
+import TrashIcon from '../../Components/icons/TrashIcon.vue';
+import CheckIcon from '../../Components/icons/CheckIcon.vue';
 import { useI18n } from '../../i18n';
 
 const props = defineProps({
@@ -21,6 +24,22 @@ const unitForm = useForm({ name: '', abbreviation: '' });
 
 function submitUnit() {
     unitForm.post('/products/units', { preserveScroll: true, onSuccess: () => unitForm.reset() });
+}
+
+const unitEditForms = ref({});
+
+function unitEditForm(unit) {
+    if (!unitEditForms.value[unit.id]) {
+        unitEditForms.value[unit.id] = useForm({ name: unit.name, abbreviation: unit.abbreviation });
+    }
+    return unitEditForms.value[unit.id];
+}
+
+function submitUnitEdit(unit) {
+    unitEditForm(unit).post(`/products/units/${unit.id}`, {
+        preserveScroll: true,
+        onSuccess: () => toggle(null),
+    });
 }
 
 const productForm = useForm({ base_unit_id: props.units[0]?.id ?? null, name: '', sku: '', low_stock_threshold: '' });
@@ -47,6 +66,30 @@ function submitConversion(productId) {
         preserveScroll: true,
         onSuccess: () => { conversionForm(productId).reset('factor'); toggle(null); },
     });
+}
+
+const productEditForms = ref({});
+
+function productEditForm(product) {
+    if (!productEditForms.value[product.id]) {
+        productEditForms.value[product.id] = useForm({
+            name: product.name,
+            sku: product.sku,
+            low_stock_threshold: product.low_stock_threshold,
+        });
+    }
+    return productEditForms.value[product.id];
+}
+
+function submitProductEdit(product) {
+    productEditForm(product).post(`/products/${product.id}`, {
+        preserveScroll: true,
+        onSuccess: () => toggle(null),
+    });
+}
+
+function toggleProductStatus(product) {
+    router.post(`/products/${product.id}/toggle-status`, {}, { preserveScroll: true });
 }
 </script>
 
@@ -81,10 +124,21 @@ function submitConversion(productId) {
                 </form>
 
                 <div class="flex flex-wrap gap-2">
-                    <span v-for="u in units" :key="u.id" class="rounded-full bg-stone-100 px-3 py-1 text-xs text-stone-700">
+                    <span v-for="u in units" :key="u.id" class="inline-flex items-center gap-1 rounded-full bg-stone-100 py-1 pl-3 pr-1.5 text-xs text-stone-700">
                         {{ u.name }}<span v-if="u.abbreviation" class="text-stone-400"> ({{ u.abbreviation }})</span>
+                        <button type="button" @click="toggle(`unit-edit-${u.id}`)" :aria-label="t('common.edit')" class="ml-1 inline-flex size-5 items-center justify-center rounded-full text-indigo-600 hover:bg-indigo-100">
+                            <PencilIcon class="size-3" />
+                        </button>
                     </span>
                     <span v-if="units.length === 0" class="text-sm text-stone-400">{{ t('products.none_yet') }}</span>
+                </div>
+
+                <div v-for="u in units" :key="`edit-row-${u.id}`">
+                    <div v-if="activePanel === `unit-edit-${u.id}`" class="mt-3 flex items-center gap-2 rounded-md border border-stone-200 p-3">
+                        <input v-model="unitEditForm(u).name" type="text" class="rounded border-stone-300 text-sm">
+                        <input v-model="unitEditForm(u).abbreviation" type="text" class="rounded border-stone-300 text-sm">
+                        <button type="button" @click="submitUnitEdit(u)" :disabled="unitEditForm(u).processing" class="rounded-md bg-indigo-600 px-3 py-1.5 text-xs text-white hover:bg-indigo-700">{{ t('common.save') }}</button>
+                    </div>
                 </div>
             </section>
 
@@ -136,14 +190,35 @@ function submitConversion(productId) {
                                     <span v-else>{{ p.conversions.map(c => `${c.unit} (×${c.factor})`).join(', ') }}</span>
                                 </td>
                                 <td class="text-stone-500">{{ p.status === 'active' ? t('common.active') : t('common.inactive') }}</td>
-                                <td class="text-right">
+                                <td class="text-right whitespace-nowrap">
                                     <button
                                         type="button"
                                         @click="toggle(`unit-${p.id}`)"
                                         :aria-label="t('products.add_alt_unit')"
-                                        class="ml-auto flex size-7 items-center justify-center rounded-full text-indigo-600 hover:bg-indigo-50"
+                                        class="mr-1 inline-flex size-7 items-center justify-center rounded-full text-indigo-600 hover:bg-indigo-50"
                                     >
-                                        <PlusIcon class="size-4" />
+                                        <PlusIcon class="size-3.5" />
+                                    </button>
+                                    <button type="button" @click="toggle(`edit-${p.id}`)" :aria-label="t('common.edit')" class="mr-1 inline-flex size-7 items-center justify-center rounded-full text-indigo-600 hover:bg-indigo-50">
+                                        <PencilIcon class="size-3.5" />
+                                    </button>
+                                    <button
+                                        v-if="p.status === 'active'"
+                                        type="button"
+                                        @click="toggleProductStatus(p)"
+                                        :aria-label="t('common.deactivate')"
+                                        class="inline-flex size-7 items-center justify-center rounded-full text-red-600 hover:bg-red-50"
+                                    >
+                                        <TrashIcon class="size-3.5" />
+                                    </button>
+                                    <button
+                                        v-else
+                                        type="button"
+                                        @click="toggleProductStatus(p)"
+                                        :aria-label="t('common.activate')"
+                                        class="inline-flex size-7 items-center justify-center rounded-full text-emerald-600 hover:bg-emerald-50"
+                                    >
+                                        <CheckIcon class="size-3.5" />
                                     </button>
                                 </td>
                             </tr>
@@ -164,6 +239,16 @@ function submitConversion(productId) {
                                         >
                                             <PlusIcon class="size-4" />
                                         </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr v-if="activePanel === `edit-${p.id}`" class="border-b border-stone-100 bg-stone-50">
+                                <td colspan="6" class="p-2">
+                                    <div class="grid grid-cols-4 gap-2">
+                                        <input v-model="productEditForm(p).name" type="text" :placeholder="t('products.name_placeholder')" class="rounded border-stone-300 text-sm">
+                                        <input v-model="productEditForm(p).sku" type="text" :placeholder="t('products.sku_placeholder')" class="rounded border-stone-300 text-sm">
+                                        <input v-model="productEditForm(p).low_stock_threshold" type="number" step="0.0001" :placeholder="t('products.low_stock_placeholder')" class="rounded border-stone-300 text-sm">
+                                        <button type="button" @click="submitProductEdit(p)" :disabled="productEditForm(p).processing" class="rounded-md bg-indigo-600 px-3 py-1.5 text-sm text-white hover:bg-indigo-700">{{ t('common.save') }}</button>
                                     </div>
                                 </td>
                             </tr>

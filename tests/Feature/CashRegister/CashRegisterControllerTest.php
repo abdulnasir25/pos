@@ -103,6 +103,35 @@ class CashRegisterControllerTest extends TestCase
         $this->assertSame(1, FinancialAccount::where('name', 'Main Till')->count());
     }
 
+    public function test_an_account_can_be_renamed_through_the_form(): void
+    {
+        $account = app(CreateFinancialAccount::class)->handle('Main Till', 'cash');
+        $this->login();
+
+        $response = $this->post("{$this->baseUrl}/cash-register/accounts/{$account->id}", [
+            'name' => 'Front Till',
+        ]);
+
+        $response->assertRedirect();
+        $this->resumeTenantContext();
+        $this->assertSame('Front Till', $account->fresh()->name);
+    }
+
+    public function test_an_accounts_status_can_be_toggled_through_the_form(): void
+    {
+        $account = app(CreateFinancialAccount::class)->handle('Main Till', 'cash');
+        $this->login();
+
+        $this->post("{$this->baseUrl}/cash-register/accounts/{$account->id}/toggle-status")->assertRedirect();
+        $this->resumeTenantContext();
+        $this->assertSame('inactive', $account->fresh()->status->value);
+
+        $this->login();
+        $this->post("{$this->baseUrl}/cash-register/accounts/{$account->id}/toggle-status")->assertRedirect();
+        $this->resumeTenantContext();
+        $this->assertSame('active', $account->fresh()->status->value);
+    }
+
     public function test_the_page_shows_the_open_session_for_an_account(): void
     {
         $account = app(CreateFinancialAccount::class)->handle('Main Till', 'cash');

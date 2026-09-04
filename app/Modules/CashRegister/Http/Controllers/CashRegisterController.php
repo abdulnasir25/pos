@@ -6,6 +6,7 @@ use App\Modules\CashRegister\Actions\CloseCashRegisterSession;
 use App\Modules\CashRegister\Actions\CreateFinancialAccount;
 use App\Modules\CashRegister\Actions\OpenCashRegisterSession;
 use App\Modules\CashRegister\Enums\CashRegisterSessionStatus;
+use App\Modules\CashRegister\Enums\FinancialAccountStatus;
 use App\Modules\CashRegister\Exceptions\AccountNotACashAccountException;
 use App\Modules\CashRegister\Exceptions\SessionAlreadyClosedException;
 use App\Modules\CashRegister\Exceptions\SessionAlreadyOpenException;
@@ -31,6 +32,7 @@ class CashRegisterController extends \App\Http\Controllers\Controller
                     'id' => $account->id,
                     'name' => $account->name,
                     'account_type' => $account->account_type->value,
+                    'status' => $account->status->value,
                     'open_session' => $openSession ? [
                         'id' => $openSession->id,
                         'opening_float' => (string) $openSession->opening_float,
@@ -74,6 +76,24 @@ class CashRegisterController extends \App\Http\Controllers\Controller
         );
 
         return back()->with('success', 'Financial account added.');
+    }
+
+    public function updateAccount(Request $request, FinancialAccount $account): RedirectResponse
+    {
+        $validated = $request->validate([
+            'name' => ['required', 'string', 'max:100'],
+        ]);
+
+        $account->update($validated);
+
+        return back()->with('success', 'Financial account updated.');
+    }
+
+    public function toggleAccountStatus(FinancialAccount $account): RedirectResponse
+    {
+        $account->update(['status' => $account->status === FinancialAccountStatus::Active ? FinancialAccountStatus::Inactive : FinancialAccountStatus::Active]);
+
+        return back()->with('success', 'Financial account status updated.');
     }
 
     public function openSession(Request $request): RedirectResponse

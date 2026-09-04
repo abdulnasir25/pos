@@ -3,6 +3,7 @@ import { ref, watch } from 'vue';
 import { useForm } from '@inertiajs/vue3';
 import AppLayout from '../../Layouts/AppLayout.vue';
 import PlusIcon from '../../Components/icons/PlusIcon.vue';
+import PencilIcon from '../../Components/icons/PencilIcon.vue';
 import { useI18n } from '../../i18n';
 
 const props = defineProps({
@@ -35,6 +36,24 @@ const employeeForm = useForm({ name: '', phone: '', hired_at: new Date().toISOSt
 
 function submitEmployee() {
     employeeForm.post('/employees', { preserveScroll: true, onSuccess: () => employeeForm.reset('name', 'phone') });
+}
+
+// --- Profile edit -----------------------------------------------------
+
+const editForms = ref({});
+
+function editForm(employee) {
+    if (!editForms.value[employee.id]) {
+        editForms.value[employee.id] = useForm({ name: employee.name, phone: employee.phone ?? '' });
+    }
+    return editForms.value[employee.id];
+}
+
+function submitEdit(employee) {
+    editForm(employee).post(`/employees/${employee.id}/profile`, {
+        preserveScroll: true,
+        onSuccess: () => toggle(null),
+    });
 }
 
 // --- Salary change -------------------------------------------------------
@@ -167,9 +186,27 @@ function submitPayment(employeeId) {
                                     >{{ statusLabel(e.status) }}</span>
                                 </td>
                                 <td class="text-right whitespace-nowrap">
+                                    <button
+                                        type="button"
+                                        @click="toggle(`edit-${e.id}`)"
+                                        :aria-label="t('common.edit')"
+                                        class="mr-2 inline-flex size-6 items-center justify-center rounded-full text-stone-500 hover:bg-stone-100 hover:text-indigo-700"
+                                    >
+                                        <PencilIcon class="size-3.5" />
+                                    </button>
                                     <button type="button" @click="toggle(`salary-${e.id}`)" class="mr-2 text-xs text-indigo-700 underline hover:text-indigo-800">{{ t('employees.salary_action') }}</button>
                                     <button type="button" @click="toggle(`pay-${e.id}`)" class="mr-2 text-xs text-indigo-700 underline hover:text-indigo-800">{{ t('employees.pay_action') }}</button>
                                     <button type="button" @click="toggle(`status-${e.id}`)" class="text-xs text-indigo-700 underline hover:text-indigo-800">{{ t('employees.status_action') }}</button>
+                                </td>
+                            </tr>
+
+                            <tr v-if="activePanel === `edit-${e.id}`" class="border-b border-stone-100 bg-stone-50">
+                                <td colspan="6" class="p-2">
+                                    <div class="flex items-center gap-2">
+                                        <input v-model="editForm(e).name" type="text" :placeholder="t('common.name')" class="rounded border-stone-300 text-sm">
+                                        <input v-model="editForm(e).phone" type="text" :placeholder="t('customers.phone_placeholder')" class="rounded border-stone-300 text-sm">
+                                        <button type="button" @click="submitEdit(e)" :disabled="editForm(e).processing" class="rounded-md bg-indigo-600 px-3 py-1.5 text-xs text-white hover:bg-indigo-700">{{ t('common.save') }}</button>
+                                    </div>
                                 </td>
                             </tr>
 

@@ -121,6 +121,23 @@ class EmployeesControllerTest extends TestCase
         $this->assertSame('active', Employee::where('name', 'Bilal')->first()->status->value);
     }
 
+    public function test_an_employees_profile_can_be_updated_through_the_form(): void
+    {
+        $employee = Employee::create(['name' => 'Bilal', 'hired_at' => '2026-01-01', 'status' => 'active']);
+        $this->login();
+
+        $response = $this->post("{$this->baseUrl}/employees/{$employee->id}/profile", [
+            'name' => 'Bilal Ahmed',
+            'phone' => '0300-1112222',
+        ]);
+
+        $response->assertRedirect();
+        $this->resumeTenantContext();
+        $fresh = $employee->fresh();
+        $this->assertSame('Bilal Ahmed', $fresh->name);
+        $this->assertSame('0300-1112222', $fresh->phone);
+    }
+
     public function test_a_salary_can_be_recorded_through_the_form(): void
     {
         $employee = Employee::create(['name' => 'Bilal', 'hired_at' => '2026-01-01', 'status' => 'active']);

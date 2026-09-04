@@ -173,4 +173,51 @@ class ProductsControllerTest extends TestCase
 
         $response->assertSessionHasErrors('conversion');
     }
+
+    public function test_a_product_can_be_updated_through_the_form(): void
+    {
+        $product = Product::create(['base_unit_id' => $this->meter->id, 'name' => 'Cotton', 'sku' => 'CT-001', 'status' => 'active']);
+        $this->login();
+
+        $response = $this->post("{$this->baseUrl}/products/{$product->id}", [
+            'name' => 'Cotton Fabric',
+            'sku' => 'CT-002',
+            'low_stock_threshold' => '10',
+        ]);
+
+        $response->assertRedirect();
+        $this->resumeTenantContext();
+        $fresh = $product->fresh();
+        $this->assertSame('Cotton Fabric', $fresh->name);
+        $this->assertSame('CT-002', $fresh->sku);
+    }
+
+    public function test_a_product_can_be_deactivated_and_reactivated(): void
+    {
+        $product = Product::create(['base_unit_id' => $this->meter->id, 'name' => 'Cotton', 'status' => 'active']);
+        $this->login();
+
+        $this->post("{$this->baseUrl}/products/{$product->id}/toggle-status")->assertRedirect();
+        $this->resumeTenantContext();
+        $this->assertSame('inactive', $product->fresh()->status);
+
+        $this->login();
+        $this->post("{$this->baseUrl}/products/{$product->id}/toggle-status")->assertRedirect();
+        $this->resumeTenantContext();
+        $this->assertSame('active', $product->fresh()->status);
+    }
+
+    public function test_a_unit_can_be_renamed_through_the_form(): void
+    {
+        $this->login();
+
+        $response = $this->post("{$this->baseUrl}/products/units/{$this->meter->id}", [
+            'name' => 'Metre',
+            'abbreviation' => 'm',
+        ]);
+
+        $response->assertRedirect();
+        $this->resumeTenantContext();
+        $this->assertSame('Metre', $this->meter->fresh()->name);
+    }
 }

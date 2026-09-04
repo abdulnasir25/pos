@@ -9,6 +9,7 @@ use App\Modules\Commission\Actions\FinalizeCommissionEntry;
 use App\Modules\Commission\Actions\RecordCommissionCorrection;
 use App\Modules\Commission\Actions\RecordCommissionPayment;
 use App\Modules\Commission\Enums\CommissionCorrectionReason;
+use App\Modules\Commission\Enums\CommissionRuleStatus;
 use App\Modules\Commission\Exceptions\CommissionAlreadyCalculatedException;
 use App\Modules\Commission\Exceptions\CorrectionMustLandInAnOpenPeriodException;
 use App\Modules\Commission\Exceptions\InvalidCommissionEntryTransitionException;
@@ -92,6 +93,13 @@ class CommissionController extends \App\Http\Controllers\Controller
         app(CreateCommissionRule::class)->handle($employee, (string) $validated['rate'], $validated['effective_from']);
 
         return back()->with('success', 'Commission rule added.');
+    }
+
+    public function toggleRuleStatus(CommissionRule $rule): RedirectResponse
+    {
+        $rule->update(['status' => $rule->status === CommissionRuleStatus::Active ? CommissionRuleStatus::Inactive : CommissionRuleStatus::Active]);
+
+        return back()->with('success', 'Commission rule status updated.');
     }
 
     public function storePeriod(Request $request): RedirectResponse

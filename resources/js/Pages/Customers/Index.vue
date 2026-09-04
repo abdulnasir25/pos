@@ -1,8 +1,11 @@
 <script setup>
 import { ref, watch } from 'vue';
-import { useForm } from '@inertiajs/vue3';
+import { useForm, router } from '@inertiajs/vue3';
 import AppLayout from '../../Layouts/AppLayout.vue';
 import PlusIcon from '../../Components/icons/PlusIcon.vue';
+import PencilIcon from '../../Components/icons/PencilIcon.vue';
+import TrashIcon from '../../Components/icons/TrashIcon.vue';
+import CheckIcon from '../../Components/icons/CheckIcon.vue';
 import { useI18n } from '../../i18n';
 
 const props = defineProps({
@@ -49,6 +52,26 @@ function recordPayment(customerId) {
         onSuccess: () => { paymentForm(customerId).reset('amount'); toggle(null); },
     });
 }
+
+const editForms = ref({});
+
+function editForm(customer) {
+    if (!editForms.value[customer.id]) {
+        editForms.value[customer.id] = useForm({ name: customer.name, phone: customer.phone });
+    }
+    return editForms.value[customer.id];
+}
+
+function submitEditCustomer(customer) {
+    editForm(customer).post(`/customers/${customer.id}`, {
+        preserveScroll: true,
+        onSuccess: () => toggle(null),
+    });
+}
+
+function toggleStatus(customer) {
+    router.post(`/customers/${customer.id}/toggle-status`, {}, { preserveScroll: true });
+}
 </script>
 
 <template>
@@ -93,8 +116,29 @@ function recordPayment(customerId) {
                                 <td class="text-stone-500">{{ c.phone ?? '—' }}</td>
                                 <td class="text-right tabular-nums" :class="parseFloat(c.balance) > 0 ? 'text-amber-700' : ''">{{ money(c.balance) }}</td>
                                 <td class="text-stone-500">{{ c.status === 'active' ? t('common.active') : t('common.inactive') }}</td>
-                                <td class="text-right">
-                                    <button type="button" @click="toggle(`pay-${c.id}`)" class="text-xs text-indigo-700 underline hover:text-indigo-800">{{ t('customers.record_payment') }}</button>
+                                <td class="text-right whitespace-nowrap">
+                                    <button type="button" @click="toggle(`pay-${c.id}`)" class="mr-2 text-xs text-indigo-700 underline hover:text-indigo-800">{{ t('customers.record_payment') }}</button>
+                                    <button type="button" @click="toggle(`edit-${c.id}`)" :aria-label="t('common.edit')" class="mr-1 inline-flex size-7 items-center justify-center rounded-full text-indigo-600 hover:bg-indigo-50">
+                                        <PencilIcon class="size-3.5" />
+                                    </button>
+                                    <button
+                                        v-if="c.status === 'active'"
+                                        type="button"
+                                        @click="toggleStatus(c)"
+                                        :aria-label="t('common.deactivate')"
+                                        class="inline-flex size-7 items-center justify-center rounded-full text-red-600 hover:bg-red-50"
+                                    >
+                                        <TrashIcon class="size-3.5" />
+                                    </button>
+                                    <button
+                                        v-else
+                                        type="button"
+                                        @click="toggleStatus(c)"
+                                        :aria-label="t('common.activate')"
+                                        class="inline-flex size-7 items-center justify-center rounded-full text-emerald-600 hover:bg-emerald-50"
+                                    >
+                                        <CheckIcon class="size-3.5" />
+                                    </button>
                                 </td>
                             </tr>
                             <tr v-if="activePanel === `pay-${c.id}`" class="border-b border-stone-100 bg-stone-50">
@@ -105,6 +149,15 @@ function recordPayment(customerId) {
                                             <option v-for="m in paymentMethods" :key="m.id" :value="m.id">{{ m.name }}</option>
                                         </select>
                                         <button type="button" @click="recordPayment(c.id)" :disabled="paymentForm(c.id).processing" class="rounded-md bg-indigo-600 px-3 py-1.5 text-xs text-white hover:bg-indigo-700">{{ t('customers.record') }}</button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr v-if="activePanel === `edit-${c.id}`" class="border-b border-stone-100 bg-stone-50">
+                                <td colspan="5" class="p-2">
+                                    <div class="flex items-center gap-2">
+                                        <input v-model="editForm(c).name" type="text" :placeholder="t('common.name')" class="rounded border-stone-300 text-sm">
+                                        <input v-model="editForm(c).phone" type="text" :placeholder="t('customers.phone_placeholder')" class="rounded border-stone-300 text-sm">
+                                        <button type="button" @click="submitEditCustomer(c)" :disabled="editForm(c).processing" class="rounded-md bg-indigo-600 px-3 py-1.5 text-xs text-white hover:bg-indigo-700">{{ t('common.save') }}</button>
                                     </div>
                                 </td>
                             </tr>

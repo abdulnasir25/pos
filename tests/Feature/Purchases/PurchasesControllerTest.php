@@ -114,6 +114,36 @@ class PurchasesControllerTest extends TestCase
         $this->assertSame(1, Supplier::where('name', 'Karachi Fabrics')->count());
     }
 
+    public function test_a_supplier_can_be_updated_through_the_form(): void
+    {
+        $this->login();
+
+        $response = $this->post("{$this->baseUrl}/purchases/suppliers/{$this->supplier->id}", [
+            'name' => 'Faisalabad Textiles Ltd',
+            'phone' => '0300-1112222',
+        ]);
+
+        $response->assertRedirect();
+        $this->resumeTenantContext();
+        $fresh = $this->supplier->fresh();
+        $this->assertSame('Faisalabad Textiles Ltd', $fresh->name);
+        $this->assertSame('0300-1112222', $fresh->phone);
+    }
+
+    public function test_a_supplier_can_be_deactivated_and_reactivated(): void
+    {
+        $this->login();
+
+        $this->post("{$this->baseUrl}/purchases/suppliers/{$this->supplier->id}/toggle-status")->assertRedirect();
+        $this->resumeTenantContext();
+        $this->assertSame('inactive', $this->supplier->fresh()->status);
+
+        $this->login();
+        $this->post("{$this->baseUrl}/purchases/suppliers/{$this->supplier->id}/toggle-status")->assertRedirect();
+        $this->resumeTenantContext();
+        $this->assertSame('active', $this->supplier->fresh()->status);
+    }
+
     public function test_confirming_a_purchase_through_the_form_increases_stock(): void
     {
         $this->login();

@@ -120,4 +120,31 @@ class WarehousesControllerTest extends TestCase
 
         $response->assertSessionHasErrors('name');
     }
+
+    public function test_a_warehouse_can_be_renamed_through_the_form(): void
+    {
+        $warehouse = Warehouse::create(['name' => 'Main Store', 'status' => 'active']);
+        $this->login();
+
+        $response = $this->post("{$this->baseUrl}/warehouses/{$warehouse->id}", ['name' => 'Main Branch']);
+
+        $response->assertRedirect();
+        $this->resumeTenantContext();
+        $this->assertSame('Main Branch', $warehouse->fresh()->name);
+    }
+
+    public function test_a_warehouse_can_be_deactivated_and_reactivated(): void
+    {
+        $warehouse = Warehouse::create(['name' => 'Main Store', 'status' => 'active']);
+        $this->login();
+
+        $this->post("{$this->baseUrl}/warehouses/{$warehouse->id}/toggle-status")->assertRedirect();
+        $this->resumeTenantContext();
+        $this->assertSame('inactive', $warehouse->fresh()->status);
+
+        $this->login();
+        $this->post("{$this->baseUrl}/warehouses/{$warehouse->id}/toggle-status")->assertRedirect();
+        $this->resumeTenantContext();
+        $this->assertSame('active', $warehouse->fresh()->status);
+    }
 }

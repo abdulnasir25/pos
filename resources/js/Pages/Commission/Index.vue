@@ -4,6 +4,8 @@ import { useForm, router } from '@inertiajs/vue3';
 import AppLayout from '../../Layouts/AppLayout.vue';
 import PlusIcon from '../../Components/icons/PlusIcon.vue';
 import ChevronDownIcon from '../../Components/icons/ChevronDownIcon.vue';
+import TrashIcon from '../../Components/icons/TrashIcon.vue';
+import CheckIcon from '../../Components/icons/CheckIcon.vue';
 import { useI18n } from '../../i18n';
 
 const props = defineProps({
@@ -60,6 +62,10 @@ watch(() => props.employees, (list) => {
 
 function submitRule() {
     ruleForm.post('/commission/rules', { preserveScroll: true, onSuccess: () => ruleForm.reset('rate') });
+}
+
+function toggleRuleStatus(ruleId) {
+    router.post(`/commission/rules/${ruleId}/toggle-status`, {}, { preserveScroll: true });
 }
 
 // --- Financial periods -------------------------------------------------
@@ -147,7 +153,7 @@ function submitCorrection() {
                 <table class="mt-3 w-full text-sm">
                     <thead>
                         <tr class="border-b border-stone-200 text-left text-xs uppercase text-stone-500">
-                            <th class="py-2">{{ t('commission.employee') }}</th><th>{{ t('commission.rate') }}</th><th>{{ t('commission.effective_from') }}</th><th>{{ t('commission.status') }}</th>
+                            <th class="py-2">{{ t('commission.employee') }}</th><th>{{ t('commission.rate') }}</th><th>{{ t('commission.effective_from') }}</th><th>{{ t('commission.status') }}</th><th></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -156,8 +162,20 @@ function submitCorrection() {
                             <td class="tabular-nums">{{ r.rate }}%</td>
                             <td>{{ r.effective_from }}</td>
                             <td>{{ r.status === 'active' ? t('common.active') : t('common.inactive') }}</td>
+                            <td class="text-right">
+                                <button
+                                    type="button"
+                                    @click="toggleRuleStatus(r.id)"
+                                    :aria-label="r.status === 'active' ? t('common.deactivate') : t('common.activate')"
+                                    class="inline-flex size-6 items-center justify-center rounded-full text-stone-500 hover:bg-stone-100"
+                                    :class="r.status === 'active' ? 'hover:text-red-700' : 'hover:text-emerald-700'"
+                                >
+                                    <TrashIcon v-if="r.status === 'active'" class="size-3.5" />
+                                    <CheckIcon v-else class="size-3.5" />
+                                </button>
+                            </td>
                         </tr>
-                        <tr v-if="rules.length === 0"><td colspan="4" class="py-3 text-center text-stone-400">{{ t('commission.no_rules') }}</td></tr>
+                        <tr v-if="rules.length === 0"><td colspan="5" class="py-3 text-center text-stone-400">{{ t('commission.no_rules') }}</td></tr>
                     </tbody>
                 </table>
             </section>

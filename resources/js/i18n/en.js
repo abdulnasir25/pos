@@ -84,6 +84,9 @@ export default {
     'common.active': 'Active',
     'common.inactive': 'Inactive',
     'common.none_yet': 'Nothing added yet.',
+    'common.edit': 'Edit',
+    'common.deactivate': 'Turn off',
+    'common.activate': 'Turn on',
 
     // Warehouses
     'warehouses.title': 'Warehouses',
@@ -361,6 +364,7 @@ export default {
     'purchases.new_purchase': 'New Purchase',
     'purchases.cancel': 'Cancel',
     'purchases.return': 'Return',
+    'purchases.suppliers_title': 'Suppliers',
     'purchases.search_placeholder': 'Search for an item...',
     'purchases.supplier': 'Supplier',
     'purchases.supplier_name_placeholder': 'Supplier name',
