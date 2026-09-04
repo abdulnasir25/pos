@@ -45,6 +45,8 @@ Route::post('/pos/sale', [PosController::class, 'store'])->middleware(['auth', '
 Route::middleware(['auth', 'permission:partners.manage'])->group(function () {
     Route::get('/partners', [PartnersController::class, 'show'])->name('partners');
     Route::post('/partners', [PartnersController::class, 'storePartner'])->name('partners.store');
+    Route::post('/partners/{partner}/profile', [PartnersController::class, 'updateProfile'])->name('partners.profile.update');
+    Route::post('/partners/{partner}/exit', [PartnersController::class, 'exit'])->name('partners.exit');
     Route::post('/partners/rebalance', [PartnersController::class, 'storeRebalance'])->name('partners.rebalance');
     Route::post('/partners/capital', [PartnersController::class, 'storeCapital'])->name('partners.capital');
     Route::post('/partners/loans', [PartnersController::class, 'storeLoan'])->name('partners.loans');

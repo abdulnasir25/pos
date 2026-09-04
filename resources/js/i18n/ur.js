@@ -142,6 +142,12 @@ export default {
     'partners.principal_placeholder': 'قرض کی رقم',
     'partners.owes': 'کا ادھار ہے',
     'partners.record_repayment_action': 'واپسی درج کریں',
+    'partners.exited': 'الگ ہو گیا',
+    'partners.edit_title': 'شراکت دار میں تبدیلی',
+    'partners.exit_title': 'شراکت داری ختم کریں',
+    'partners.exit_note': 'اس سے شراکت دار یا اس کی تاریخ حذف نہیں ہوتی — بس یہ ظاہر ہوتا ہے کہ وہ اب فعال نہیں۔ باقی حصہ داروں کو نیا حصہ الگ سے دینا ہوگا۔',
+    'partners.exited_on': 'الگ ہونے کی تاریخ',
+    'partners.exit_action': 'شراکت داری ختم کریں',
 
     // Expenses
     'expenses.title': 'اخراجات',

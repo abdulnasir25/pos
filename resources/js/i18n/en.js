@@ -142,6 +142,12 @@ export default {
     'partners.principal_placeholder': 'Loan amount',
     'partners.owes': 'owes',
     'partners.record_repayment_action': 'Record Repayment',
+    'partners.exited': 'Exited',
+    'partners.edit_title': 'Edit Partner',
+    'partners.exit_title': 'Mark as Exited',
+    'partners.exit_note': "This doesn't delete the partner or their history — it just marks them as no longer active. Their ownership share must be given to the remaining partners separately.",
+    'partners.exited_on': 'Exited on',
+    'partners.exit_action': 'Mark as Exited',
 
     // Expenses
     'expenses.title': 'Expenses',
