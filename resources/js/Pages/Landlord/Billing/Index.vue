@@ -127,7 +127,7 @@ function recordPayment(invoiceId) {
                     <button type="button" @click="toggle('plan')" class="text-sm text-indigo-700 underline hover:text-indigo-800">+ Add Plan</button>
                 </div>
 
-                <form v-if="activePanel === 'plan'" @submit.prevent="submitPlan" class="mb-4 grid grid-cols-4 gap-2 rounded-md border border-stone-200 p-3">
+                <form v-if="activePanel === 'plan'" @submit.prevent="submitPlan" class="mb-4 grid grid-cols-1 sm:grid-cols-4 gap-2 rounded-md border border-stone-200 p-3">
                     <input v-model="planForm.name" type="text" placeholder="Name" class="rounded border-stone-300 text-sm">
                     <input v-model="planForm.slug" type="text" placeholder="Slug (e.g. pro)" class="rounded border-stone-300 text-sm">
                     <input v-model="planForm.price" type="number" step="0.01" placeholder="Price" class="rounded border-stone-300 text-sm">
@@ -164,7 +164,7 @@ function recordPayment(invoiceId) {
                     <button type="button" @click="toggle('subscription')" class="text-sm text-indigo-700 underline hover:text-indigo-800">+ Start Subscription</button>
                 </div>
 
-                <form v-if="activePanel === 'subscription'" @submit.prevent="submitSubscription" class="mb-4 grid grid-cols-4 gap-2 rounded-md border border-stone-200 p-3">
+                <form v-if="activePanel === 'subscription'" @submit.prevent="submitSubscription" class="mb-4 grid grid-cols-1 sm:grid-cols-4 gap-2 rounded-md border border-stone-200 p-3">
                     <select v-model="subscriptionForm.tenant_id" class="rounded border-stone-300 text-sm">
                         <option v-for="t in tenants" :key="t.id" :value="t.id">{{ t.name }}</option>
                     </select>

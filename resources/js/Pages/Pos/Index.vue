@@ -119,7 +119,7 @@ function money(n) {
         <main class="grid grid-cols-1 gap-6 p-6 lg:grid-cols-3">
             <!-- Product catalog -->
             <section class="lg:col-span-2">
-                <div class="mb-4 flex gap-3">
+                <div class="mb-4 flex flex-col gap-3 sm:flex-row">
                     <input
                         v-model="search"
                         type="text"
@@ -165,7 +165,7 @@ function money(n) {
                         <span class="text-sm font-medium text-stone-900">{{ line.product_name }}</span>
                         <button type="button" @click="removeLine(index)" class="text-xs text-red-600 hover:text-red-800">{{ t('pos.remove') }}</button>
                     </div>
-                    <div class="grid grid-cols-4 gap-2 text-xs">
+                    <div class="grid grid-cols-2 gap-2 text-xs sm:grid-cols-4">
                         <div>
                             <label class="text-stone-500">{{ t('pos.unit') }}</label>
                             <select v-model="line.unit_id" class="mt-0.5 w-full rounded border-stone-300 text-xs">

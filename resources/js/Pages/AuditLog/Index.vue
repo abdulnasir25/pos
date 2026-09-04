@@ -40,6 +40,7 @@ function toggleExpand(id) {
 
                 <p class="mb-3 text-xs text-stone-400">{{ t('audit_log.note') }}</p>
 
+                <div class="overflow-x-auto">
                 <table class="w-full text-sm">
                     <thead>
                         <tr class="border-b border-stone-200 text-left text-xs uppercase text-stone-500">
@@ -66,7 +67,7 @@ function toggleExpand(id) {
                             </tr>
                             <tr v-if="expandedId === e.id" class="border-b border-stone-100 bg-stone-50">
                                 <td colspan="5" class="px-2 py-3">
-                                    <div class="grid grid-cols-2 gap-4 text-xs">
+                                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
                                         <div v-if="e.old_values">
                                             <p class="mb-1 uppercase text-stone-400">{{ t('audit_log.before') }}</p>
                                             <pre class="whitespace-pre-wrap rounded bg-white p-2">{{ JSON.stringify(e.old_values, null, 2) }}</pre>
@@ -82,6 +83,7 @@ function toggleExpand(id) {
                         <tr v-if="entries.length === 0"><td colspan="5" class="py-3 text-center text-stone-400">{{ t('audit_log.none_yet') }}</td></tr>
                     </tbody>
                 </table>
+                </div>
             </section>
         </main>
     </AppLayout>

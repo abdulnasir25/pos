@@ -145,7 +145,7 @@ function money(n) {
                     </button>
                 </div>
 
-                <form v-if="activePanel === 'add'" @submit.prevent="submitPartner" class="mb-4 grid grid-cols-4 gap-2 rounded-md border border-stone-200 p-3">
+                <form v-if="activePanel === 'add'" @submit.prevent="submitPartner" class="mb-4 grid grid-cols-1 sm:grid-cols-4 gap-2 rounded-md border border-stone-200 p-3">
                     <input v-model="partnerForm.name" type="text" :placeholder="t('common.name')" class="rounded border-stone-300 text-sm">
                     <input v-model="partnerForm.phone" type="text" :placeholder="t('customers.phone_placeholder')" class="rounded border-stone-300 text-sm">
                     <input v-model="partnerForm.joined_at" type="date" class="rounded border-stone-300 text-sm">
@@ -159,6 +159,7 @@ function money(n) {
                     </button>
                 </form>
 
+                <div class="overflow-x-auto">
                 <table class="w-full text-sm">
                     <thead>
                         <tr class="border-b border-stone-200 text-left text-xs uppercase text-stone-500">
@@ -224,6 +225,7 @@ function money(n) {
                         </template>
                     </tbody>
                 </table>
+                </div>
             </section>
 
             <!-- Rebalance ownership -->
@@ -235,7 +237,7 @@ function money(n) {
 
                 <div v-if="activePanel === 'rebalance'" class="mt-3">
                     <p class="mb-2 text-xs text-stone-500">{{ t('partners.every_partner_note') }}</p>
-                    <div class="mb-2 grid grid-cols-2 gap-2">
+                    <div class="mb-2 grid grid-cols-1 sm:grid-cols-2 gap-2">
                         <div v-for="p in activePartners" :key="p.id" class="flex items-center gap-2">
                             <label class="w-32 text-sm text-stone-700">{{ p.name }}</label>
                             <input v-model="rebalanceForm.percentages[p.id]" type="number" step="0.01" class="w-24 rounded border-stone-300 text-sm">
@@ -262,7 +264,7 @@ function money(n) {
                     <ChevronDownIcon class="size-4 transition-transform" :class="{ 'rotate-180': activePanel === 'capital' }" />
                 </button>
 
-                <form v-if="activePanel === 'capital'" @submit.prevent="submitCapital" class="mt-3 grid grid-cols-4 gap-2">
+                <form v-if="activePanel === 'capital'" @submit.prevent="submitCapital" class="mt-3 grid grid-cols-1 sm:grid-cols-4 gap-2">
                     <select v-model="capitalForm.partner_id" class="rounded border-stone-300 text-sm">
                         <option v-for="p in partners" :key="p.id" :value="p.id">{{ p.name }}</option>
                     </select>
@@ -283,7 +285,7 @@ function money(n) {
                     <ChevronDownIcon class="size-4 transition-transform" :class="{ 'rotate-180': activePanel === 'loan' }" />
                 </button>
 
-                <form v-if="activePanel === 'loan'" @submit.prevent="submitLoan" class="mt-3 grid grid-cols-3 gap-2">
+                <form v-if="activePanel === 'loan'" @submit.prevent="submitLoan" class="mt-3 grid grid-cols-1 sm:grid-cols-3 gap-2">
                     <select v-model="loanForm.partner_id" class="rounded border-stone-300 text-sm">
                         <option v-for="p in partners" :key="p.id" :value="p.id">{{ p.name }}</option>
                     </select>
@@ -300,7 +302,7 @@ function money(n) {
                     <ChevronDownIcon class="size-4 transition-transform" :class="{ 'rotate-180': activePanel === 'repayment' }" />
                 </button>
 
-                <form v-if="activePanel === 'repayment'" @submit.prevent="submitRepayment" class="mt-3 grid grid-cols-3 gap-2">
+                <form v-if="activePanel === 'repayment'" @submit.prevent="submitRepayment" class="mt-3 grid grid-cols-1 sm:grid-cols-3 gap-2">
                     <select v-model="repaymentForm.loan_id" class="rounded border-stone-300 text-sm">
                         <option v-for="l in outstandingLoans" :key="l.id" :value="l.id">
                             {{ l.partner_name }} — {{ t('partners.owes') }} {{ money(l.outstanding) }}

@@ -113,7 +113,7 @@ function money(n) {
                     </button>
                 </form>
 
-                <form v-if="categories.length > 0" @submit.prevent="submitExpense" class="grid grid-cols-2 gap-2">
+                <form v-if="categories.length > 0" @submit.prevent="submitExpense" class="grid grid-cols-1 sm:grid-cols-2 gap-2">
                     <select v-model="expenseForm.expense_category_id" class="rounded border-stone-300 text-sm">
                         <option v-for="c in categories" :key="c.id" :value="c.id">{{ c.name }}</option>
                     </select>
@@ -138,7 +138,7 @@ function money(n) {
                     {{ t('expenses.correction_note') }}
                 </p>
 
-                <form v-if="activePanel === 'correction'" @submit.prevent="submitCorrection" class="mt-3 grid grid-cols-3 gap-2">
+                <form v-if="activePanel === 'correction'" @submit.prevent="submitCorrection" class="mt-3 grid grid-cols-1 sm:grid-cols-3 gap-2">
                     <select v-model="correctionForm.expense_id" class="rounded border-stone-300 text-sm">
                         <option v-for="e in expenses" :key="e.id" :value="e.id">
                             {{ e.category }} — {{ money(e.amount) }} ({{ e.expense_date }})
@@ -157,6 +157,7 @@ function money(n) {
                     <span class="text-sm text-stone-600">{{ t('expenses.total') }}: <span class="font-medium tabular-nums">{{ money(total) }}</span></span>
                 </div>
 
+                <div class="overflow-x-auto">
                 <table class="w-full text-sm">
                     <thead>
                         <tr class="border-b border-stone-200 text-left text-xs uppercase text-stone-500">
@@ -183,6 +184,7 @@ function money(n) {
                         </tr>
                     </tbody>
                 </table>
+                </div>
             </section>
         </main>
     </AppLayout>

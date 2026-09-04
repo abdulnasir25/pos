@@ -204,6 +204,7 @@ function purchaseStatusLabel(status) {
                 <!-- Suppliers -->
                 <div class="mt-6 rounded-xl border border-stone-200/70 bg-white p-6 shadow-sm">
                     <h2 class="mb-3 text-base font-medium text-stone-900">{{ t('purchases.suppliers_title') }}</h2>
+                    <div class="overflow-x-auto">
                     <table class="w-full text-sm">
                         <thead>
                             <tr class="border-b border-stone-200 text-left text-xs uppercase text-stone-500">
@@ -253,6 +254,7 @@ function purchaseStatusLabel(status) {
                             </template>
                         </tbody>
                     </table>
+                    </div>
                     <p v-if="allSuppliers.length === 0" class="text-sm text-stone-400">{{ t('common.none_yet') }}</p>
                 </div>
             </section>
@@ -292,7 +294,7 @@ function purchaseStatusLabel(status) {
                             <TrashIcon class="size-3.5" />
                         </button>
                     </div>
-                    <div class="grid grid-cols-4 gap-2 text-xs">
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
                         <select v-model="line.unit_id" class="rounded border-stone-300 text-xs">
                             <option v-for="u in line.units" :key="u.id" :value="u.id">{{ u.name }}</option>
                         </select>
