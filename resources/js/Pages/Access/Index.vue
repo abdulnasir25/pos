@@ -8,7 +8,7 @@ const page = usePage();
 <template>
     <AppLayout title="My Access">
         <main class="mx-auto max-w-2xl px-6 py-8">
-            <div class="rounded-lg bg-white p-6 shadow-sm">
+            <div class="rounded-xl border border-stone-200/70 bg-white p-6 shadow-sm">
                 <h2 class="mb-4 text-base font-medium text-stone-900">Your access</h2>
 
                 <p class="mb-2 text-sm text-stone-600">Roles</p>

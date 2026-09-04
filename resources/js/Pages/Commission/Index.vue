@@ -98,7 +98,7 @@ function submitCorrection() {
     <AppLayout title="Commission">
         <main class="mx-auto max-w-4xl space-y-6 p-6">
             <!-- Rules -->
-            <section class="rounded-lg bg-white p-4 shadow-sm">
+            <section class="rounded-xl border border-stone-200/70 bg-white p-6 shadow-sm">
                 <button type="button" @click="toggle('rule')" class="text-base font-medium text-stone-900">
                     Commission Rules {{ activePanel === 'rule' ? '▲' : '▼' }}
                 </button>
@@ -109,7 +109,7 @@ function submitCorrection() {
                     </select>
                     <input v-model="ruleForm.rate" type="number" step="0.01" placeholder="Rate %" class="rounded border-stone-300 text-sm">
                     <input v-model="ruleForm.effective_from" type="date" class="rounded border-stone-300 text-sm">
-                    <button type="submit" :disabled="ruleForm.processing" class="rounded-md bg-stone-900 px-3 py-1.5 text-sm text-white hover:bg-stone-700">Add Rule</button>
+                    <button type="submit" :disabled="ruleForm.processing" class="rounded-md bg-indigo-600 px-3 py-1.5 text-sm text-white hover:bg-indigo-700">Add Rule</button>
                 </form>
 
                 <table class="mt-3 w-full text-sm">
@@ -131,7 +131,7 @@ function submitCorrection() {
             </section>
 
             <!-- Financial periods + calculate -->
-            <section class="rounded-lg bg-white p-4 shadow-sm">
+            <section class="rounded-xl border border-stone-200/70 bg-white p-6 shadow-sm">
                 <button type="button" @click="toggle('period')" class="text-base font-medium text-stone-900">
                     Financial Periods {{ activePanel === 'period' ? '▲' : '▼' }}
                 </button>
@@ -139,7 +139,7 @@ function submitCorrection() {
                 <form v-if="activePanel === 'period'" @submit.prevent="submitPeriod" class="mt-3 grid grid-cols-3 gap-2">
                     <input v-model="periodForm.period_start" type="date" class="rounded border-stone-300 text-sm">
                     <input v-model="periodForm.period_end" type="date" class="rounded border-stone-300 text-sm">
-                    <button type="submit" :disabled="periodForm.processing" class="rounded-md bg-stone-900 px-3 py-1.5 text-sm text-white hover:bg-stone-700">Create Period</button>
+                    <button type="submit" :disabled="periodForm.processing" class="rounded-md bg-indigo-600 px-3 py-1.5 text-sm text-white hover:bg-indigo-700">Create Period</button>
                 </form>
 
                 <div v-if="periods.length > 0" class="mt-4 border-t border-stone-200 pt-3">
@@ -150,13 +150,13 @@ function submitCorrection() {
                                 {{ p.period_start }} – {{ p.period_end }} ({{ p.status }})
                             </option>
                         </select>
-                        <button type="submit" :disabled="calculateForm.processing" class="rounded-md bg-stone-900 px-3 py-1.5 text-sm text-white hover:bg-stone-700">Calculate</button>
+                        <button type="submit" :disabled="calculateForm.processing" class="rounded-md bg-indigo-600 px-3 py-1.5 text-sm text-white hover:bg-indigo-700">Calculate</button>
                     </form>
                 </div>
             </section>
 
             <!-- Entries -->
-            <section class="rounded-lg bg-white p-4 shadow-sm">
+            <section class="rounded-xl border border-stone-200/70 bg-white p-6 shadow-sm">
                 <h2 class="mb-3 text-base font-medium text-stone-900">Commission Entries</h2>
                 <table class="w-full text-sm">
                     <thead>
@@ -175,9 +175,9 @@ function submitCorrection() {
                                 <span class="rounded-full bg-stone-100 px-2 py-0.5 text-xs text-stone-700">{{ e.status }}</span>
                             </td>
                             <td class="text-right">
-                                <button v-if="e.status === 'calculated'" type="button" @click="approve(e.id)" class="text-xs text-stone-600 underline">Approve</button>
-                                <button v-else-if="e.status === 'approved'" type="button" @click="finalize(e.id)" class="text-xs text-stone-600 underline">Finalize</button>
-                                <button v-else-if="e.status === 'finalized'" type="button" @click="pay(e.id)" class="text-xs text-stone-600 underline">Pay</button>
+                                <button v-if="e.status === 'calculated'" type="button" @click="approve(e.id)" class="text-xs text-indigo-700 underline hover:text-indigo-800">Approve</button>
+                                <button v-else-if="e.status === 'approved'" type="button" @click="finalize(e.id)" class="text-xs text-indigo-700 underline hover:text-indigo-800">Finalize</button>
+                                <button v-else-if="e.status === 'finalized'" type="button" @click="pay(e.id)" class="text-xs text-indigo-700 underline hover:text-indigo-800">Pay</button>
                             </td>
                         </tr>
                         <tr v-if="entries.length === 0"><td colspan="7" class="py-3 text-center text-stone-400">No commission entries yet.</td></tr>
@@ -186,7 +186,7 @@ function submitCorrection() {
             </section>
 
             <!-- Correction -->
-            <section v-if="finalizedEntries.length > 0" class="rounded-lg bg-white p-4 shadow-sm">
+            <section v-if="finalizedEntries.length > 0" class="rounded-xl border border-stone-200/70 bg-white p-6 shadow-sm">
                 <button type="button" @click="toggle('correction')" class="text-base font-medium text-stone-900">
                     Record Correction {{ activePanel === 'correction' ? '▲' : '▼' }}
                 </button>
@@ -207,7 +207,7 @@ function submitCorrection() {
                         <option value="sale_cancellation">Sale cancellation</option>
                         <option value="manual_adjustment">Manual adjustment</option>
                     </select>
-                    <button type="submit" :disabled="correctionForm.processing || openPeriods.length === 0" class="col-span-2 rounded-md bg-stone-900 px-3 py-1.5 text-sm text-white hover:bg-stone-700 disabled:opacity-50">
+                    <button type="submit" :disabled="correctionForm.processing || openPeriods.length === 0" class="col-span-2 rounded-md bg-indigo-600 px-3 py-1.5 text-sm text-white hover:bg-indigo-700 disabled:opacity-50">
                         Save Correction
                     </button>
                     <p v-if="openPeriods.length === 0" class="col-span-2 text-xs text-red-600">No open financial period exists to land this correction in.</p>

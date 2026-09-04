@@ -66,10 +66,10 @@ function submitEntry() {
     <AppLayout title="Accounting">
         <main class="mx-auto max-w-4xl space-y-6 p-6">
             <!-- Chart of accounts -->
-            <section class="rounded-lg bg-white p-4 shadow-sm">
+            <section class="rounded-xl border border-stone-200/70 bg-white p-6 shadow-sm">
                 <div class="mb-3 flex items-center justify-between">
                     <h2 class="text-base font-medium text-stone-900">Chart of Accounts</h2>
-                    <button type="button" @click="toggle('account')" class="text-sm text-stone-600 underline">+ Add Account</button>
+                    <button type="button" @click="toggle('account')" class="text-sm text-indigo-700 underline hover:text-indigo-800">+ Add Account</button>
                 </div>
 
                 <form v-if="activePanel === 'account'" @submit.prevent="submitAccount" class="mb-4 grid grid-cols-4 gap-2 rounded-md border border-stone-200 p-3">
@@ -87,7 +87,7 @@ function submitEntry() {
                         <option value="">No parent</option>
                         <option v-for="a in accounts" :key="a.id" :value="a.id">{{ a.code }} — {{ a.name }}</option>
                     </select>
-                    <button type="submit" :disabled="accountForm.processing" class="col-span-4 rounded-md bg-stone-900 px-3 py-1.5 text-sm text-white hover:bg-stone-700">Add</button>
+                    <button type="submit" :disabled="accountForm.processing" class="col-span-4 rounded-md bg-indigo-600 px-3 py-1.5 text-sm text-white hover:bg-indigo-700">Add</button>
                 </form>
 
                 <table class="w-full text-sm">
@@ -108,7 +108,7 @@ function submitEntry() {
             </section>
 
             <!-- Journal entry -->
-            <section class="rounded-lg bg-white p-4 shadow-sm">
+            <section class="rounded-xl border border-stone-200/70 bg-white p-6 shadow-sm">
                 <button type="button" @click="toggle('entry')" class="text-base font-medium text-stone-900">
                     Post Journal Entry {{ activePanel === 'entry' ? '▲' : '▼' }}
                 </button>
@@ -130,21 +130,21 @@ function submitEntry() {
                         </div>
                     </div>
 
-                    <button type="button" @click="addLine" class="text-xs text-stone-600 underline">+ Add line</button>
+                    <button type="button" @click="addLine" class="text-xs text-indigo-700 underline hover:text-indigo-800">+ Add line</button>
 
                     <div class="mt-3 flex items-center justify-between border-t border-stone-200 pt-3 text-sm">
                         <span>Debits: <span class="font-medium tabular-nums">{{ money(totalDebits) }}</span> · Credits: <span class="font-medium tabular-nums">{{ money(totalCredits) }}</span></span>
                         <span :class="isBalanced ? 'text-emerald-700' : 'text-red-600'">{{ isBalanced ? 'Balanced' : 'Not balanced' }}</span>
                     </div>
 
-                    <button type="submit" :disabled="!isBalanced || entryForm.processing" class="mt-3 w-full rounded-md bg-stone-900 px-4 py-2 text-sm font-medium text-white hover:bg-stone-700 disabled:opacity-50">
+                    <button type="submit" :disabled="!isBalanced || entryForm.processing" class="mt-3 w-full rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 disabled:opacity-50">
                         Post Entry
                     </button>
                 </form>
             </section>
 
             <!-- Recent entries -->
-            <section class="rounded-lg bg-white p-4 shadow-sm">
+            <section class="rounded-xl border border-stone-200/70 bg-white p-6 shadow-sm">
                 <h2 class="mb-3 text-base font-medium text-stone-900">Recent Journal Entries</h2>
                 <div v-for="e in entries" :key="e.id" class="mb-3 rounded-md border border-stone-200 p-2 text-sm">
                     <div class="flex justify-between">

@@ -17,15 +17,15 @@ function submit() {
 <template>
     <AppLayout title="Warehouses">
         <main class="mx-auto max-w-2xl space-y-6 p-6">
-            <section class="rounded-lg bg-white p-4 shadow-sm">
+            <section class="rounded-xl border border-stone-200/70 bg-white p-6 shadow-sm">
                 <h2 class="mb-3 text-base font-medium text-stone-900">Add Warehouse</h2>
                 <form @submit.prevent="submit" class="flex gap-2">
                     <input v-model="form.name" type="text" placeholder="Name (e.g. Main Store)" class="flex-1 rounded border-stone-300 text-sm">
-                    <button type="submit" :disabled="form.processing" class="rounded-md bg-stone-900 px-4 py-2 text-sm font-medium text-white hover:bg-stone-700 disabled:opacity-50">Add</button>
+                    <button type="submit" :disabled="form.processing" class="rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 disabled:opacity-50">Add</button>
                 </form>
             </section>
 
-            <section class="rounded-lg bg-white p-4 shadow-sm">
+            <section class="rounded-xl border border-stone-200/70 bg-white p-6 shadow-sm">
                 <h2 class="mb-3 text-base font-medium text-stone-900">All Warehouses</h2>
                 <table class="w-full text-sm">
                     <thead>

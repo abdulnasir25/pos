@@ -51,16 +51,16 @@ function recordPayment(customerId) {
 <template>
     <AppLayout title="Customers">
         <main class="mx-auto max-w-3xl space-y-6 p-6">
-            <section class="rounded-lg bg-white p-4 shadow-sm">
+            <section class="rounded-xl border border-stone-200/70 bg-white p-6 shadow-sm">
                 <div class="mb-3 flex items-center justify-between">
                     <h2 class="text-base font-medium text-stone-900">Customers</h2>
-                    <button type="button" @click="toggle('customer')" class="text-sm text-stone-600 underline">+ Add Customer</button>
+                    <button type="button" @click="toggle('customer')" class="text-sm text-indigo-700 underline hover:text-indigo-800">+ Add Customer</button>
                 </div>
 
                 <form v-if="activePanel === 'customer'" @submit.prevent="submitCustomer" class="mb-4 grid grid-cols-3 gap-2 rounded-md border border-stone-200 p-3">
                     <input v-model="customerForm.name" type="text" placeholder="Name" class="rounded border-stone-300 text-sm">
                     <input v-model="customerForm.phone" type="text" placeholder="Phone (optional)" class="rounded border-stone-300 text-sm">
-                    <button type="submit" :disabled="customerForm.processing" class="rounded-md bg-stone-900 px-3 py-1.5 text-sm text-white hover:bg-stone-700">Add</button>
+                    <button type="submit" :disabled="customerForm.processing" class="rounded-md bg-indigo-600 px-3 py-1.5 text-sm text-white hover:bg-indigo-700">Add</button>
                 </form>
 
                 <table class="w-full text-sm">
@@ -77,7 +77,7 @@ function recordPayment(customerId) {
                                 <td class="text-right tabular-nums" :class="parseFloat(c.balance) > 0 ? 'text-amber-700' : ''">{{ money(c.balance) }}</td>
                                 <td class="text-stone-500">{{ c.status }}</td>
                                 <td class="text-right">
-                                    <button type="button" @click="toggle(`pay-${c.id}`)" class="text-xs text-stone-600 underline">Record payment</button>
+                                    <button type="button" @click="toggle(`pay-${c.id}`)" class="text-xs text-indigo-700 underline hover:text-indigo-800">Record payment</button>
                                 </td>
                             </tr>
                             <tr v-if="activePanel === `pay-${c.id}`" class="border-b border-stone-100 bg-stone-50">
@@ -87,7 +87,7 @@ function recordPayment(customerId) {
                                         <select v-model="paymentForm(c.id).payment_method_id" class="rounded border-stone-300 text-sm">
                                             <option v-for="m in paymentMethods" :key="m.id" :value="m.id">{{ m.name }}</option>
                                         </select>
-                                        <button type="button" @click="recordPayment(c.id)" :disabled="paymentForm(c.id).processing" class="rounded-md bg-stone-900 px-3 py-1.5 text-xs text-white hover:bg-stone-700">Record</button>
+                                        <button type="button" @click="recordPayment(c.id)" :disabled="paymentForm(c.id).processing" class="rounded-md bg-indigo-600 px-3 py-1.5 text-xs text-white hover:bg-indigo-700">Record</button>
                                     </div>
                                 </td>
                             </tr>

@@ -20,10 +20,10 @@ function money(n) {
         <main class="mx-auto max-w-4xl space-y-6 p-6">
             <template v-if="salesSummary">
                 <!-- Sales summary (this month) -->
-                <section class="rounded-lg bg-white p-4 shadow-sm">
+                <section class="rounded-xl border border-stone-200/70 bg-white p-6 shadow-sm">
                     <div class="mb-3 flex items-center justify-between">
                         <h2 class="text-base font-medium text-stone-900">Sales This Month</h2>
-                        <Link href="/reports" class="text-sm text-stone-600 underline">Full reports</Link>
+                        <Link href="/reports" class="text-sm text-indigo-700 underline hover:text-indigo-800">Full reports</Link>
                     </div>
 
                     <div class="grid grid-cols-4 gap-4 text-sm">
@@ -43,13 +43,13 @@ function money(n) {
 
                 <!-- Stock value + outstanding balances -->
                 <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
-                    <section class="rounded-lg bg-white p-4 shadow-sm">
+                    <section class="rounded-xl border border-stone-200/70 bg-white p-6 shadow-sm">
                         <h2 class="mb-3 text-base font-medium text-stone-900">Stock Value</h2>
                         <p class="text-2xl font-semibold tabular-nums text-stone-900">{{ money(stockLevel?.totalStockValue) }}</p>
                         <p class="mt-1 text-xs text-stone-500">Across all warehouses</p>
                     </section>
 
-                    <section class="rounded-lg bg-white p-4 shadow-sm">
+                    <section class="rounded-xl border border-stone-200/70 bg-white p-6 shadow-sm">
                         <h2 class="mb-3 text-base font-medium text-stone-900">Outstanding Balances</h2>
                         <div class="flex justify-between text-sm">
                             <span class="text-stone-600">Customers owe us</span>
@@ -63,7 +63,7 @@ function money(n) {
                 </div>
             </template>
 
-            <section v-else class="rounded-lg bg-white p-6 shadow-sm">
+            <section v-else class="rounded-xl border border-stone-200/70 bg-white p-6 shadow-sm">
                 <h2 class="mb-1 text-base font-medium text-stone-900">Welcome, {{ page.props.auth.user.name }}</h2>
                 <p class="text-sm text-stone-500">Use the menu on the left to get to work.</p>
             </section>

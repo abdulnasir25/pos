@@ -39,7 +39,7 @@ function money(n) {
     <AppLayout title="Reports">
         <main class="mx-auto max-w-4xl space-y-6 p-6">
             <!-- Sales Summary -->
-            <section class="rounded-lg bg-white p-4 shadow-sm">
+            <section class="rounded-xl border border-stone-200/70 bg-white p-6 shadow-sm">
                 <h2 class="mb-3 text-base font-medium text-stone-900">Sales Summary</h2>
 
                 <div class="mb-4 flex items-end gap-2">
@@ -51,7 +51,7 @@ function money(n) {
                         <label class="block text-xs text-stone-500">To</label>
                         <input v-model="to" type="date" class="mt-0.5 rounded border-stone-300 text-sm">
                     </div>
-                    <button type="button" @click="reload()" class="rounded-md bg-stone-900 px-3 py-1.5 text-sm text-white hover:bg-stone-700">Run</button>
+                    <button type="button" @click="reload()" class="rounded-md bg-indigo-600 px-3 py-1.5 text-sm text-white hover:bg-indigo-700">Run</button>
                 </div>
 
                 <div v-if="salesSummary" class="grid grid-cols-4 gap-4 text-sm">
@@ -70,7 +70,7 @@ function money(n) {
             </section>
 
             <!-- Stock Level -->
-            <section class="rounded-lg bg-white p-4 shadow-sm">
+            <section class="rounded-xl border border-stone-200/70 bg-white p-6 shadow-sm">
                 <div class="mb-3 flex items-end justify-between">
                     <h2 class="text-base font-medium text-stone-900">Stock Level</h2>
                     <div class="flex items-end gap-2">
@@ -78,7 +78,7 @@ function money(n) {
                             <option value="">All warehouses</option>
                             <option v-for="w in warehouses" :key="w.id" :value="w.id">{{ w.name }}</option>
                         </select>
-                        <button type="button" @click="reload()" class="rounded-md bg-stone-900 px-3 py-1.5 text-sm text-white hover:bg-stone-700">Run</button>
+                        <button type="button" @click="reload()" class="rounded-md bg-indigo-600 px-3 py-1.5 text-sm text-white hover:bg-indigo-700">Run</button>
                     </div>
                 </div>
 
@@ -108,7 +108,7 @@ function money(n) {
             </section>
 
             <!-- Profit and Loss -->
-            <section class="rounded-lg bg-white p-4 shadow-sm">
+            <section class="rounded-xl border border-stone-200/70 bg-white p-6 shadow-sm">
                 <div class="mb-3 flex items-end justify-between">
                     <h2 class="text-base font-medium text-stone-900">Profit &amp; Loss</h2>
                     <div class="flex items-end gap-2">
@@ -116,7 +116,7 @@ function money(n) {
                             <option value="">Select a period</option>
                             <option v-for="p in financialPeriods" :key="p.id" :value="p.id">{{ p.label }}</option>
                         </select>
-                        <button type="button" @click="reload()" class="rounded-md bg-stone-900 px-3 py-1.5 text-sm text-white hover:bg-stone-700">Run</button>
+                        <button type="button" @click="reload()" class="rounded-md bg-indigo-600 px-3 py-1.5 text-sm text-white hover:bg-indigo-700">Run</button>
                     </div>
                 </div>
 
@@ -135,7 +135,7 @@ function money(n) {
             </section>
 
             <!-- Outstanding Balances -->
-            <section class="rounded-lg bg-white p-4 shadow-sm">
+            <section class="rounded-xl border border-stone-200/70 bg-white p-6 shadow-sm">
                 <h2 class="mb-3 text-base font-medium text-stone-900">Outstanding Balances</h2>
                 <div class="grid grid-cols-2 gap-6">
                     <div>
