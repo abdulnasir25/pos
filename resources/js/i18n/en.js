@@ -193,7 +193,7 @@ export default {
     'products.base_unit': 'Unit',
     'products.alt_units': 'Other Units',
     'products.add_alt_unit': 'Add another unit',
-    'products.alt_unit_hint': 'equals how many :unit?',
+    'products.alt_unit_hint': '1 :altUnit = how many :unit?',
     'products.factor_placeholder': 'How many',
     'products.list_empty': 'No products yet.',
 

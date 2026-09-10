@@ -149,6 +149,38 @@ class PartnersControllerTest extends TestCase
         $this->assertSame('2026-06-01', $fresh->exited_at->toDateString());
     }
 
+    public function test_exiting_a_partner_with_an_outstanding_loan_is_refused(): void
+    {
+        $partner = app(CreatePartner::class)->handle('Ahmed', '2026-01-01');
+        app(IssuePartnerLoan::class)->handle($partner, '50000.00', '2026-01-15', $this->managerUser->id);
+        $this->login();
+
+        $response = $this->post("{$this->baseUrl}/partners/{$partner->id}/exit", [
+            'exited_at' => '2026-06-01',
+        ]);
+
+        $response->assertSessionHasErrors('exit');
+        $this->resumeTenantContext();
+        $this->assertSame('active', $partner->fresh()->status->value);
+    }
+
+    public function test_a_partner_can_exit_once_their_loan_is_fully_repaid(): void
+    {
+        $partner = app(CreatePartner::class)->handle('Ahmed', '2026-01-01');
+        $loan = app(IssuePartnerLoan::class)->handle($partner, '50000.00', '2026-01-15', $this->managerUser->id);
+        app(\App\Modules\Partners\Actions\RecordLoanRepayment::class)->handle($loan, '50000.00', '2026-03-01', $this->managerUser->id);
+        $this->login();
+
+        $response = $this->post("{$this->baseUrl}/partners/{$partner->id}/exit", [
+            'exited_at' => '2026-06-01',
+        ]);
+
+        $response->assertRedirect();
+        $response->assertSessionHasNoErrors();
+        $this->resumeTenantContext();
+        $this->assertSame('exited', $partner->fresh()->status->value);
+    }
+
     public function test_ownership_can_be_rebalanced_through_the_form(): void
     {
         $a = app(CreatePartner::class)->handle('Ahmed', '2026-01-01');

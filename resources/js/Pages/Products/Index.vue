@@ -66,6 +66,11 @@ function conversionForm(productId) {
     return conversionForms.value[productId];
 }
 
+function selectedUnitName(productId) {
+    const unitId = conversionForm(productId).unit_id;
+    return props.activeUnits.find((u) => u.id === unitId)?.name ?? '';
+}
+
 function submitConversion(productId) {
     conversionForm(productId).post(`/products/${productId}/conversions`, {
         preserveScroll: true,
@@ -258,7 +263,7 @@ function toggleProductStatus(product) {
                                         <select v-model="conversionForm(p.id).unit_id" class="rounded border-stone-300 text-sm">
                                             <option v-for="u in activeUnits" :key="u.id" :value="u.id">{{ u.name }}</option>
                                         </select>
-                                        <span class="text-xs text-stone-500">{{ t('products.alt_unit_hint', { unit: p.base_unit }) }}</span>
+                                        <span class="text-xs text-stone-500">{{ t('products.alt_unit_hint', { unit: p.base_unit, altUnit: selectedUnitName(p.id) }) }}</span>
                                         <input v-model="conversionForm(p.id).factor" type="number" step="0.0001" :placeholder="t('products.factor_placeholder')" class="w-28 rounded border-stone-300 text-sm">
                                         <button
                                             type="button"

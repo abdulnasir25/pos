@@ -193,7 +193,7 @@ export default {
     'products.base_unit': 'ناپ',
     'products.alt_units': 'دوسری ناپ',
     'products.add_alt_unit': 'ایک اور ناپ شامل کریں',
-    'products.alt_unit_hint': 'کتنے :unit کے برابر ہے؟',
+    'products.alt_unit_hint': '1 :altUnit = کتنے :unit؟',
     'products.factor_placeholder': 'کتنے',
     'products.list_empty': 'ابھی کوئی مال شامل نہیں۔',
 
