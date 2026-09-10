@@ -23,6 +23,7 @@ const navItems = computed(() => [
     { label: t('nav.sales'), href: '/sales', permission: 'sales.view' },
     { label: t('nav.products'), href: '/products', permission: 'products.manage' },
     { label: t('nav.warehouses'), href: '/warehouses', permission: 'warehouses.manage' },
+    { label: t('nav.inventory'), href: '/inventory', permission: 'inventory.view' },
     { label: t('nav.customers'), href: '/customers', permission: 'customers.manage' },
     { label: t('nav.purchases'), href: '/purchases', permission: 'purchases.manage' },
     { label: t('nav.partners'), href: '/partners', permission: 'partners.manage' },

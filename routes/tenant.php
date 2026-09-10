@@ -13,6 +13,7 @@ use App\Modules\Customers\Http\Controllers\CustomersController;
 use App\Modules\Employees\Http\Controllers\EmployeesController;
 use App\Modules\Expenses\Http\Controllers\ExpensesController;
 use App\Modules\FinancialPeriods\Http\Controllers\FinancialPeriodsController;
+use App\Modules\Inventory\Http\Controllers\InventoryController;
 use App\Modules\Partners\Http\Controllers\PartnersController;
 use App\Modules\Products\Http\Controllers\ProductsController;
 use App\Modules\Purchases\Http\Controllers\PurchasesController;
@@ -64,6 +65,9 @@ Route::middleware(['auth', 'permission:sales.view'])->group(function () {
 });
 Route::post('/sales/{sale}/cancel', [SalesController::class, 'cancel'])->middleware(['auth', 'permission:sales.cancel'])->name('sales.cancel');
 Route::post('/sales/{sale}/returns', [SalesController::class, 'storeReturn'])->middleware(['auth', 'permission:sales.return'])->name('sales.returns.store');
+
+Route::get('/inventory', [InventoryController::class, 'show'])->middleware(['auth', 'permission:inventory.view'])->name('inventory');
+Route::post('/inventory/adjustments', [InventoryController::class, 'storeAdjustment'])->middleware(['auth', 'permission:inventory.adjust'])->name('inventory.adjustments.store');
 
 Route::middleware(['auth', 'permission:partners.manage'])->group(function () {
     Route::get('/partners', [PartnersController::class, 'show'])->name('partners');
