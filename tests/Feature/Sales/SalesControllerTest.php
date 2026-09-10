@@ -159,6 +159,19 @@ class SalesControllerTest extends TestCase
         );
     }
 
+    public function test_the_detail_page_carries_the_shops_settings(): void
+    {
+        $sale = $this->confirmSale();
+        $this->login();
+
+        $response = $this->get("{$this->baseUrl}/sales/{$sale->id}");
+
+        $response->assertInertia(fn ($page) => $page
+            ->where('shop.name', 'Al-Fateh Cloth House')
+            ->where('shop.currency_symbol', 'Rs.')
+        );
+    }
+
     public function test_a_confirmed_sale_can_be_cancelled_through_the_form(): void
     {
         $sale = $this->confirmSale(quantity: 5, unitPrice: 50);

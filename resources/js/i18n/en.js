@@ -23,6 +23,7 @@ export default {
     'nav.my_access': 'My Access',
     'nav.users': 'User Accounts',
     'nav.roles': 'Roles',
+    'nav.settings': 'Settings',
     'nav.sign_out': 'Sign out',
     'nav.brand': 'Ledger & Loom',
 
@@ -449,6 +450,19 @@ export default {
     'roles.protected': 'Protected',
     'roles.protected_note': 'Super Admin always has every permission and cannot be changed.',
     'roles.none_yet': 'No roles yet.',
+
+    // Settings
+    'settings.title': 'Settings',
+    'settings.shop_details': 'Shop Details',
+    'settings.shop_name_label': 'Shop name',
+    'settings.shop_name_hint': 'Shown on receipts and at the top of this app.',
+    'settings.address_label': 'Address',
+    'settings.phone_label': 'Phone',
+    'settings.currency_symbol_label': 'Currency symbol',
+    'settings.currency_symbol_hint': 'e.g. Rs., PKR, ₨',
+    'settings.receipt_footer_label': 'Receipt note',
+    'settings.receipt_footer_hint': 'A short line printed at the bottom of every receipt — e.g. an exchange policy or thank-you note.',
+    'settings.save': 'Save Settings',
 
     // Purchases / Buying
     'purchases.title': 'Buying',

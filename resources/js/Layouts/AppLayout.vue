@@ -37,6 +37,7 @@ const navItems = computed(() => [
     { label: t('nav.audit_log'), href: '/audit-log', permission: 'audit_logs.view' },
     { label: t('nav.users'), href: '/access/users', permission: 'roles.manage' },
     { label: t('nav.roles'), href: '/access/roles', permission: 'roles.manage' },
+    { label: t('nav.settings'), href: '/settings', permission: 'settings.manage' },
     { label: t('nav.my_access'), href: '/access', permission: null },
 ]);
 

@@ -20,6 +20,7 @@ use App\Modules\Purchases\Http\Controllers\PurchasesController;
 use App\Modules\Reports\Http\Controllers\ReportsController;
 use App\Modules\Sales\Http\Controllers\PosController;
 use App\Modules\Sales\Http\Controllers\SalesController;
+use App\Modules\Settings\Http\Controllers\SettingsController;
 use App\Modules\Tenancy\Support\TenantContext;
 use App\Modules\Warehouses\Http\Controllers\WarehousesController;
 use Illuminate\Support\Facades\Route;
@@ -54,6 +55,11 @@ Route::middleware(['auth', 'permission:roles.manage'])->group(function () {
     Route::get('/access/roles', [RolesController::class, 'show'])->name('access.roles');
     Route::post('/access/roles', [RolesController::class, 'store'])->name('access.roles.store');
     Route::post('/access/roles/{role}/permissions/{permission}/toggle', [RolesController::class, 'togglePermission'])->name('access.roles.permissions.toggle');
+});
+
+Route::middleware(['auth', 'permission:settings.manage'])->group(function () {
+    Route::get('/settings', [SettingsController::class, 'show'])->name('settings');
+    Route::post('/settings', [SettingsController::class, 'update'])->name('settings.update');
 });
 
 Route::get('/pos', [PosController::class, 'show'])->middleware(['auth', 'permission:sales.create'])->name('pos');
