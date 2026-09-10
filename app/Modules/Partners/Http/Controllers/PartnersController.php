@@ -13,6 +13,7 @@ use App\Modules\Partners\Actions\UpdatePartnerProfile;
 use App\Modules\Partners\Enums\LoanStatus;
 use App\Modules\Partners\Exceptions\InvalidOwnershipDateRangeException;
 use App\Modules\Partners\Exceptions\OwnershipPercentagesMustSumTo100Exception;
+use App\Modules\Partners\Exceptions\PartnerHasOutstandingLoanException;
 use App\Modules\Partners\Exceptions\RebalanceMustCoverEveryActivePartnerException;
 use App\Modules\Partners\Exceptions\RepaymentExceedsOutstandingBalanceException;
 use App\Modules\Partners\Models\Partner;
@@ -98,7 +99,11 @@ class PartnersController extends \App\Http\Controllers\Controller
             'exited_at' => ['required', 'date'],
         ]);
 
-        app(ExitPartner::class)->handle($partner, $validated['exited_at']);
+        try {
+            app(ExitPartner::class)->handle($partner, $validated['exited_at']);
+        } catch (PartnerHasOutstandingLoanException $e) {
+            return back()->withErrors(['exit' => $e->getMessage()]);
+        }
 
         return back()->with('success', 'Partner marked as exited.');
     }
