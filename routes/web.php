@@ -30,6 +30,14 @@ Route::middleware(HandleLandlordInertiaRequests::class)->group(function () {
     Route::post('/landlord/login', [LandlordLoginController::class, 'store'])->middleware('guest:landlord');
     Route::post('/landlord/logout', [LandlordLoginController::class, 'destroy'])->middleware('auth:landlord');
 
+    // Signed, no landlord login required — this is the link a tenant
+    // receives to view/print/save their own invoice. The signature
+    // (with its own expiry) is the only thing standing in for auth
+    // here, so this must stay outside the auth:landlord group.
+    Route::get('/landlord/billing/invoices/{invoice}/shared', [BillingController::class, 'showSharedInvoice'])
+        ->middleware('signed')
+        ->name('landlord.billing.invoices.shared');
+
     Route::middleware('auth:landlord')->group(function () {
         Route::get('/landlord/tenants', [TenantsController::class, 'show'])->name('landlord.tenants');
         Route::post('/landlord/tenants', [TenantsController::class, 'store'])->name('landlord.tenants.store');
@@ -46,6 +54,7 @@ Route::middleware(HandleLandlordInertiaRequests::class)->group(function () {
         Route::post('/landlord/billing/subscriptions/{subscription}/invoices', [BillingController::class, 'generateInvoice'])->name('landlord.billing.invoices.generate');
 
         Route::get('/landlord/billing/invoices', [BillingController::class, 'showInvoices'])->name('landlord.billing.invoices');
+        Route::get('/landlord/billing/invoices/{invoice}', [BillingController::class, 'showInvoice'])->name('landlord.billing.invoices.show');
         Route::post('/landlord/billing/invoices/{invoice}/pay', [BillingController::class, 'recordPayment'])->name('landlord.billing.invoices.pay');
     });
 });

@@ -17,6 +17,7 @@ use App\Modules\Billing\Models\Subscription;
 use App\Modules\Platform\Models\Tenant;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\URL;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -46,6 +47,59 @@ class BillingController extends \App\Http\Controllers\Controller
         return Inertia::render('Landlord/Billing/Invoices', [
             'invoices' => $this->invoiceRows(),
         ]);
+    }
+
+    /**
+     * The landlord's own view of one invoice — same printable document
+     * as the shared link, plus a 30-day signed URL they can copy and
+     * send to the tenant.
+     */
+    public function showInvoice(Invoice $invoice): Response
+    {
+        return Inertia::render('Landlord/Billing/InvoiceShow', [
+            'invoice' => $this->invoiceDetail($invoice),
+            'shareUrl' => URL::temporarySignedRoute(
+                'landlord.billing.invoices.shared',
+                now()->addDays(30),
+                ['invoice' => $invoice->id],
+            ),
+            'viewerIsLandlord' => true,
+        ]);
+    }
+
+    /**
+     * What a tenant sees when they open the link the landlord shared
+     * with them — the 'signed' route middleware already rejected the
+     * request before this runs if the signature is missing, altered,
+     * or past its 30-day expiry, so no landlord session is needed.
+     */
+    public function showSharedInvoice(Invoice $invoice): Response
+    {
+        return Inertia::render('Landlord/Billing/InvoiceShow', [
+            'invoice' => $this->invoiceDetail($invoice),
+            'shareUrl' => null,
+            'viewerIsLandlord' => false,
+        ]);
+    }
+
+    private function invoiceDetail(Invoice $invoice): array
+    {
+        $invoice->loadMissing(['tenant', 'subscription.plan']);
+
+        return [
+            'id' => $invoice->id,
+            'reference' => 'INV-'.str_pad((string) $invoice->id, 6, '0', STR_PAD_LEFT),
+            'tenant' => $invoice->tenant->name,
+            'tenant_subdomain' => $invoice->tenant->slug,
+            'plan' => $invoice->subscription?->plan?->name ?? '—',
+            'amount' => (string) $invoice->amount,
+            'status' => $invoice->status->value,
+            'period_start' => $invoice->period_start->toDateString(),
+            'period_end' => $invoice->period_end->toDateString(),
+            'due_date' => $invoice->due_date->toDateString(),
+            'paid_at' => $invoice->paid_at?->toDateString(),
+            'issued_at' => $invoice->created_at->toDateString(),
+        ];
     }
 
     private function planRows()
