@@ -6,6 +6,7 @@ use App\Modules\Billing\Actions\CreatePlan;
 use App\Modules\Billing\Actions\CreateSubscription;
 use App\Modules\Billing\Actions\GenerateInvoiceForSubscription;
 use App\Modules\Billing\Actions\RecordInvoicePayment;
+use App\Modules\Billing\Enums\PlanStatus;
 use App\Modules\Billing\Exceptions\DuplicatePlanSlugException;
 use App\Modules\Billing\Exceptions\InvoiceAlreadyPaidException;
 use App\Modules\Billing\Exceptions\TenantAlreadyHasActiveSubscriptionException;
@@ -31,7 +32,10 @@ class BillingController extends \App\Http\Controllers\Controller
     {
         return Inertia::render('Landlord/Billing/Subscriptions', [
             'tenants' => Tenant::orderBy('name')->get(['id', 'name']),
-            'plans' => $this->planRows(),
+            // Retired plans can't be picked for a new subscription — only
+            // active ones are offered here. The full plan list (retired
+            // included) lives on the Plans page.
+            'plans' => Plan::where('status', PlanStatus::Active)->orderBy('price')->get(['id', 'name']),
             'subscriptions' => $this->subscriptionRows(),
         ]);
     }
@@ -108,6 +112,34 @@ class BillingController extends \App\Http\Controllers\Controller
         }
 
         return back()->with('success', 'Plan created.');
+    }
+
+    /**
+     * Only the display name is editable — price, slug, and billing
+     * interval are locked in the moment a plan exists, the same
+     * effective-dated convention CreateSubscription documents. An
+     * invoice is generated from $subscription->plan->price at
+     * generation time (see GenerateInvoiceForSubscription), so
+     * changing a plan's price after tenants have subscribed would
+     * silently change what every one of them is billed next, with no
+     * notice.
+     */
+    public function updatePlan(Request $request, Plan $plan): RedirectResponse
+    {
+        $validated = $request->validate([
+            'name' => ['required', 'string', 'max:100'],
+        ]);
+
+        $plan->update($validated);
+
+        return back()->with('success', 'Plan updated.');
+    }
+
+    public function togglePlanStatus(Plan $plan): RedirectResponse
+    {
+        $plan->update(['status' => $plan->status === PlanStatus::Active ? PlanStatus::Retired : PlanStatus::Active]);
+
+        return back()->with('success', 'Plan status updated.');
     }
 
     public function storeSubscription(Request $request): RedirectResponse

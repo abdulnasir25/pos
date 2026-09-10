@@ -98,6 +98,49 @@ class BillingControllerTest extends TestCase
         $response->assertSessionHasErrors('plan');
     }
 
+    public function test_a_plans_name_can_be_updated_through_the_form(): void
+    {
+        $this->actingAs($this->admin(), 'landlord');
+        $plan = app(CreatePlan::class)->handle('Starter', 'starter', '2000.00', 'monthly');
+
+        $response = $this->post("/landlord/billing/plans/{$plan->id}", ['name' => 'Starter Plan']);
+
+        $response->assertRedirect();
+        $response->assertSessionHasNoErrors();
+        $fresh = $plan->fresh();
+        $this->assertSame('Starter Plan', $fresh->name);
+        // Untouched — price/slug/interval are not editable through this form.
+        $this->assertSame('2000.00', $fresh->price);
+        $this->assertSame('starter', $fresh->slug);
+    }
+
+    public function test_a_plans_status_can_be_toggled_through_the_form(): void
+    {
+        $this->actingAs($this->admin(), 'landlord');
+        $plan = app(CreatePlan::class)->handle('Starter', 'starter', '2000.00', 'monthly');
+
+        $this->post("/landlord/billing/plans/{$plan->id}/toggle-status")->assertRedirect();
+        $this->assertSame('retired', $plan->fresh()->status->value);
+
+        $this->post("/landlord/billing/plans/{$plan->id}/toggle-status")->assertRedirect();
+        $this->assertSame('active', $plan->fresh()->status->value);
+    }
+
+    public function test_the_subscriptions_page_only_offers_active_plans(): void
+    {
+        $this->actingAs($this->admin(), 'landlord');
+        $active = app(CreatePlan::class)->handle('Starter', 'starter', '2000.00', 'monthly');
+        $retired = app(CreatePlan::class)->handle('Legacy', 'legacy', '1000.00', 'monthly');
+        $retired->update(['status' => 'retired']);
+
+        $response = $this->get('/landlord/billing/subscriptions');
+
+        $response->assertInertia(fn ($page) => $page
+            ->has('plans', 1)
+            ->where('plans.0.id', $active->id)
+        );
+    }
+
     public function test_a_subscription_can_be_started_through_the_form(): void
     {
         $this->actingAs($this->admin(), 'landlord');
