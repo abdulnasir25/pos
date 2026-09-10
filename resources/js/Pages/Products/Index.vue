@@ -11,6 +11,7 @@ import { useI18n } from '../../i18n';
 const props = defineProps({
     products: { type: Array, default: () => [] },
     units: { type: Array, default: () => [] },
+    activeUnits: { type: Array, default: () => [] },
 });
 
 const { t } = useI18n();
@@ -42,13 +43,17 @@ function submitUnitEdit(unit) {
     });
 }
 
-const productForm = useForm({ base_unit_id: props.units[0]?.id ?? null, name: '', sku: '', low_stock_threshold: '' });
+function toggleUnitStatus(unit) {
+    router.post(`/products/units/${unit.id}/toggle-status`, {}, { preserveScroll: true });
+}
+
+const productForm = useForm({ base_unit_id: props.activeUnits[0]?.id ?? null, name: '', sku: '', low_stock_threshold: '' });
 
 function submitProduct() {
     productForm.post('/products', { preserveScroll: true, onSuccess: () => productForm.reset('name', 'sku', 'low_stock_threshold') });
 }
 
-watch(() => props.units, (list) => {
+watch(() => props.activeUnits, (list) => {
     if (productForm.base_unit_id === null && list.length > 0) productForm.base_unit_id = list[0].id;
 });
 
@@ -56,7 +61,7 @@ const conversionForms = ref({});
 
 function conversionForm(productId) {
     if (!conversionForms.value[productId]) {
-        conversionForms.value[productId] = useForm({ unit_id: props.units[0]?.id ?? null, factor: '' });
+        conversionForms.value[productId] = useForm({ unit_id: props.activeUnits[0]?.id ?? null, factor: '' });
     }
     return conversionForms.value[productId];
 }
@@ -124,10 +129,34 @@ function toggleProductStatus(product) {
                 </form>
 
                 <div class="flex flex-wrap gap-2">
-                    <span v-for="u in units" :key="u.id" class="inline-flex items-center gap-1 rounded-full bg-stone-100 py-1 pl-3 pr-1.5 text-xs text-stone-700">
+                    <span
+                        v-for="u in units"
+                        :key="u.id"
+                        class="inline-flex items-center gap-1 rounded-full py-1 pl-3 pr-1.5 text-xs"
+                        :class="u.status === 'active' ? 'bg-stone-100 text-stone-700' : 'bg-stone-50 text-stone-400'"
+                    >
                         {{ u.name }}<span v-if="u.abbreviation" class="text-stone-400"> ({{ u.abbreviation }})</span>
+                        <span v-if="u.status !== 'active'" class="text-stone-400">· {{ t('common.inactive') }}</span>
                         <button type="button" @click="toggle(`unit-edit-${u.id}`)" :aria-label="t('common.edit')" class="ml-1 inline-flex size-5 items-center justify-center rounded-full text-indigo-600 hover:bg-indigo-100">
                             <PencilIcon class="size-3" />
+                        </button>
+                        <button
+                            v-if="u.status === 'active'"
+                            type="button"
+                            @click="toggleUnitStatus(u)"
+                            :aria-label="t('common.deactivate')"
+                            class="inline-flex size-5 items-center justify-center rounded-full text-red-600 hover:bg-red-100"
+                        >
+                            <TrashIcon class="size-3" />
+                        </button>
+                        <button
+                            v-else
+                            type="button"
+                            @click="toggleUnitStatus(u)"
+                            :aria-label="t('common.activate')"
+                            class="inline-flex size-5 items-center justify-center rounded-full text-emerald-600 hover:bg-emerald-100"
+                        >
+                            <CheckIcon class="size-3" />
                         </button>
                     </span>
                     <span v-if="units.length === 0" class="text-sm text-stone-400">{{ t('products.none_yet') }}</span>
@@ -160,7 +189,7 @@ function toggleProductStatus(product) {
                     <input v-model="productForm.name" type="text" :placeholder="t('products.name_placeholder')" class="rounded border-stone-300 text-sm">
                     <input v-model="productForm.sku" type="text" :placeholder="t('products.sku_placeholder')" class="rounded border-stone-300 text-sm">
                     <select v-model="productForm.base_unit_id" class="rounded border-stone-300 text-sm">
-                        <option v-for="u in units" :key="u.id" :value="u.id">{{ u.name }}</option>
+                        <option v-for="u in activeUnits" :key="u.id" :value="u.id">{{ u.name }}</option>
                     </select>
                     <input v-model="productForm.low_stock_threshold" type="number" step="0.0001" :placeholder="t('products.low_stock_placeholder')" class="rounded border-stone-300 text-sm">
                     <button
@@ -227,7 +256,7 @@ function toggleProductStatus(product) {
                                 <td colspan="6" class="p-2">
                                     <div class="flex items-center gap-2">
                                         <select v-model="conversionForm(p.id).unit_id" class="rounded border-stone-300 text-sm">
-                                            <option v-for="u in units" :key="u.id" :value="u.id">{{ u.name }}</option>
+                                            <option v-for="u in activeUnits" :key="u.id" :value="u.id">{{ u.name }}</option>
                                         </select>
                                         <span class="text-xs text-stone-500">{{ t('products.alt_unit_hint', { unit: p.base_unit }) }}</span>
                                         <input v-model="conversionForm(p.id).factor" type="number" step="0.0001" :placeholder="t('products.factor_placeholder')" class="w-28 rounded border-stone-300 text-sm">

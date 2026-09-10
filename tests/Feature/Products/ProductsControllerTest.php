@@ -220,4 +220,32 @@ class ProductsControllerTest extends TestCase
         $this->resumeTenantContext();
         $this->assertSame('Metre', $this->meter->fresh()->name);
     }
+
+    public function test_a_units_status_can_be_toggled_through_the_form(): void
+    {
+        $this->login();
+
+        $this->post("{$this->baseUrl}/products/units/{$this->meter->id}/toggle-status")->assertRedirect();
+        $this->resumeTenantContext();
+        $this->assertSame('inactive', $this->meter->fresh()->status);
+
+        $this->login();
+        $this->post("{$this->baseUrl}/products/units/{$this->meter->id}/toggle-status")->assertRedirect();
+        $this->resumeTenantContext();
+        $this->assertSame('active', $this->meter->fresh()->status);
+    }
+
+    public function test_a_deactivated_unit_is_excluded_from_the_active_units_list(): void
+    {
+        $this->login();
+        $this->post("{$this->baseUrl}/products/units/{$this->meter->id}/toggle-status");
+
+        $this->login();
+        $response = $this->get("{$this->baseUrl}/products");
+
+        $response->assertInertia(fn ($page) => $page
+            ->has('units', 1)
+            ->has('activeUnits', 0)
+        );
+    }
 }

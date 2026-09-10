@@ -138,6 +138,7 @@ Route::middleware(['auth', 'permission:products.manage'])->group(function () {
     Route::get('/products', [ProductsController::class, 'show'])->name('products');
     Route::post('/products/units', [ProductsController::class, 'storeUnit'])->name('products.units.store');
     Route::post('/products/units/{unit}', [ProductsController::class, 'updateUnit'])->name('products.units.update');
+    Route::post('/products/units/{unit}/toggle-status', [ProductsController::class, 'toggleUnitStatus'])->name('products.units.toggle-status');
     Route::post('/products', [ProductsController::class, 'storeProduct'])->name('products.store');
     Route::post('/products/{product}/conversions', [ProductsController::class, 'storeConversion'])->name('products.conversions.store');
     Route::post('/products/{product}', [ProductsController::class, 'updateProduct'])->name('products.update');
