@@ -14,7 +14,7 @@ class ProductsController extends \App\Http\Controllers\Controller
 {
     public function show(): Response
     {
-        $units = Unit::orderBy('name')->get(['id', 'name', 'abbreviation']);
+        $units = Unit::orderBy('name')->get(['id', 'name', 'abbreviation', 'status']);
 
         $products = Product::with(['baseUnit:id,name,abbreviation', 'unitConversions.unit:id,name,abbreviation'])
             ->orderBy('name')
@@ -35,6 +35,10 @@ class ProductsController extends \App\Http\Controllers\Controller
         return Inertia::render('Products/Index', [
             'products' => $products,
             'units' => $units,
+            // Deactivated units can't be picked for a new product's
+            // base unit or a new alt-unit conversion — only the
+            // management list on this page shows the full set.
+            'activeUnits' => $units->where('status', 'active')->values(),
         ]);
     }
 
@@ -45,7 +49,7 @@ class ProductsController extends \App\Http\Controllers\Controller
             'abbreviation' => ['nullable', 'string', 'max:10'],
         ]);
 
-        Unit::create($validated);
+        Unit::create([...$validated, 'status' => 'active']);
 
         return back()->with('success', 'Unit added.');
     }
@@ -60,6 +64,13 @@ class ProductsController extends \App\Http\Controllers\Controller
         $unit->update($validated);
 
         return back()->with('success', 'Unit updated.');
+    }
+
+    public function toggleUnitStatus(Unit $unit): RedirectResponse
+    {
+        $unit->update(['status' => $unit->status === 'active' ? 'inactive' : 'active']);
+
+        return back()->with('success', 'Unit status updated.');
     }
 
     public function storeProduct(Request $request): RedirectResponse

@@ -9,5 +9,5 @@ class Unit extends Model
 {
     use HasTenantScopedQueries;
 
-    protected $fillable = ['name', 'abbreviation'];
+    protected $fillable = ['name', 'abbreviation', 'status'];
 }
