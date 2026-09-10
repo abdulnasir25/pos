@@ -23,6 +23,7 @@ export default {
     'nav.my_access': 'میری اجازتیں',
     'nav.users': 'یوزر اکاؤنٹس',
     'nav.roles': 'رولز',
+    'nav.settings': 'ترتیبات',
     'nav.sign_out': 'باہر نکلیں',
     'nav.brand': 'لیجر اینڈ لوم',
 
@@ -449,6 +450,19 @@ export default {
     'roles.protected': 'محفوظ',
     'roles.protected_note': 'سپر ایڈمن کے پاس ہمیشہ ہر اجازت ہوتی ہے، اسے تبدیل نہیں کیا جا سکتا۔',
     'roles.none_yet': 'ابھی کوئی کردار نہیں۔',
+
+    // Settings
+    'settings.title': 'ترتیبات',
+    'settings.shop_details': 'دکان کی تفصیلات',
+    'settings.shop_name_label': 'دکان کا نام',
+    'settings.shop_name_hint': 'رسید پر اور ایپ کے اوپر دکھایا جائے گا۔',
+    'settings.address_label': 'پتہ',
+    'settings.phone_label': 'فون نمبر',
+    'settings.currency_symbol_label': 'کرنسی کی علامت',
+    'settings.currency_symbol_hint': 'مثلاً Rs.، PKR، ₨',
+    'settings.receipt_footer_label': 'رسید کا پیغام',
+    'settings.receipt_footer_hint': 'ہر رسید کے آخر میں ایک مختصر لائن — مثلاً واپسی کی پالیسی یا شکریہ کا پیغام۔',
+    'settings.save': 'ترتیبات محفوظ کریں',
 
     // Purchases / Buying
     'purchases.title': 'خریداری',

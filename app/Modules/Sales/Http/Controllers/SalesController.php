@@ -12,6 +12,7 @@ use App\Modules\Sales\Exceptions\InvalidSaleStateException;
 use App\Modules\Sales\Exceptions\ReturnQuantityExceedsAvailableException;
 use App\Modules\Sales\Models\Sale;
 use App\Modules\Sales\Support\ReceiptBuilder;
+use App\Modules\Settings\Support\CurrentSettings;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -38,16 +39,24 @@ class SalesController extends \App\Http\Controllers\Controller
         ]);
     }
 
-    public function showOne(Sale $sale): Response
+    public function showOne(Sale $sale, CurrentSettings $currentSettings): Response
     {
         $sale->loadMissing('items', 'payments', 'returns.items');
         $receipt = app(ReceiptBuilder::class)->build($sale);
+        $settings = $currentSettings->get();
 
         return Inertia::render('Sales/Show', [
             'sale' => [
                 'id' => $sale->id,
                 'status' => $sale->status->value,
                 'cancelled_at' => $sale->cancelled_at?->toDateTimeString(),
+            ],
+            'shop' => [
+                'name' => $settings->shop_name,
+                'address' => $settings->address,
+                'phone' => $settings->phone,
+                'currency_symbol' => $settings->currency_symbol,
+                'receipt_footer' => $settings->receipt_footer,
             ],
             'receipt' => [
                 'reference_no' => $receipt->referenceNo,

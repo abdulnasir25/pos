@@ -7,6 +7,7 @@ import { useI18n } from '../../i18n';
 
 const props = defineProps({
     sale: { type: Object, required: true },
+    shop: { type: Object, required: true },
     receipt: { type: Object, required: true },
     items: { type: Array, default: () => [] },
     returns: { type: Array, default: () => [] },
@@ -16,7 +17,9 @@ const { t } = useI18n();
 const page = usePage();
 
 function money(n) {
-    return (Math.round(parseFloat(n ?? 0) * 100) / 100).toFixed(2);
+    const amount = (Math.round(parseFloat(n ?? 0) * 100) / 100).toFixed(2);
+
+    return props.shop.currency_symbol ? `${props.shop.currency_symbol} ${amount}` : amount;
 }
 
 const permissions = computed(() => page.props.auth.user?.permissions ?? []);
@@ -65,6 +68,12 @@ function submitReturn() {
             <Link href="/sales" class="text-sm text-indigo-700 underline hover:text-indigo-800">{{ t('sales.back') }}</Link>
 
             <section class="rounded-xl border border-stone-200/70 bg-white p-6 shadow-sm">
+                <div class="mb-4 border-b border-stone-100 pb-4 text-center" dir="auto">
+                    <p class="text-base font-semibold text-stone-900">{{ shop.name }}</p>
+                    <p v-if="shop.address" class="text-xs text-stone-500">{{ shop.address }}</p>
+                    <p v-if="shop.phone" class="text-xs text-stone-500">{{ shop.phone }}</p>
+                </div>
+
                 <div class="mb-4 flex items-start justify-between">
                     <div>
                         <h2 class="text-lg font-semibold text-stone-900">{{ receipt.reference_no }}</h2>
@@ -120,6 +129,10 @@ function submitReturn() {
                         <span>{{ p.method }}</span><span class="tabular-nums">{{ money(p.amount) }}</span>
                     </div>
                 </div>
+
+                <p v-if="shop.receipt_footer" class="mt-4 border-t border-stone-100 pt-3 text-center text-xs text-stone-500" dir="auto">
+                    {{ shop.receipt_footer }}
+                </p>
             </section>
 
             <section v-if="returns.length > 0" class="rounded-xl border border-stone-200/70 bg-white p-6 shadow-sm">
