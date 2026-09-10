@@ -31,7 +31,7 @@ class LandlordLoginController extends \App\Http\Controllers\Controller
 
         $request->session()->regenerate();
 
-        return redirect()->intended('/landlord/tenants');
+        return redirect()->intended('/landlord/dashboard');
     }
 
     public function destroy(Request $request): RedirectResponse
