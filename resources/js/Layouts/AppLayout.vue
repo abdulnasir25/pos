@@ -20,6 +20,7 @@ watch(() => page.url, () => { sidebarOpen.value = false; });
 const navItems = computed(() => [
     { label: t('nav.home'), href: '/dashboard', permission: null },
     { label: t('nav.new_sale'), href: '/pos', permission: 'sales.create' },
+    { label: t('nav.sales'), href: '/sales', permission: 'sales.view' },
     { label: t('nav.products'), href: '/products', permission: 'products.manage' },
     { label: t('nav.warehouses'), href: '/warehouses', permission: 'warehouses.manage' },
     { label: t('nav.customers'), href: '/customers', permission: 'customers.manage' },

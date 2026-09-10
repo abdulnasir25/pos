@@ -18,6 +18,7 @@ use App\Modules\Products\Http\Controllers\ProductsController;
 use App\Modules\Purchases\Http\Controllers\PurchasesController;
 use App\Modules\Reports\Http\Controllers\ReportsController;
 use App\Modules\Sales\Http\Controllers\PosController;
+use App\Modules\Sales\Http\Controllers\SalesController;
 use App\Modules\Tenancy\Support\TenantContext;
 use App\Modules\Warehouses\Http\Controllers\WarehousesController;
 use Illuminate\Support\Facades\Route;
@@ -56,6 +57,13 @@ Route::middleware(['auth', 'permission:roles.manage'])->group(function () {
 
 Route::get('/pos', [PosController::class, 'show'])->middleware(['auth', 'permission:sales.create'])->name('pos');
 Route::post('/pos/sale', [PosController::class, 'store'])->middleware(['auth', 'permission:sales.create'])->name('pos.sale');
+
+Route::middleware(['auth', 'permission:sales.view'])->group(function () {
+    Route::get('/sales', [SalesController::class, 'show'])->name('sales');
+    Route::get('/sales/{sale}', [SalesController::class, 'showOne'])->name('sales.show');
+});
+Route::post('/sales/{sale}/cancel', [SalesController::class, 'cancel'])->middleware(['auth', 'permission:sales.cancel'])->name('sales.cancel');
+Route::post('/sales/{sale}/returns', [SalesController::class, 'storeReturn'])->middleware(['auth', 'permission:sales.return'])->name('sales.returns.store');
 
 Route::middleware(['auth', 'permission:partners.manage'])->group(function () {
     Route::get('/partners', [PartnersController::class, 'show'])->name('partners');
