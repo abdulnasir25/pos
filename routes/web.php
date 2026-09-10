@@ -2,6 +2,7 @@
 
 use App\Modules\Platform\Http\Controllers\BillingController;
 use App\Modules\Platform\Http\Controllers\LandlordLoginController;
+use App\Modules\Platform\Http\Controllers\TenantsController;
 use App\Modules\Platform\Http\Middleware\HandleLandlordInertiaRequests;
 use App\Modules\Tenancy\Support\TenantResolver;
 use Illuminate\Http\Request;
@@ -30,12 +31,18 @@ Route::middleware(HandleLandlordInertiaRequests::class)->group(function () {
     Route::post('/landlord/logout', [LandlordLoginController::class, 'destroy'])->middleware('auth:landlord');
 
     Route::middleware('auth:landlord')->group(function () {
-        Route::get('/landlord/billing', [BillingController::class, 'show'])->name('landlord.billing');
-        Route::post('/landlord/tenants', [BillingController::class, 'storeTenant'])->name('landlord.tenants.store');
-        Route::post('/landlord/tenants/{tenant}/toggle-status', [BillingController::class, 'toggleTenantStatus'])->name('landlord.tenants.toggle-status');
+        Route::get('/landlord/tenants', [TenantsController::class, 'show'])->name('landlord.tenants');
+        Route::post('/landlord/tenants', [TenantsController::class, 'store'])->name('landlord.tenants.store');
+        Route::post('/landlord/tenants/{tenant}/toggle-status', [TenantsController::class, 'toggleStatus'])->name('landlord.tenants.toggle-status');
+
+        Route::get('/landlord/billing/plans', [BillingController::class, 'showPlans'])->name('landlord.billing.plans');
         Route::post('/landlord/billing/plans', [BillingController::class, 'storePlan'])->name('landlord.billing.plans.store');
+
+        Route::get('/landlord/billing/subscriptions', [BillingController::class, 'showSubscriptions'])->name('landlord.billing.subscriptions');
         Route::post('/landlord/billing/subscriptions', [BillingController::class, 'storeSubscription'])->name('landlord.billing.subscriptions.store');
         Route::post('/landlord/billing/subscriptions/{subscription}/invoices', [BillingController::class, 'generateInvoice'])->name('landlord.billing.invoices.generate');
+
+        Route::get('/landlord/billing/invoices', [BillingController::class, 'showInvoices'])->name('landlord.billing.invoices');
         Route::post('/landlord/billing/invoices/{invoice}/pay', [BillingController::class, 'recordPayment'])->name('landlord.billing.invoices.pay');
     });
 });
