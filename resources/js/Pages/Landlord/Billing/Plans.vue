@@ -1,9 +1,12 @@
 <script setup>
 import { ref } from 'vue';
-import { useForm } from '@inertiajs/vue3';
+import { useForm, router } from '@inertiajs/vue3';
 import LandlordLayout from '../../../Layouts/LandlordLayout.vue';
+import PencilIcon from '../../../Components/icons/PencilIcon.vue';
+import TrashIcon from '../../../Components/icons/TrashIcon.vue';
+import CheckIcon from '../../../Components/icons/CheckIcon.vue';
 
-defineProps({
+const props = defineProps({
     plans: { type: Array, default: () => [] },
 });
 
@@ -24,6 +27,28 @@ function submitPlan() {
         preserveScroll: true,
         onSuccess: () => { planForm.reset(); toggle(null); },
     });
+}
+
+// --- Edit / retire ---------------------------------------------------------
+
+const editForms = ref({});
+
+function editForm(plan) {
+    if (!editForms.value[plan.id]) {
+        editForms.value[plan.id] = useForm({ name: plan.name });
+    }
+    return editForms.value[plan.id];
+}
+
+function submitEdit(plan) {
+    editForm(plan).post(`/landlord/billing/plans/${plan.id}`, {
+        preserveScroll: true,
+        onSuccess: () => toggle(null),
+    });
+}
+
+function togglePlanStatus(planId) {
+    router.post(`/landlord/billing/plans/${planId}/toggle-status`, {}, { preserveScroll: true });
 }
 </script>
 
@@ -51,17 +76,53 @@ function submitPlan() {
                 <table class="w-full text-sm">
                     <thead>
                         <tr class="border-b border-stone-200 text-left text-xs uppercase text-stone-500">
-                            <th class="py-2">Name</th><th>Slug</th><th>Interval</th><th class="text-right">Price</th><th>Status</th>
+                            <th class="py-2">Name</th><th>Slug</th><th>Interval</th><th class="text-right">Price</th><th>Status</th><th></th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr v-for="p in plans" :key="p.id" class="border-b border-stone-100">
-                            <td class="py-2 text-stone-900">{{ p.name }}</td>
-                            <td class="text-stone-500">{{ p.slug }}</td>
-                            <td class="text-stone-500">{{ p.billing_interval }}</td>
-                            <td class="text-right tabular-nums">{{ money(p.price) }}</td>
-                            <td class="text-stone-500">{{ p.status }}</td>
-                        </tr>
+                        <template v-for="p in plans" :key="p.id">
+                            <tr class="border-b border-stone-100">
+                                <td class="py-2 text-stone-900">{{ p.name }}</td>
+                                <td class="text-stone-500">{{ p.slug }}</td>
+                                <td class="text-stone-500">{{ p.billing_interval }}</td>
+                                <td class="text-right tabular-nums">{{ money(p.price) }}</td>
+                                <td>
+                                    <span
+                                        class="rounded-full px-2 py-0.5 text-xs"
+                                        :class="p.status === 'active' ? 'bg-emerald-100 text-emerald-800' : 'bg-stone-200 text-stone-600'"
+                                    >{{ p.status }}</span>
+                                </td>
+                                <td class="text-right whitespace-nowrap">
+                                    <button
+                                        type="button"
+                                        @click="toggle(`edit-${p.id}`)"
+                                        aria-label="Edit"
+                                        class="mr-1 inline-flex size-7 items-center justify-center rounded-full text-indigo-600 hover:bg-indigo-50"
+                                    >
+                                        <PencilIcon class="size-3.5" />
+                                    </button>
+                                    <button
+                                        type="button"
+                                        @click="togglePlanStatus(p.id)"
+                                        :aria-label="p.status === 'active' ? 'Retire' : 'Reactivate'"
+                                        class="inline-flex size-7 items-center justify-center rounded-full"
+                                        :class="p.status === 'active' ? 'text-red-600 hover:bg-red-50' : 'text-emerald-600 hover:bg-emerald-50'"
+                                    >
+                                        <TrashIcon v-if="p.status === 'active'" class="size-3.5" />
+                                        <CheckIcon v-else class="size-3.5" />
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr v-if="activePanel === `edit-${p.id}`" class="border-b border-stone-100 bg-stone-50">
+                                <td colspan="6" class="p-2">
+                                    <div class="flex items-center gap-2">
+                                        <input v-model="editForm(p).name" type="text" placeholder="Name" class="rounded border-stone-300 text-sm">
+                                        <span class="text-xs text-stone-400">Price, slug, and interval can't change once a plan exists — retire it and add a new one instead.</span>
+                                        <button type="button" @click="submitEdit(p)" :disabled="editForm(p).processing" class="ml-auto rounded-md bg-indigo-600 px-3 py-1.5 text-xs text-white hover:bg-indigo-700">Save</button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </template>
                     </tbody>
                 </table>
                 </div>

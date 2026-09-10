@@ -37,6 +37,8 @@ Route::middleware(HandleLandlordInertiaRequests::class)->group(function () {
 
         Route::get('/landlord/billing/plans', [BillingController::class, 'showPlans'])->name('landlord.billing.plans');
         Route::post('/landlord/billing/plans', [BillingController::class, 'storePlan'])->name('landlord.billing.plans.store');
+        Route::post('/landlord/billing/plans/{plan}', [BillingController::class, 'updatePlan'])->name('landlord.billing.plans.update');
+        Route::post('/landlord/billing/plans/{plan}/toggle-status', [BillingController::class, 'togglePlanStatus'])->name('landlord.billing.plans.toggle-status');
 
         Route::get('/landlord/billing/subscriptions', [BillingController::class, 'showSubscriptions'])->name('landlord.billing.subscriptions');
         Route::post('/landlord/billing/subscriptions', [BillingController::class, 'storeSubscription'])->name('landlord.billing.subscriptions.store');
