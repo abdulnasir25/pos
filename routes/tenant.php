@@ -3,6 +3,8 @@
 use App\Modules\Access\Http\Controllers\AccessController;
 use App\Modules\Access\Http\Controllers\DashboardController;
 use App\Modules\Access\Http\Controllers\LoginController;
+use App\Modules\Access\Http\Controllers\RolesController;
+use App\Modules\Access\Http\Controllers\UsersController;
 use App\Modules\Accounting\Http\Controllers\AccountingController;
 use App\Modules\AuditLog\Http\Controllers\AuditLogController;
 use App\Modules\CashRegister\Http\Controllers\CashRegisterController;
@@ -38,6 +40,19 @@ Route::post('/logout', [LoginController::class, 'destroy'])->middleware('auth');
 
 Route::get('/dashboard', [DashboardController::class, 'show'])->middleware('auth')->name('dashboard');
 Route::get('/access', [AccessController::class, 'show'])->middleware('auth')->name('access');
+
+Route::middleware(['auth', 'permission:roles.manage'])->group(function () {
+    Route::get('/access/users', [UsersController::class, 'show'])->name('access.users');
+    Route::post('/access/users', [UsersController::class, 'store'])->name('access.users.store');
+    Route::post('/access/users/{user}', [UsersController::class, 'update'])->name('access.users.update');
+    Route::post('/access/users/{user}/toggle-status', [UsersController::class, 'toggleStatus'])->name('access.users.toggle-status');
+    Route::post('/access/users/{user}/roles', [UsersController::class, 'assignRole'])->name('access.users.roles.store');
+    Route::post('/access/users/{user}/roles/{role}/remove', [UsersController::class, 'removeRole'])->name('access.users.roles.remove');
+
+    Route::get('/access/roles', [RolesController::class, 'show'])->name('access.roles');
+    Route::post('/access/roles', [RolesController::class, 'store'])->name('access.roles.store');
+    Route::post('/access/roles/{role}/permissions/{permission}/toggle', [RolesController::class, 'togglePermission'])->name('access.roles.permissions.toggle');
+});
 
 Route::get('/pos', [PosController::class, 'show'])->middleware(['auth', 'permission:sales.create'])->name('pos');
 Route::post('/pos/sale', [PosController::class, 'store'])->middleware(['auth', 'permission:sales.create'])->name('pos.sale');

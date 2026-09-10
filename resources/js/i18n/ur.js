@@ -19,6 +19,8 @@ export default {
     'nav.reports': 'رپورٹس',
     'nav.audit_log': 'سرگرمیوں کا ریکارڈ',
     'nav.my_access': 'میری اجازتیں',
+    'nav.users': 'یوزر اکاؤنٹس',
+    'nav.roles': 'رولز',
     'nav.sign_out': 'باہر نکلیں',
     'nav.brand': 'لیجر اینڈ لوم',
 
@@ -358,6 +360,30 @@ export default {
     'access.permissions': 'اجازتیں',
     'access.no_roles': 'کوئی کردار تفویض نہیں',
     'access.no_permissions': 'کوئی اجازت نہیں دی گئی',
+
+    // User Accounts
+    'users.title': 'یوزر اکاؤنٹس',
+    'users.list_title': 'یوزر اکاؤنٹس',
+    'users.add_title': 'نیا یوزر اکاؤنٹ شامل کریں',
+    'users.name_placeholder': 'نام',
+    'users.email_placeholder': 'ای میل',
+    'users.password_placeholder': 'پاس ورڈ',
+    'users.role_placeholder': 'کردار (اختیاری)',
+    'users.no_role_option': 'ابھی کوئی کردار نہیں',
+    'users.roles_label': 'کردار',
+    'users.no_roles': 'کوئی کردار نہیں',
+    'users.add_role': 'کردار شامل کریں',
+    'users.none_yet': 'ابھی کوئی یوزر اکاؤنٹ نہیں۔',
+
+    // Roles
+    'roles.title': 'رولز',
+    'roles.list_title': 'رولز',
+    'roles.add_title': 'نیا کردار شامل کریں',
+    'roles.name_placeholder': 'کردار کا نام',
+    'roles.permissions': 'اجازتیں',
+    'roles.protected': 'محفوظ',
+    'roles.protected_note': 'سپر ایڈمن کے پاس ہمیشہ ہر اجازت ہوتی ہے، اسے تبدیل نہیں کیا جا سکتا۔',
+    'roles.none_yet': 'ابھی کوئی کردار نہیں۔',
 
     // Purchases / Buying
     'purchases.title': 'خریداری',
