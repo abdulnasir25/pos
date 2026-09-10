@@ -24,6 +24,10 @@ export default {
     'nav.users': 'یوزر اکاؤنٹس',
     'nav.roles': 'رولز',
     'nav.settings': 'ترتیبات',
+    'nav.group_inventory': 'مال و اسٹاک',
+    'nav.group_people': 'لوگ',
+    'nav.group_finance': 'پیسے کا حساب',
+    'nav.group_admin': 'انتظام',
     'nav.sign_out': 'باہر نکلیں',
     'nav.brand': 'لیجر اینڈ لوم',
 

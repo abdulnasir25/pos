@@ -1,9 +1,10 @@
 <script setup>
-import { computed, ref, watch } from 'vue';
+import { computed, reactive, ref, watch } from 'vue';
 import { Link, router, usePage } from '@inertiajs/vue3';
 import { useI18n } from '../i18n';
 import MenuIcon from '../Components/icons/MenuIcon.vue';
 import CloseIcon from '../Components/icons/CloseIcon.vue';
+import ChevronDownIcon from '../Components/icons/ChevronDownIcon.vue';
 
 defineProps({
     title: { type: String, default: '' },
@@ -16,39 +17,97 @@ const sidebarOpen = ref(false);
 
 watch(() => page.url, () => { sidebarOpen.value = false; });
 
-// permission: null means always visible to any authenticated user.
-const navItems = computed(() => [
-    { label: t('nav.home'), href: '/dashboard', permission: null },
-    { label: t('nav.new_sale'), href: '/pos', permission: 'sales.create' },
-    { label: t('nav.sales'), href: '/sales', permission: 'sales.view' },
-    { label: t('nav.products'), href: '/products', permission: 'products.manage' },
-    { label: t('nav.warehouses'), href: '/warehouses', permission: 'warehouses.manage' },
-    { label: t('nav.inventory'), href: '/inventory', permission: 'inventory.view' },
-    { label: t('nav.customers'), href: '/customers', permission: 'customers.manage' },
-    { label: t('nav.purchases'), href: '/purchases', permission: 'purchases.manage' },
-    { label: t('nav.partners'), href: '/partners', permission: 'partners.manage' },
-    { label: t('nav.expenses'), href: '/expenses', permission: 'expenses.manage' },
-    { label: t('nav.employees'), href: '/employees', permission: 'employees.view' },
-    { label: t('nav.commission'), href: '/commission', permission: 'commission.manage' },
-    { label: t('nav.cash_register'), href: '/cash-register', permission: 'cash_register.manage' },
-    { label: t('nav.financial_periods'), href: '/financial-periods', permission: 'financial_periods.manage' },
-    { label: t('nav.accounting'), href: '/accounting', permission: 'accounting.view' },
-    { label: t('nav.reports'), href: '/reports', permission: 'reports.view' },
-    { label: t('nav.audit_log'), href: '/audit-log', permission: 'audit_logs.view' },
-    { label: t('nav.users'), href: '/access/users', permission: 'roles.manage' },
-    { label: t('nav.roles'), href: '/access/roles', permission: 'roles.manage' },
-    { label: t('nav.settings'), href: '/settings', permission: 'settings.manage' },
-    { label: t('nav.my_access'), href: '/access', permission: null },
-]);
-
-const visibleNavItems = computed(() => {
-    const permissions = page.props.auth.user?.permissions ?? [];
-
-    return navItems.value.filter((item) => item.permission === null || permissions.includes(item.permission));
-});
-
 function isActive(href) {
     return page.url === href || page.url.startsWith(`${href}/`);
+}
+
+// permission: null means always visible to any authenticated user.
+// A handful of frequent, single-purpose links stay flat; everything
+// else that's more configuration than daily work is grouped under a
+// collapsible section, the same disclosure pattern already used on
+// the Commission/Roles pages — this is what keeps the sidebar from
+// growing one row per module forever.
+const navStructure = computed(() => [
+    { type: 'link', label: t('nav.home'), href: '/dashboard', permission: null },
+    { type: 'link', label: t('nav.new_sale'), href: '/pos', permission: 'sales.create' },
+    { type: 'link', label: t('nav.sales'), href: '/sales', permission: 'sales.view' },
+    { type: 'link', label: t('nav.customers'), href: '/customers', permission: 'customers.manage' },
+    { type: 'link', label: t('nav.purchases'), href: '/purchases', permission: 'purchases.manage' },
+    {
+        type: 'group',
+        key: 'inventory',
+        label: t('nav.group_inventory'),
+        items: [
+            { label: t('nav.products'), href: '/products', permission: 'products.manage' },
+            { label: t('nav.warehouses'), href: '/warehouses', permission: 'warehouses.manage' },
+            { label: t('nav.inventory'), href: '/inventory', permission: 'inventory.view' },
+        ],
+    },
+    {
+        type: 'group',
+        key: 'people',
+        label: t('nav.group_people'),
+        items: [
+            { label: t('nav.partners'), href: '/partners', permission: 'partners.manage' },
+            { label: t('nav.employees'), href: '/employees', permission: 'employees.view' },
+            { label: t('nav.commission'), href: '/commission', permission: 'commission.manage' },
+        ],
+    },
+    {
+        type: 'group',
+        key: 'finance',
+        label: t('nav.group_finance'),
+        items: [
+            { label: t('nav.expenses'), href: '/expenses', permission: 'expenses.manage' },
+            { label: t('nav.cash_register'), href: '/cash-register', permission: 'cash_register.manage' },
+            { label: t('nav.financial_periods'), href: '/financial-periods', permission: 'financial_periods.manage' },
+            { label: t('nav.accounting'), href: '/accounting', permission: 'accounting.view' },
+            { label: t('nav.reports'), href: '/reports', permission: 'reports.view' },
+        ],
+    },
+    {
+        type: 'group',
+        key: 'admin',
+        label: t('nav.group_admin'),
+        items: [
+            { label: t('nav.audit_log'), href: '/audit-log', permission: 'audit_logs.view' },
+            { label: t('nav.users'), href: '/access/users', permission: 'roles.manage' },
+            { label: t('nav.roles'), href: '/access/roles', permission: 'roles.manage' },
+            { label: t('nav.settings'), href: '/settings', permission: 'settings.manage' },
+            { label: t('nav.my_access'), href: '/access', permission: null },
+        ],
+    },
+]);
+
+function itemVisible(item, permissions) {
+    return item.permission === null || permissions.includes(item.permission);
+}
+
+const visibleNavStructure = computed(() => {
+    const permissions = page.props.auth.user?.permissions ?? [];
+
+    return navStructure.value
+        .map((entry) => entry.type === 'link'
+            ? entry
+            : { ...entry, items: entry.items.filter((item) => itemVisible(item, permissions)) })
+        .filter((entry) => entry.type === 'link' ? itemVisible(entry, permissions) : entry.items.length > 0);
+});
+
+// A group starts open if the page you're currently on lives inside
+// it, so landing on e.g. /reports doesn't hide the very link you just
+// followed behind a collapsed section.
+const openGroups = reactive({});
+
+watch(visibleNavStructure, (structure) => {
+    for (const entry of structure) {
+        if (entry.type === 'group' && !(entry.key in openGroups)) {
+            openGroups[entry.key] = entry.items.some((item) => isActive(item.href));
+        }
+    }
+}, { immediate: true });
+
+function toggleGroup(key) {
+    openGroups[key] = !openGroups[key];
 }
 
 function logout() {
@@ -81,15 +140,38 @@ function logout() {
                 </button>
             </div>
             <nav class="flex flex-1 flex-col gap-1 overflow-y-auto p-3">
-                <Link
-                    v-for="item in visibleNavItems"
-                    :key="item.href"
-                    :href="item.href"
-                    class="rounded-lg px-3.5 py-2.5 text-[0.95rem] font-medium"
-                    :class="isActive(item.href) ? 'bg-white text-indigo-700 shadow-sm' : 'bg-white/5 text-indigo-100/90 hover:bg-white/15 hover:text-white'"
-                >
-                    {{ item.label }}
-                </Link>
+                <template v-for="entry in visibleNavStructure" :key="entry.key ?? entry.href">
+                    <Link
+                        v-if="entry.type === 'link'"
+                        :href="entry.href"
+                        class="rounded-lg px-3.5 py-2.5 text-[0.95rem] font-medium"
+                        :class="isActive(entry.href) ? 'bg-white text-indigo-700 shadow-sm' : 'bg-white/5 text-indigo-100/90 hover:bg-white/15 hover:text-white'"
+                    >
+                        {{ entry.label }}
+                    </Link>
+
+                    <div v-else>
+                        <button
+                            type="button"
+                            @click="toggleGroup(entry.key)"
+                            class="flex w-full items-center justify-between rounded-lg px-3.5 py-2.5 text-[0.95rem] font-medium text-indigo-100/90 hover:bg-white/15 hover:text-white"
+                        >
+                            {{ entry.label }}
+                            <ChevronDownIcon class="size-4 flex-shrink-0 transition-transform" :class="{ 'rotate-180': openGroups[entry.key] }" />
+                        </button>
+                        <div v-if="openGroups[entry.key]" class="mt-1 flex flex-col gap-1 pl-3">
+                            <Link
+                                v-for="item in entry.items"
+                                :key="item.href"
+                                :href="item.href"
+                                class="rounded-lg px-3.5 py-2 text-sm font-medium"
+                                :class="isActive(item.href) ? 'bg-white text-indigo-700 shadow-sm' : 'bg-white/5 text-indigo-100/80 hover:bg-white/15 hover:text-white'"
+                            >
+                                {{ item.label }}
+                            </Link>
+                        </div>
+                    </div>
+                </template>
             </nav>
         </aside>
 
