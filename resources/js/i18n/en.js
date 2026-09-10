@@ -19,6 +19,8 @@ export default {
     'nav.reports': 'Reports',
     'nav.audit_log': 'Activity History',
     'nav.my_access': 'My Access',
+    'nav.users': 'User Accounts',
+    'nav.roles': 'Roles',
     'nav.sign_out': 'Sign out',
     'nav.brand': 'Ledger & Loom',
 
@@ -358,6 +360,30 @@ export default {
     'access.permissions': 'Permissions',
     'access.no_roles': 'No roles assigned',
     'access.no_permissions': 'No permissions granted',
+
+    // User Accounts
+    'users.title': 'User Accounts',
+    'users.list_title': 'User Accounts',
+    'users.add_title': 'Add a User Account',
+    'users.name_placeholder': 'Name',
+    'users.email_placeholder': 'Email',
+    'users.password_placeholder': 'Password',
+    'users.role_placeholder': 'Role (optional)',
+    'users.no_role_option': 'No role yet',
+    'users.roles_label': 'Roles',
+    'users.no_roles': 'No role',
+    'users.add_role': 'Add role',
+    'users.none_yet': 'No user accounts yet.',
+
+    // Roles
+    'roles.title': 'Roles',
+    'roles.list_title': 'Roles',
+    'roles.add_title': 'Add a Role',
+    'roles.name_placeholder': 'Role name',
+    'roles.permissions': 'Permissions',
+    'roles.protected': 'Protected',
+    'roles.protected_note': 'Super Admin always has every permission and cannot be changed.',
+    'roles.none_yet': 'No roles yet.',
 
     // Purchases / Buying
     'purchases.title': 'Buying',

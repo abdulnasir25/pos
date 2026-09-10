@@ -33,6 +33,8 @@ const navItems = computed(() => [
     { label: t('nav.accounting'), href: '/accounting', permission: 'accounting.view' },
     { label: t('nav.reports'), href: '/reports', permission: 'reports.view' },
     { label: t('nav.audit_log'), href: '/audit-log', permission: 'audit_logs.view' },
+    { label: t('nav.users'), href: '/access/users', permission: 'roles.manage' },
+    { label: t('nav.roles'), href: '/access/roles', permission: 'roles.manage' },
     { label: t('nav.my_access'), href: '/access', permission: null },
 ]);
 

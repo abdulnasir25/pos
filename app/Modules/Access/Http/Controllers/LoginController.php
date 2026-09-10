@@ -23,7 +23,12 @@ class LoginController extends \App\Http\Controllers\Controller
             'password' => ['required', 'string'],
         ]);
 
-        if (! Auth::attempt($credentials, $request->boolean('remember'))) {
+        // 'status' rides along as an extra query constraint on the
+        // credentials array — a deactivated login fails the same
+        // generic "credentials don't match" check a wrong password
+        // would, rather than confirming to a guest that the email
+        // exists but is disabled.
+        if (! Auth::attempt([...$credentials, 'status' => 'active'], $request->boolean('remember'))) {
             throw ValidationException::withMessages([
                 'email' => 'These credentials do not match our records.',
             ]);
