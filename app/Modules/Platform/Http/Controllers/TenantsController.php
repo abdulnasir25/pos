@@ -56,6 +56,24 @@ class TenantsController extends \App\Http\Controllers\Controller
         return back()->with('success', "Shop provisioned and active. Owner login — email: {$provisioned->ownerEmail}, password: {$provisioned->ownerPassword} (shown once, share it now).");
     }
 
+    /**
+     * Only the display name is editable — the subdomain (slug) and its
+     * backing database name are locked in at provisioning time. The
+     * tenant's own login/DNS-equivalent already points at that slug,
+     * so changing it here would silently break the shop's existing
+     * URL rather than actually moving anything.
+     */
+    public function update(Request $request, Tenant $tenant): RedirectResponse
+    {
+        $validated = $request->validate([
+            'name' => ['required', 'string', 'max:150'],
+        ]);
+
+        $tenant->update($validated);
+
+        return back()->with('success', 'Shop updated.');
+    }
+
     public function toggleStatus(Tenant $tenant): RedirectResponse
     {
         $tenant->isSuspended()
