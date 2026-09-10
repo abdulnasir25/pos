@@ -41,6 +41,7 @@ Route::middleware(HandleLandlordInertiaRequests::class)->group(function () {
     Route::middleware('auth:landlord')->group(function () {
         Route::get('/landlord/tenants', [TenantsController::class, 'show'])->name('landlord.tenants');
         Route::post('/landlord/tenants', [TenantsController::class, 'store'])->name('landlord.tenants.store');
+        Route::post('/landlord/tenants/{tenant}', [TenantsController::class, 'update'])->name('landlord.tenants.update');
         Route::post('/landlord/tenants/{tenant}/toggle-status', [TenantsController::class, 'toggleStatus'])->name('landlord.tenants.toggle-status');
 
         Route::get('/landlord/billing/plans', [BillingController::class, 'showPlans'])->name('landlord.billing.plans');

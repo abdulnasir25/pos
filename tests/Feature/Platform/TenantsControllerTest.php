@@ -128,6 +128,31 @@ class TenantsControllerTest extends TestCase
         $response->assertSessionHasErrors('tenant');
     }
 
+    public function test_a_shops_name_can_be_updated_through_the_form(): void
+    {
+        $this->actingAs($this->admin(), 'landlord');
+        $tenant = $this->tenant();
+
+        $response = $this->post("/landlord/tenants/{$tenant->id}", ['name' => 'Al-Fateh Cloth House Ltd']);
+
+        $response->assertRedirect();
+        $response->assertSessionHasNoErrors();
+        $fresh = $tenant->fresh();
+        $this->assertSame('Al-Fateh Cloth House Ltd', $fresh->name);
+        // Untouched — the subdomain isn't editable through this form.
+        $this->assertSame('alfateh', $fresh->slug);
+    }
+
+    public function test_a_guest_cannot_update_a_shop(): void
+    {
+        $tenant = $this->tenant();
+
+        $response = $this->post("/landlord/tenants/{$tenant->id}", ['name' => 'Someone Else']);
+
+        $response->assertRedirect('/landlord/login');
+        $this->assertSame('Al-Fateh Cloth House', $tenant->fresh()->name);
+    }
+
     public function test_a_shops_status_can_be_toggled_through_the_form(): void
     {
         $this->actingAs($this->admin(), 'landlord');

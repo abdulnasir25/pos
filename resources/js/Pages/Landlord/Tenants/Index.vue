@@ -3,6 +3,7 @@ import { ref } from 'vue';
 import { useForm, router } from '@inertiajs/vue3';
 import LandlordLayout from '../../../Layouts/LandlordLayout.vue';
 import PlusIcon from '../../../Components/icons/PlusIcon.vue';
+import PencilIcon from '../../../Components/icons/PencilIcon.vue';
 import TrashIcon from '../../../Components/icons/TrashIcon.vue';
 import CheckIcon from '../../../Components/icons/CheckIcon.vue';
 
@@ -27,6 +28,24 @@ function submitTenant() {
 
 function toggleTenantStatus(tenantId) {
     router.post(`/landlord/tenants/${tenantId}/toggle-status`, {}, { preserveScroll: true });
+}
+
+// --- Edit --------------------------------------------------------------
+
+const editForms = ref({});
+
+function editForm(tenant) {
+    if (!editForms.value[tenant.id]) {
+        editForms.value[tenant.id] = useForm({ name: tenant.name });
+    }
+    return editForms.value[tenant.id];
+}
+
+function submitEdit(tenant) {
+    editForm(tenant).post(`/landlord/tenants/${tenant.id}`, {
+        preserveScroll: true,
+        onSuccess: () => toggle(null),
+    });
 }
 </script>
 
@@ -69,28 +88,47 @@ function toggleTenantStatus(tenantId) {
                         </tr>
                     </thead>
                     <tbody>
-                        <tr v-for="t in tenants" :key="t.id" class="border-b border-stone-100">
-                            <td class="py-2 text-stone-900">{{ t.name }}</td>
-                            <td class="text-stone-500">{{ t.url }}</td>
-                            <td>
-                                <span
-                                    class="rounded-full px-2 py-0.5 text-xs"
-                                    :class="t.status === 'active' ? 'bg-emerald-100 text-emerald-800' : 'bg-red-100 text-red-800'"
-                                >{{ t.status }}</span>
-                            </td>
-                            <td class="text-right">
-                                <button
-                                    type="button"
-                                    @click="toggleTenantStatus(t.id)"
-                                    :aria-label="t.status === 'active' ? 'Suspend' : 'Reactivate'"
-                                    class="inline-flex size-6 items-center justify-center rounded-full text-stone-500 hover:bg-stone-100"
-                                    :class="t.status === 'active' ? 'hover:text-red-700' : 'hover:text-emerald-700'"
-                                >
-                                    <TrashIcon v-if="t.status === 'active'" class="size-3.5" />
-                                    <CheckIcon v-else class="size-3.5" />
-                                </button>
-                            </td>
-                        </tr>
+                        <template v-for="t in tenants" :key="t.id">
+                            <tr class="border-b border-stone-100">
+                                <td class="py-2 text-stone-900">{{ t.name }}</td>
+                                <td class="text-stone-500">{{ t.url }}</td>
+                                <td>
+                                    <span
+                                        class="rounded-full px-2 py-0.5 text-xs"
+                                        :class="t.status === 'active' ? 'bg-emerald-100 text-emerald-800' : 'bg-red-100 text-red-800'"
+                                    >{{ t.status }}</span>
+                                </td>
+                                <td class="text-right whitespace-nowrap">
+                                    <button
+                                        type="button"
+                                        @click="toggle(`edit-${t.id}`)"
+                                        aria-label="Edit"
+                                        class="mr-1 inline-flex size-7 items-center justify-center rounded-full text-indigo-600 hover:bg-indigo-50"
+                                    >
+                                        <PencilIcon class="size-3.5" />
+                                    </button>
+                                    <button
+                                        type="button"
+                                        @click="toggleTenantStatus(t.id)"
+                                        :aria-label="t.status === 'active' ? 'Suspend' : 'Reactivate'"
+                                        class="inline-flex size-7 items-center justify-center rounded-full"
+                                        :class="t.status === 'active' ? 'text-red-600 hover:bg-red-50' : 'text-emerald-600 hover:bg-emerald-50'"
+                                    >
+                                        <TrashIcon v-if="t.status === 'active'" class="size-3.5" />
+                                        <CheckIcon v-else class="size-3.5" />
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr v-if="activePanel === `edit-${t.id}`" class="border-b border-stone-100 bg-stone-50">
+                                <td colspan="4" class="p-2">
+                                    <div class="flex items-center gap-2">
+                                        <input v-model="editForm(t).name" type="text" placeholder="Shop name" class="rounded border-stone-300 text-sm">
+                                        <span class="text-xs text-stone-400">The subdomain ({{ t.url }}) can't change once a shop exists.</span>
+                                        <button type="button" @click="submitEdit(t)" :disabled="editForm(t).processing" class="ml-auto rounded-md bg-indigo-600 px-3 py-1.5 text-xs text-white hover:bg-indigo-700">Save</button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </template>
                     </tbody>
                 </table>
                 </div>
