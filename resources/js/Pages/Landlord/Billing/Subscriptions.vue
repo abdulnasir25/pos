@@ -2,6 +2,7 @@
 import { ref, watch } from 'vue';
 import { useForm, router } from '@inertiajs/vue3';
 import LandlordLayout from '../../../Layouts/LandlordLayout.vue';
+import TrashIcon from '../../../Components/icons/TrashIcon.vue';
 
 const props = defineProps({
     tenants: { type: Array, default: () => [] },
@@ -38,6 +39,10 @@ watch(() => props.plans, (list) => {
 function generateInvoice(subscriptionId) {
     router.post(`/landlord/billing/subscriptions/${subscriptionId}/invoices`, {}, { preserveScroll: true });
 }
+
+function cancelSubscription(subscriptionId) {
+    router.post(`/landlord/billing/subscriptions/${subscriptionId}/cancel`, {}, { preserveScroll: true });
+}
 </script>
 
 <template>
@@ -57,7 +62,8 @@ function generateInvoice(subscriptionId) {
                         <option v-for="p in plans" :key="p.id" :value="p.id">{{ p.name }}</option>
                     </select>
                     <input v-model="subscriptionForm.start_date" type="date" class="rounded border-stone-300 text-sm">
-                    <button type="submit" :disabled="subscriptionForm.processing" class="rounded-md bg-indigo-600 px-3 py-1.5 text-sm text-white hover:bg-indigo-700">Start</button>
+                    <button type="submit" :disabled="subscriptionForm.processing || plans.length === 0" class="rounded-md bg-indigo-600 px-3 py-1.5 text-sm text-white hover:bg-indigo-700 disabled:opacity-50">Start</button>
+                    <p v-if="plans.length === 0" class="text-xs text-amber-700 sm:col-span-4">No active plans to subscribe to — reactivate one on the Plans page first.</p>
                 </form>
 
                 <div class="overflow-x-auto">
@@ -71,10 +77,25 @@ function generateInvoice(subscriptionId) {
                         <tr v-for="s in subscriptions" :key="s.id" class="border-b border-stone-100">
                             <td class="py-2 text-stone-900">{{ s.tenant }}</td>
                             <td class="text-stone-500">{{ s.plan }}</td>
-                            <td class="text-stone-500">{{ s.status }}</td>
+                            <td>
+                                <span
+                                    class="rounded-full px-2 py-0.5 text-xs"
+                                    :class="s.status === 'active' ? 'bg-emerald-100 text-emerald-800' : 'bg-stone-200 text-stone-600'"
+                                >{{ s.status }}</span>
+                            </td>
                             <td class="text-stone-500">{{ s.current_period_start }} — {{ s.current_period_end }}</td>
-                            <td class="text-right">
-                                <button type="button" @click="generateInvoice(s.id)" class="text-xs text-indigo-700 underline hover:text-indigo-800">Generate invoice</button>
+                            <td class="text-right whitespace-nowrap">
+                                <template v-if="s.status === 'active'">
+                                    <button type="button" @click="generateInvoice(s.id)" class="mr-2 text-xs text-indigo-700 underline hover:text-indigo-800">Generate invoice</button>
+                                    <button
+                                        type="button"
+                                        @click="cancelSubscription(s.id)"
+                                        aria-label="Cancel subscription"
+                                        class="inline-flex size-6 items-center justify-center rounded-full text-red-600 hover:bg-red-50"
+                                    >
+                                        <TrashIcon class="size-3.5" />
+                                    </button>
+                                </template>
                             </td>
                         </tr>
                     </tbody>

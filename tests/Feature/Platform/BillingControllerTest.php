@@ -157,6 +157,39 @@ class BillingControllerTest extends TestCase
         $response->assertSessionHasNoErrors();
     }
 
+    public function test_a_subscription_can_be_cancelled_through_the_form(): void
+    {
+        $this->actingAs($this->admin(), 'landlord');
+        $tenant = $this->tenant();
+        $plan = app(CreatePlan::class)->handle('Starter', 'starter', '2000.00', 'monthly');
+        $subscription = app(CreateSubscription::class)->handle($tenant, $plan, '2026-01-01');
+
+        $response = $this->post("/landlord/billing/subscriptions/{$subscription->id}/cancel");
+
+        $response->assertRedirect();
+        $fresh = $subscription->fresh();
+        $this->assertSame('cancelled', $fresh->status->value);
+        $this->assertNotNull($fresh->cancelled_at);
+    }
+
+    public function test_cancelling_a_subscription_frees_the_tenant_to_start_a_new_one(): void
+    {
+        $this->actingAs($this->admin(), 'landlord');
+        $tenant = $this->tenant();
+        $plan = app(CreatePlan::class)->handle('Starter', 'starter', '2000.00', 'monthly');
+        $subscription = app(CreateSubscription::class)->handle($tenant, $plan, '2026-01-01');
+        $this->post("/landlord/billing/subscriptions/{$subscription->id}/cancel");
+
+        $response = $this->post('/landlord/billing/subscriptions', [
+            'tenant_id' => $tenant->id,
+            'plan_id' => $plan->id,
+            'start_date' => '2026-02-01',
+        ]);
+
+        $response->assertRedirect();
+        $response->assertSessionHasNoErrors();
+    }
+
     public function test_an_invoice_can_be_generated_and_paid_through_the_form(): void
     {
         $this->actingAs($this->admin(), 'landlord');

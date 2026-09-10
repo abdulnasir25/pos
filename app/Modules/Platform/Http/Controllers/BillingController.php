@@ -2,6 +2,7 @@
 
 namespace App\Modules\Platform\Http\Controllers;
 
+use App\Modules\Billing\Actions\CancelSubscription;
 use App\Modules\Billing\Actions\CreatePlan;
 use App\Modules\Billing\Actions\CreateSubscription;
 use App\Modules\Billing\Actions\GenerateInvoiceForSubscription;
@@ -161,6 +162,22 @@ class BillingController extends \App\Http\Controllers\Controller
         }
 
         return back()->with('success', 'Subscription started.');
+    }
+
+    /**
+     * A subscription is never edited — no changing its plan or dates
+     * on an existing row (see CreateSubscription's docblock: that's a
+     * cancel-then-recreate, matching the never-rewrite-history
+     * convention used throughout this codebase). Cancelling is also
+     * one-way here, unlike the active/inactive toggles elsewhere — a
+     * cancelled subscription isn't "reactivated", the tenant is put on
+     * a fresh one via the Start Subscription form.
+     */
+    public function cancelSubscription(Subscription $subscription): RedirectResponse
+    {
+        app(CancelSubscription::class)->handle($subscription);
+
+        return back()->with('success', 'Subscription cancelled.');
     }
 
     public function generateInvoice(Subscription $subscription): RedirectResponse
