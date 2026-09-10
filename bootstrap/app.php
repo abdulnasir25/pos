@@ -48,11 +48,11 @@ return Application::configure(basePath: dirname(__DIR__))
         // /landlord/login), is route('dashboard') — a tenant-scoped
         // route name that doesn't exist reachably on the central
         // domain, so it 404s instead of redirecting anywhere useful.
-        // An already-signed-in landlord admin goes to the Tenants
-        // screen (the landlord panel's home page), not the tenant
-        // dashboard.
+        // An already-signed-in landlord admin goes to the landlord's
+        // own Dashboard (the landlord panel's home page), not the
+        // tenant dashboard.
         $middleware->redirectUsersTo(
-            fn (Request $request) => $request->is('landlord/*') ? '/landlord/tenants' : '/dashboard',
+            fn (Request $request) => $request->is('landlord/*') ? '/landlord/dashboard' : '/dashboard',
         );
 
         // Laravel reorders route middleware by its internal priority list,

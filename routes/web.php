@@ -1,6 +1,7 @@
 <?php
 
 use App\Modules\Platform\Http\Controllers\BillingController;
+use App\Modules\Platform\Http\Controllers\DashboardController;
 use App\Modules\Platform\Http\Controllers\LandlordLoginController;
 use App\Modules\Platform\Http\Controllers\TenantsController;
 use App\Modules\Platform\Http\Middleware\HandleLandlordInertiaRequests;
@@ -39,6 +40,8 @@ Route::middleware(HandleLandlordInertiaRequests::class)->group(function () {
         ->name('landlord.billing.invoices.shared');
 
     Route::middleware('auth:landlord')->group(function () {
+        Route::get('/landlord/dashboard', [DashboardController::class, 'show'])->name('landlord.dashboard');
+
         Route::get('/landlord/tenants', [TenantsController::class, 'show'])->name('landlord.tenants');
         Route::post('/landlord/tenants', [TenantsController::class, 'store'])->name('landlord.tenants.store');
         Route::post('/landlord/tenants/{tenant}', [TenantsController::class, 'update'])->name('landlord.tenants.update');

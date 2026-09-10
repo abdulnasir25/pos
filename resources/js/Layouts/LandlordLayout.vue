@@ -14,6 +14,7 @@ const sidebarOpen = ref(false);
 watch(() => page.url, () => { sidebarOpen.value = false; });
 
 const navItems = [
+    { label: 'Dashboard', href: '/landlord/dashboard' },
     { label: 'Tenants', href: '/landlord/tenants' },
     { label: 'Plans', href: '/landlord/billing/plans' },
     { label: 'Subscriptions', href: '/landlord/billing/subscriptions' },

@@ -57,20 +57,14 @@ class TenantsControllerTest extends TestCase
         $this->admin();
 
         $login = $this->post('/landlord/login', ['email' => 'owner@platform.test', 'password' => 'secret']);
-        $login->assertRedirect('/landlord/tenants');
+        // The post-login landing page is the Dashboard now — see
+        // DashboardControllerTest for that redirect assertion. This
+        // test only cares that the Tenants page itself still works.
+        $login->assertRedirect('/landlord/dashboard');
 
         $response = $this->get('/landlord/tenants');
         $response->assertOk();
         $response->assertInertia(fn ($page) => $page->component('Landlord/Tenants/Index'));
-    }
-
-    public function test_an_already_authenticated_admin_visiting_login_is_sent_to_tenants_not_dashboard(): void
-    {
-        $this->actingAs($this->admin(), 'landlord');
-
-        $response = $this->get('/landlord/login');
-
-        $response->assertRedirect('/landlord/tenants');
     }
 
     public function test_wrong_credentials_are_rejected(): void
