@@ -220,4 +220,76 @@ class BillingControllerTest extends TestCase
 
         $response->assertSessionHasErrors('invoice');
     }
+
+    public function test_a_landlord_admin_can_view_one_invoice_with_a_share_link(): void
+    {
+        $this->actingAs($this->admin(), 'landlord');
+        $tenant = $this->tenant();
+        $plan = app(CreatePlan::class)->handle('Starter', 'starter', '2000.00', 'monthly');
+        $subscription = app(CreateSubscription::class)->handle($tenant, $plan, '2026-01-01');
+        $invoice = app(GenerateInvoiceForSubscription::class)->handle($subscription);
+
+        $response = $this->get("/landlord/billing/invoices/{$invoice->id}");
+
+        $response->assertOk();
+        $response->assertInertia(fn ($page) => $page
+            ->component('Landlord/Billing/InvoiceShow')
+            ->where('invoice.reference', 'INV-'.str_pad((string) $invoice->id, 6, '0', STR_PAD_LEFT))
+            ->where('invoice.tenant', 'Al-Fateh Cloth House')
+            ->where('invoice.plan', 'Starter')
+            ->where('viewerIsLandlord', true)
+            ->has('shareUrl')
+        );
+    }
+
+    public function test_a_guest_cannot_view_an_invoice_without_going_through_the_share_link(): void
+    {
+        $tenant = $this->tenant();
+        $plan = app(CreatePlan::class)->handle('Starter', 'starter', '2000.00', 'monthly');
+        $subscription = app(CreateSubscription::class)->handle($tenant, $plan, '2026-01-01');
+        $invoice = app(GenerateInvoiceForSubscription::class)->handle($subscription);
+
+        $this->get("/landlord/billing/invoices/{$invoice->id}")->assertRedirect('/landlord/login');
+        $this->get("/landlord/billing/invoices/{$invoice->id}/shared")->assertForbidden();
+    }
+
+    public function test_a_valid_share_link_shows_the_invoice_to_a_guest(): void
+    {
+        $tenant = $this->tenant();
+        $plan = app(CreatePlan::class)->handle('Starter', 'starter', '2000.00', 'monthly');
+        $subscription = app(CreateSubscription::class)->handle($tenant, $plan, '2026-01-01');
+        $invoice = app(GenerateInvoiceForSubscription::class)->handle($subscription);
+        $shareUrl = \Illuminate\Support\Facades\URL::temporarySignedRoute(
+            'landlord.billing.invoices.shared',
+            now()->addDays(30),
+            ['invoice' => $invoice->id],
+        );
+
+        $response = $this->get($shareUrl);
+
+        $response->assertOk();
+        $response->assertInertia(fn ($page) => $page
+            ->component('Landlord/Billing/InvoiceShow')
+            ->where('invoice.tenant', 'Al-Fateh Cloth House')
+            ->where('viewerIsLandlord', false)
+            ->where('shareUrl', null)
+        );
+    }
+
+    public function test_a_tampered_share_link_is_rejected(): void
+    {
+        $tenant = $this->tenant();
+        $plan = app(CreatePlan::class)->handle('Starter', 'starter', '2000.00', 'monthly');
+        $subscription = app(CreateSubscription::class)->handle($tenant, $plan, '2026-01-01');
+        $invoice = app(GenerateInvoiceForSubscription::class)->handle($subscription);
+        $shareUrl = \Illuminate\Support\Facades\URL::temporarySignedRoute(
+            'landlord.billing.invoices.shared',
+            now()->addDays(30),
+            ['invoice' => $invoice->id],
+        );
+
+        $response = $this->get($shareUrl.'tampered');
+
+        $response->assertForbidden();
+    }
 }

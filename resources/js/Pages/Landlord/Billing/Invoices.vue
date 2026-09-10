@@ -1,6 +1,6 @@
 <script setup>
 import { ref } from 'vue';
-import { useForm } from '@inertiajs/vue3';
+import { Link, useForm } from '@inertiajs/vue3';
 import LandlordLayout from '../../../Layouts/LandlordLayout.vue';
 
 defineProps({
@@ -32,7 +32,7 @@ function recordPayment(invoiceId) {
                 <h2 class="mb-3 text-base font-medium text-stone-900">Invoices</h2>
                 <div v-for="inv in invoices" :key="inv.id" class="mb-2 flex flex-col gap-2 rounded-md border border-stone-200 p-2 text-sm sm:flex-row sm:items-center sm:justify-between">
                     <div>
-                        <span class="font-medium text-stone-900">{{ inv.tenant }}</span>
+                        <Link :href="`/landlord/billing/invoices/${inv.id}`" class="font-medium text-stone-900 hover:text-indigo-700 hover:underline">{{ inv.tenant }}</Link>
                         <span class="ml-2 text-stone-500">{{ money(inv.amount) }} · due {{ inv.due_date }}</span>
                     </div>
                     <div class="flex items-center gap-2">
@@ -40,6 +40,7 @@ function recordPayment(invoiceId) {
                             class="rounded-full px-2 py-0.5 text-xs"
                             :class="inv.status === 'paid' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'"
                         >{{ inv.status }}</span>
+                        <Link :href="`/landlord/billing/invoices/${inv.id}`" class="text-xs text-indigo-700 underline hover:text-indigo-800">View</Link>
                         <template v-if="inv.status !== 'paid'">
                             <input v-model="paymentForm(inv.id).paid_at" type="date" class="rounded border-stone-300 text-xs">
                             <button type="button" @click="recordPayment(inv.id)" class="text-xs text-indigo-700 underline hover:text-indigo-800">Record payment</button>
