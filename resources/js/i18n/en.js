@@ -24,6 +24,10 @@ export default {
     'nav.users': 'User Accounts',
     'nav.roles': 'Roles',
     'nav.settings': 'Settings',
+    'nav.group_inventory': 'Inventory',
+    'nav.group_people': 'People',
+    'nav.group_finance': 'Finance',
+    'nav.group_admin': 'Admin',
     'nav.sign_out': 'Sign out',
     'nav.brand': 'Ledger & Loom',
 
