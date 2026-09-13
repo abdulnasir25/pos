@@ -43,15 +43,21 @@ class TenantConnectionFactory
     }
 
     /**
-     * The MySQL schema name, or the SQLite file's basename (without
-     * extension) — either way, the value TenantCreateCommand stored in
-     * tenants.database at provisioning time.
+     * The MySQL schema name (prefixed — see mysql_database_prefix), or
+     * the SQLite file's basename (without extension) — either way,
+     * built from tenants.database, the value ProvisionTenant stored
+     * there at provisioning time.
      */
     public function databaseNameFor(Tenant $tenant): string
     {
         return $this->usesMysql()
-            ? $tenant->database
+            ? $this->mysqlDatabaseNameFor($tenant)
             : $this->databasePathFor($tenant);
+    }
+
+    public function mysqlDatabaseNameFor(Tenant $tenant): string
+    {
+        return config('tenancy.mysql_database_prefix', '').$tenant->database;
     }
 
     public function usesMysql(): bool
