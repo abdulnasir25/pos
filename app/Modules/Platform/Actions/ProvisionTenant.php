@@ -62,7 +62,7 @@ class ProvisionTenant
 
         try {
             $this->connections->usesMysql()
-                ? $this->createMysqlDatabase($slug)
+                ? $this->createMysqlDatabase($this->connections->mysqlDatabaseNameFor($tenant))
                 : $this->createSqliteFile($this->connections->databasePathFor($tenant));
 
             $connectionName = $this->connections->useConnectionFor($tenant);
@@ -81,7 +81,7 @@ class ProvisionTenant
             $tenant->update(['status' => 'active']);
         } catch (Throwable $e) {
             $this->connections->usesMysql()
-                ? $this->dropMysqlDatabase($slug)
+                ? $this->dropMysqlDatabase($this->connections->mysqlDatabaseNameFor($tenant))
                 : File::delete($this->connections->databasePathFor($tenant));
 
             $tenant->delete();
