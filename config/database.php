@@ -33,8 +33,25 @@ return [
     'connections' => [
 
         // The single platform database: tenants, plans, subscriptions,
-        // platform-level admins. Never holds business data.
-        'landlord' => [
+        // platform-level admins. Never holds business data. Defaults to
+        // SQLite (a single small registry file); LANDLORD_DB_DRIVER=mysql
+        // switches it to a real server the same way TENANT_DB_DRIVER
+        // does for the tenant fleet below — set once per environment,
+        // independent of that choice.
+        'landlord' => env('LANDLORD_DB_DRIVER', 'sqlite') === 'mysql' ? [
+            'driver' => 'mysql',
+            'host' => env('LANDLORD_DB_HOST', '127.0.0.1'),
+            'port' => env('LANDLORD_DB_PORT', '3306'),
+            'database' => env('LANDLORD_DB_DATABASE', 'landlord'),
+            'username' => env('LANDLORD_DB_USERNAME', 'root'),
+            'password' => env('LANDLORD_DB_PASSWORD', ''),
+            'charset' => 'utf8mb4',
+            'collation' => 'utf8mb4_unicode_ci',
+            'prefix' => '',
+            'prefix_indexes' => true,
+            'strict' => true,
+            'engine' => null,
+        ] : [
             'driver' => 'sqlite',
             'database' => env('LANDLORD_DB_DATABASE', database_path('landlord.sqlite')),
             'prefix' => '',

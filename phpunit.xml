@@ -25,6 +25,12 @@
         <env name="CACHE_STORE" value="array"/>
         <env name="DB_CONNECTION" value="landlord"/>
         <env name="LANDLORD_DB_DATABASE" value=":memory:"/>
+        <!-- Tests provision an isolated SQLite file per test (see the
+             tenantDbPath pattern throughout tests/Feature) regardless of
+             what the app's own .env has TENANT_DB_DRIVER set to for real
+             local development — without this override, tests would
+             collide with each other on the same real MySQL database. -->
+        <env name="TENANT_DB_DRIVER" value="sqlite"/>
         <env name="TENANT_CENTRAL_DOMAINS" value="pos.test"/>
         <env name="DB_URL" value=""/>
         <env name="MAIL_MAILER" value="array"/>
